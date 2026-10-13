@@ -145,12 +145,12 @@ class MainActivity : AppCompatActivity() {
         displayProof = proof
         if (proof) {
             unitProof.setBackgroundResource(R.drawable.pill_active)
-            unitProof.setTextColor(ContextCompat.getColor(this, R.color.ink))
+            unitProof.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
             unitAbv.setBackgroundResource(0)
             unitAbv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
         } else {
             unitAbv.setBackgroundResource(R.drawable.pill_active)
-            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.ink))
+            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
             unitProof.setBackgroundResource(0)
             unitProof.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
         }
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity() {
         listOf(tabCut, tab100l, tabFlavour).forEach { tv ->
             if (tv === selected) {
                 tv.setBackgroundResource(R.drawable.pill_active)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.ink))
+                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
             } else {
                 tv.setBackgroundResource(0)
                 tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
@@ -187,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         listOf(subVolume, subOnHand, subBlend).forEach { tv ->
             if (tv === selected) {
                 tv.setBackgroundResource(R.drawable.pill_active)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.ink))
+                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
             } else {
                 tv.setBackgroundResource(0)
                 tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))

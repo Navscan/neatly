@@ -15,7 +15,6 @@
         android:paddingTop="28dp"
         android:paddingBottom="40dp">
 
-        <!-- ============ HEADER ============ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,7 +46,7 @@
                     android:gravity="center"
                     android:text="@string/unit_abv"
                     android:textSize="12sp"
-                    android:textColor="@color/ink"
+                    android:textColor="@color/on_accent"
                     android:fontFamily="sans-serif-medium"
                     android:letterSpacing="0.04"
                     android:background="@drawable/pill_active" />
@@ -65,7 +64,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ============ TAGLINE ============ -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,7 +73,6 @@
             android:lineSpacingExtra="3dp"
             android:layout_marginBottom="22dp" />
 
-        <!-- ============ MAIN TABS ============ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,7 +89,7 @@
                 android:gravity="center"
                 android:text="@string/tab_cut"
                 android:textSize="13sp"
-                android:textColor="@color/ink"
+                android:textColor="@color/on_accent"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.04"
                 android:background="@drawable/pill_active" />
@@ -122,7 +119,6 @@
                 android:letterSpacing="0.04" />
         </LinearLayout>
 
-        <!-- ============ INPUT CARD ============ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -139,7 +135,6 @@
                 android:orientation="vertical"
                 android:padding="18dp">
 
-                <!-- Sub-tabs -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -156,7 +151,7 @@
                         android:gravity="center"
                         android:text="@string/subtab_volume"
                         android:textSize="12sp"
-                        android:textColor="@color/ink"
+                        android:textColor="@color/on_accent"
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03"
                         android:background="@drawable/pill_active" />
@@ -186,7 +181,6 @@
                         android:letterSpacing="0.03" />
                 </LinearLayout>
 
-                <!-- Input: First volume -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -238,7 +232,6 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
-                <!-- Input: First strength -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -290,7 +283,6 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
-                <!-- Input: Target strength -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -344,7 +336,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ============ RESULTS CARD ============ -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/resultsCard"
             android:layout_width="match_parent"
@@ -483,7 +474,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ============ FOOTER ============ -->
         <TextView
             android:id="@+id/footerText"
             android:layout_width="match_parent"
