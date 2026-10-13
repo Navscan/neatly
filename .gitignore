@@ -1,0 +1,26 @@
+# Android build output
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+.gradle/
+local.properties
+
+# Keystore — never commit
+*.jks
+*.keystore
+keystore.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Logs
+*.log

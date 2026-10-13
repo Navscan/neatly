@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neatly</string>
+    <string name="tagline">Cut spirit to strength, read a 100 L production table, and dose flavour concentrates without losing the alcohol.</string>
+
+    <string name="tab_cut">Cut</string>
+    <string name="tab_100l">100 L</string>
+    <string name="tab_flavour">Flavour</string>
+
+    <string name="subtab_volume">Volume</string>
+    <string name="subtab_onhand">On hand</string>
+    <string name="subtab_blend">Blend</string>
+
+    <string name="label_first_volume">First volume</string>
+    <string name="label_first_strength">First strength</string>
+    <string name="label_target_strength">Target strength</string>
+
+    <string name="hint_volume">50</string>
+    <string name="hint_strength">96.4</string>
+    <string name="hint_target">46</string>
+
+    <string name="unit_liters">L</string>
+    <string name="unit_abv">% ABV</string>
+    <string name="unit_proof">Proof</string>
+
+    <string name="btn_calculate">Calculate</string>
+    <string name="btn_calculating">Calculating...</string>
+
+    <string name="results_title">Results</string>
+    <string name="result_water_to_add">Water to add</string>
+    <string name="result_final_volume">Final volume</string>
+    <string name="result_pure_alcohol">Pure alcohol</string>
+    <string name="result_contraction">Contraction</string>
+
+    <string name="msg_fill_all_fields">Please fill in all fields.</string>
+    <string name="msg_target_too_high">Target strength must be lower than source strength.</string>
+    <string name="msg_coming_soon">This mode is coming in the next build.</string>
+    <string name="msg_calc_error">Calculation failed.</string>
+
+    <string name="update_ready">Update ready</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_failed">Update failed. Try again later.</string>
+</resources>
