@@ -34,5 +34,7 @@
     <string name="msg_coming_soon">Coming in the next build.</string>
     <string name="msg_calc_error">Calculation failed.</string>
 
+    <string name="update_ready">Update ready · Tap to install</string>
+
     <string name="footer_format">Neatly v%1$s ©PayBridge (Pty) Ltd %2$d</string>
 </resources>

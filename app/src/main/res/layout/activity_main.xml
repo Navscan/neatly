@@ -344,6 +344,7 @@
             app:cardElevation="0dp"
             app:strokeColor="@color/border"
             app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp"
             android:visibility="gone">
 
             <LinearLayout
@@ -471,6 +472,33 @@
                     android:textColor="@color/ink_light"
                     android:layout_marginTop="14dp" />
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/updateBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/accent_dark"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:gravity="center"
+                android:text="@string/update_ready"
+                android:textColor="@color/on_accent"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.03" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView

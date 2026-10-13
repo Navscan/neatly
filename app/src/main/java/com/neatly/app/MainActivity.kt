@@ -1,6 +1,9 @@
 package com.neatly.app
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.SpannableString
 import android.text.TextWatcher
@@ -8,6 +11,7 @@ import android.text.style.RelativeSizeSpan
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -30,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
     private lateinit var wordmarkText: TextView
+    private lateinit var updateBanner: MaterialCardView
 
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
@@ -39,6 +44,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var subVolume: TextView
     private lateinit var subOnHand: TextView
     private lateinit var subBlend: TextView
+
+    private val installPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        if (Updater.canInstall(this)) {
+            Updater.install(this)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         wireUnitToggle()
         wireMainTabs()
         wireSubTabs()
+        wireUpdateBanner()
         checkForUpdate()
     }
 
@@ -66,6 +80,7 @@ class MainActivity : AppCompatActivity() {
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
         wordmarkText = findViewById(R.id.wordmarkText)
+        updateBanner = findViewById(R.id.updateBanner)
 
         unitAbv = findViewById(R.id.unitAbv)
         unitProof = findViewById(R.id.unitProof)
@@ -77,12 +92,6 @@ class MainActivity : AppCompatActivity() {
         subBlend = findViewById(R.id.subBlend)
     }
 
-    /**
-     * Builds the wordmark "Neatly" as a single string with two font spans:
-     * "N" in Cinzel Decorative Bold, "eatly" in Bodoni Moda.
-     * A small RelativeSizeSpan on the N compensates for Cinzel's larger
-     * cap-height, so the two halves sit visually level.
-     */
     private fun buildWordmark() {
         val cinzelTypeface = ResourcesCompat.getFont(this, R.font.cinzel_decorative_bold)
         val bodoniTypeface = ResourcesCompat.getFont(this, R.font.bodoni_moda)
@@ -110,7 +119,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Slight size reduction on the Cinzel N to match Bodoni's cap-height.
         spanned.setSpan(
             RelativeSizeSpan(0.92f),
             0, nEnd,
@@ -124,6 +132,20 @@ class MainActivity : AppCompatActivity() {
         val version = BuildConfig.VERSION_NAME
         val year = Calendar.getInstance().get(Calendar.YEAR)
         footerText.text = getString(R.string.footer_format, version, year)
+    }
+
+    private fun wireUpdateBanner() {
+        updateBanner.setOnClickListener {
+            if (Updater.canInstall(this)) {
+                Updater.install(this)
+            } else {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:$packageName")
+                )
+                installPermissionLauncher.launch(intent)
+            }
+        }
     }
 
     private fun wireInputs() {
@@ -258,7 +280,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkForUpdate() {
         lifecycleScope.launch {
             Updater.checkForUpdate(this@MainActivity) {
-                // Reserved for the "Update ready" footer indicator in a future build.
+                updateBanner.visibility = View.VISIBLE
             }
         }
     }
