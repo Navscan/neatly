@@ -11,20 +11,15 @@
     <string name="subtab_onhand">On hand</string>
     <string name="subtab_blend">Blend</string>
 
+    <string name="label_finished_volume">Finished volume</string>
     <string name="label_first_volume">First volume</string>
     <string name="label_first_strength">First strength</string>
     <string name="label_target_strength">Target strength</string>
-
-    <string name="hint_volume">50</string>
-    <string name="hint_strength">96.4</string>
-    <string name="hint_target">46</string>
+    <string name="label_spirit_strength">Spirit strength</string>
 
     <string name="unit_liters">L</string>
     <string name="unit_abv">% ABV</string>
-    <string name="unit_proof">Proof</string>
-
-    <string name="btn_calculate">Calculate</string>
-    <string name="btn_calculating">Calculating...</string>
+    <string name="unit_proof">PROOF</string>
 
     <string name="results_title">Results</string>
     <string name="result_water_to_add">Water to add</string>
@@ -32,12 +27,10 @@
     <string name="result_pure_alcohol">Pure alcohol</string>
     <string name="result_contraction">Contraction</string>
 
-    <string name="msg_fill_all_fields">Please fill in all fields.</string>
+    <string name="msg_fill_all_fields">Enter all three values.</string>
     <string name="msg_target_too_high">Target strength must be lower than source strength.</string>
-    <string name="msg_coming_soon">This mode is coming in the next build.</string>
+    <string name="msg_coming_soon">Coming in the next build.</string>
     <string name="msg_calc_error">Calculation failed.</string>
 
-    <string name="update_ready">Update ready</string>
-    <string name="update_downloading">Downloading update…</string>
-    <string name="update_failed">Update failed. Try again later.</string>
+    <string name="footer_format">Neatly v%1$s ©PayBridge (Pty) Ltd %2$d</string>
 </resources>

@@ -10,18 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="48dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="40dp">
 
-        <!-- Header: title + ABV/Proof toggle -->
+        <!-- ============ HEADER ============ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="18dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -29,76 +29,100 @@
                 android:layout_weight="1"
                 android:text="@string/app_name"
                 android:textColor="@color/ink"
-                android:textSize="40sp"
-                android:fontFamily="serif"
-                android:letterSpacing="-0.02" />
+                android:textSize="38sp"
+                android:fontFamily="@font/cormorant_garamond"
+                android:includeFontPadding="false" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/unitToggle"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/tint"
-                app:tabIndicatorColor="@color/accent_dark"
-                app:tabIndicatorHeight="0dp"
-                app:tabSelectedTextColor="@color/on_accent"
-                app:tabTextColor="@color/ink_muted"
-                app:tabMode="fixed"
-                app:tabGravity="fill"
-                app:tabPaddingStart="16dp"
-                app:tabPaddingEnd="16dp">
+                android:orientation="horizontal"
+                android:background="@drawable/pill_container"
+                android:padding="3dp">
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/unit_abv" />
+                <TextView
+                    android:id="@+id/unitAbv"
+                    android:layout_width="56dp"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:text="@string/unit_abv"
+                    android:textSize="12sp"
+                    android:textColor="@color/ink"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.04"
+                    android:background="@drawable/pill_active" />
 
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/unit_proof" />
-            </com.google.android.material.tabs.TabLayout>
+                <TextView
+                    android:id="@+id/unitProof"
+                    android:layout_width="56dp"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:text="@string/unit_proof"
+                    android:textSize="12sp"
+                    android:textColor="@color/ink_muted"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.04" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Tagline -->
+        <!-- ============ TAGLINE ============ -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/tagline"
             android:textColor="@color/ink_muted"
-            android:textSize="15sp"
-            android:layout_marginBottom="24dp" />
+            android:textSize="14sp"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="22dp" />
 
-        <!-- Main tabs: Cut / 100 L / Flavour -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/mainTabs"
+        <!-- ============ MAIN TABS ============ -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/tint"
-            app:tabIndicatorColor="@color/accent_dark"
-            app:tabIndicatorHeight="0dp"
-            app:tabSelectedTextColor="@color/on_accent"
-            app:tabTextColor="@color/ink_muted"
-            app:tabMode="fixed"
-            app:tabGravity="fill"
-            android:layout_marginBottom="20dp">
+            android:orientation="horizontal"
+            android:background="@drawable/pill_container"
+            android:padding="3dp"
+            android:layout_marginBottom="18dp">
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_cut" />
+            <TextView
+                android:id="@+id/tabCut"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/tab_cut"
+                android:textSize="13sp"
+                android:textColor="@color/ink"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.04"
+                android:background="@drawable/pill_active" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_100l" />
+            <TextView
+                android:id="@+id/tab100l"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/tab_100l"
+                android:textSize="13sp"
+                android:textColor="@color/ink_muted"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.04" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_flavour" />
-        </com.google.android.material.tabs.TabLayout>
+            <TextView
+                android:id="@+id/tabFlavour"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/tab_flavour"
+                android:textSize="13sp"
+                android:textColor="@color/ink_muted"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.04" />
+        </LinearLayout>
 
-        <!-- Cut card -->
+        <!-- ============ INPUT CARD ============ -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,102 +137,214 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="18dp">
 
-                <!-- Sub-tabs: Volume / On hand / Blend -->
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/subTabs"
+                <!-- Sub-tabs -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/tint"
-                    app:tabIndicatorColor="@color/accent_dark"
-                    app:tabIndicatorHeight="0dp"
-                    app:tabSelectedTextColor="@color/on_accent"
-                    app:tabTextColor="@color/ink_muted"
-                    app:tabMode="fixed"
-                    app:tabGravity="fill"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp"
+                    android:layout_marginBottom="22dp">
+
+                    <TextView
+                        android:id="@+id/subVolume"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/subtab_volume"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/subOnHand"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/subtab_onhand"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03" />
+
+                    <TextView
+                        android:id="@+id/subBlend"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/subtab_blend"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03" />
+                </LinearLayout>
+
+                <!-- Input: First volume -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginBottom="20dp">
 
-                    <com.google.android.material.tabs.TabItem
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/subtab_volume" />
+                        android:text="@string/label_first_volume"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
 
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/subtab_onhand" />
-
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/subtab_blend" />
-                </com.google.android.material.tabs.TabLayout>
-
-                <!-- Volume input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Neatly.Input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/label_first_volume"
-                    android:layout_marginBottom="18dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/sourceVolume"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/ink"
-                        android:textSize="22sp"
-                        android:fontFamily="serif" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
 
-                <!-- Source strength -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Neatly.Input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/label_first_strength"
-                    android:layout_marginBottom="18dp">
+                        <EditText
+                            android:id="@+id/sourceVolume"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/cormorant_garamond"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/sourceAbv"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_liters"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/ink"
-                        android:textSize="22sp"
-                        android:fontFamily="serif" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
 
-                <!-- Target strength -->
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Neatly.Input"
+                <!-- Input: First strength -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/label_target_strength"
+                    android:orientation="vertical"
                     android:layout_marginBottom="20dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/targetAbv"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_first_strength"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:textColor="@color/ink"
-                        android:textSize="22sp"
-                        android:fontFamily="serif" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/calculateBtn"
-                    style="@style/Neatly.Button.Primary"
+                        <EditText
+                            android:id="@+id/sourceAbv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/cormorant_garamond"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_abv"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
+                <!-- Input: Target strength -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/btn_calculate" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_target_strength"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
+
+                        <EditText
+                            android:id="@+id/targetAbv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/cormorant_garamond"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_abv"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Results card -->
+        <!-- ============ RESULTS CARD ============ -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/resultsCard"
             android:layout_width="match_parent"
@@ -230,10 +366,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/results_title"
-                    android:textColor="@color/ink_muted"
-                    android:textSize="18sp"
-                    android:fontFamily="serif"
-                    android:layout_marginBottom="12dp" />
+                    android:textSize="22sp"
+                    android:textColor="@color/ink"
+                    android:fontFamily="@font/cormorant_garamond"
+                    android:layout_marginBottom="14dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -247,22 +383,19 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/result_water_to_add"
-                        android:textColor="@color/ink_muted"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:textColor="@color/ink_muted" />
 
                     <TextView
                         android:id="@+id/resWater"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/ink"
                         android:textSize="24sp"
-                        android:fontFamily="serif" />
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/cormorant_garamond" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -276,22 +409,19 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/result_final_volume"
-                        android:textColor="@color/ink_muted"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:textColor="@color/ink_muted" />
 
                     <TextView
                         android:id="@+id/resFinalVol"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/ink"
                         android:textSize="24sp"
-                        android:fontFamily="serif" />
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/cormorant_garamond" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -305,22 +435,19 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/result_pure_alcohol"
-                        android:textColor="@color/ink_muted"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:textColor="@color/ink_muted" />
 
                     <TextView
                         android:id="@+id/resPureAlc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/ink"
                         android:textSize="24sp"
-                        android:fontFamily="serif" />
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/cormorant_garamond" />
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/border" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -334,27 +461,39 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/result_contraction"
-                        android:textColor="@color/ink_muted"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:textColor="@color/ink_muted" />
 
                     <TextView
                         android:id="@+id/resContraction"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/ink"
                         android:textSize="24sp"
-                        android:fontFamily="serif" />
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/cormorant_garamond" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/resWarning"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/ink_light"
                     android:textSize="13sp"
-                    android:layout_marginTop="16dp" />
+                    android:textColor="@color/ink_light"
+                    android:layout_marginTop="14dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- ============ FOOTER ============ -->
+        <TextView
+            android:id="@+id/footerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:textSize="11sp"
+            android:textColor="@color/ink_light"
+            android:fontFamily="sans-serif"
+            android:letterSpacing="0.08"
+            android:gravity="center" />
 
     </LinearLayout>
 </ScrollView>
