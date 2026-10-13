@@ -79,12 +79,12 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Builds the wordmark "Neatly" as a single string with two font spans:
-     * "N" in Cinzel Decorative, "eatly" in Bodoni Moda.
+     * "N" in Cinzel Decorative Bold, "eatly" in Bodoni Moda.
      * A small RelativeSizeSpan on the N compensates for Cinzel's larger
      * cap-height, so the two halves sit visually level.
      */
     private fun buildWordmark() {
-        val cinzelTypeface = ResourcesCompat.getFont(this, R.font.cinzel_decorative_regular)
+        val cinzelTypeface = ResourcesCompat.getFont(this, R.font.cinzel_decorative_bold)
         val bodoniTypeface = ResourcesCompat.getFont(this, R.font.bodoni_moda)
 
         val nPart = getString(R.string.wordmark_n)
