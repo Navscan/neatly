@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Base style to satisfy Android's implicit-parent lookup rule.
+         Any style named "Neatly.X" without an explicit parent attribute
+         inherits from this empty style. -->
+    <style name="Neatly" />
+
     <style name="Theme.Neatly" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/accent_dark</item>
         <item name="colorPrimaryVariant">@color/accent_dark_hover</item>
@@ -23,7 +28,6 @@
         <item name="android:textColorSecondary">@color/ink_muted</item>
     </style>
 
-    <!-- Tab text appearance: pill-style segmented control -->
     <style name="Neatly.TabText" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:textSize">13sp</item>
         <item name="android:letterSpacing">0.04</item>
@@ -31,7 +35,6 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <!-- Label above input -->
     <style name="Neatly.InputLabel">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ink_muted</item>
@@ -39,7 +42,6 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <!-- Input value: display serif, large -->
     <style name="Neatly.InputValue">
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/ink</item>
@@ -50,10 +52,8 @@
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:inputType">numberDecimal</item>
-        <item name="android:textCursorDrawable">@null</item>
     </style>
 
-    <!-- Unit suffix next to value -->
     <style name="Neatly.UnitSuffix">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ink_light</item>
@@ -61,21 +61,18 @@
         <item name="android:letterSpacing">0.04</item>
     </style>
 
-    <!-- Result number: display serif, larger -->
     <style name="Neatly.ResultValue">
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/ink</item>
         <item name="android:fontFamily">@font/cormorant_garamond</item>
     </style>
 
-    <!-- Result label -->
     <style name="Neatly.ResultLabel">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/ink_muted</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <!-- Footer -->
     <style name="Neatly.Footer">
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/ink_light</item>
