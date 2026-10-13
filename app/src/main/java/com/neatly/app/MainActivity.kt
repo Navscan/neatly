@@ -2,12 +2,15 @@ package com.neatly.app
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.SpannableString
 import android.text.TextWatcher
+import android.text.style.RelativeSizeSpan
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
@@ -26,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resContraction: TextView
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
+    private lateinit var wordmarkText: TextView
 
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
@@ -36,13 +40,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var subOnHand: TextView
     private lateinit var subBlend: TextView
 
-    private var displayProof = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         bindViews()
+        buildWordmark()
         populateFooter()
         wireInputs()
         wireUnitToggle()
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         resContraction = findViewById(R.id.resContraction)
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
+        wordmarkText = findViewById(R.id.wordmarkText)
 
         unitAbv = findViewById(R.id.unitAbv)
         unitProof = findViewById(R.id.unitProof)
@@ -71,6 +75,49 @@ class MainActivity : AppCompatActivity() {
         subVolume = findViewById(R.id.subVolume)
         subOnHand = findViewById(R.id.subOnHand)
         subBlend = findViewById(R.id.subBlend)
+    }
+
+    /**
+     * Builds the wordmark "Neatly" as a single string with two font spans:
+     * "N" in Cinzel Decorative, "eatly" in Bodoni Moda.
+     * A small RelativeSizeSpan on the N compensates for Cinzel's larger
+     * cap-height, so the two halves sit visually level.
+     */
+    private fun buildWordmark() {
+        val cinzelTypeface = ResourcesCompat.getFont(this, R.font.cinzel_decorative_regular)
+        val bodoniTypeface = ResourcesCompat.getFont(this, R.font.bodoni_moda)
+
+        val nPart = getString(R.string.wordmark_n)
+        val restPart = getString(R.string.wordmark_rest)
+        val full = nPart + restPart
+
+        val spanned = SpannableString(full)
+        val nEnd = nPart.length
+
+        if (cinzelTypeface != null) {
+            spanned.setSpan(
+                FontSpan(cinzelTypeface),
+                0, nEnd,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        if (bodoniTypeface != null) {
+            spanned.setSpan(
+                FontSpan(bodoniTypeface),
+                nEnd, full.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Slight size reduction on the Cinzel N to match Bodoni's cap-height.
+        spanned.setSpan(
+            RelativeSizeSpan(0.92f),
+            0, nEnd,
+            SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        wordmarkText.text = spanned
     }
 
     private fun populateFooter() {
@@ -142,7 +189,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun selectUnit(proof: Boolean) {
-        displayProof = proof
         if (proof) {
             unitProof.setBackgroundResource(R.drawable.pill_active)
             unitProof.setTextColor(ContextCompat.getColor(this, R.color.on_accent))

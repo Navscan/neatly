@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Neatly</string>
+    <string name="wordmark_n">N</string>
+    <string name="wordmark_rest">eatly</string>
     <string name="tagline">Cut spirit to strength, read a 100 L production table, and dose flavour concentrates without losing the alcohol.</string>
 
     <string name="tab_cut">Cut</string>
