@@ -80,12 +80,36 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerYearsBarrel: EditText
     private lateinit var bottlerAnnualLoss: EditText
 
+    // Flavour inputs
+    private lateinit var flavourCard: MaterialCardView
+    private lateinit var flavourFinishedVolume: EditText
+    private lateinit var flavourTargetAbv: EditText
+    private lateinit var flavourBaseAbv: EditText
+    private lateinit var flavourUnitVolume: TextView
+    private lateinit var flavourUnitTargetStrength: TextView
+    private lateinit var flavourUnitBaseStrength: TextView
+
+    private lateinit var flavourAddName: Array<EditText>
+    private lateinit var flavourAddDose: Array<EditText>
+    private lateinit var flavourAddAbv: Array<EditText>
+    private lateinit var flavourAddDensity: Array<EditText>
+    private lateinit var flavourAddUnitMl: Array<TextView>
+    private lateinit var flavourAddUnitG: Array<TextView>
+    private lateinit var flavourAddUnitDrops: Array<TextView>
+
+    private val flavourAddUnit: Array<SpiritsMath.DoseUnit> = arrayOf(
+        SpiritsMath.DoseUnit.ML_PER_L,
+        SpiritsMath.DoseUnit.ML_PER_L,
+        SpiritsMath.DoseUnit.ML_PER_L
+    )
+
     // Results
     private lateinit var resultsCard: MaterialCardView
     private lateinit var resultsGroupDilution: View
     private lateinit var resultsGroupCombine: View
     private lateinit var resultsGroupSolve: View
     private lateinit var resultsGroupBottler: View
+    private lateinit var resultsGroupFlavour: View
 
     private lateinit var resRow1Label: TextView
     private lateinit var resRow2Label: TextView
@@ -111,6 +135,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerStockCharge: TextView
     private lateinit var bottlerWaterAdd: TextView
     private lateinit var bottlerContraction: TextView
+
+    private lateinit var flavHeadline: TextView
+    private lateinit var flavBaseSpirit: TextView
+    private lateinit var flavWaterAdd: TextView
+    private lateinit var flavAdd1VolLabel: TextView
+    private lateinit var flavAdd1Vol: TextView
+    private lateinit var flavAdd2VolLabel: TextView
+    private lateinit var flavAdd2Vol: TextView
+    private lateinit var flavAdd3VolLabel: TextView
+    private lateinit var flavAdd3Vol: TextView
+    private lateinit var flavPureAlc: TextView
 
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
@@ -168,6 +203,7 @@ class MainActivity : AppCompatActivity() {
         wireBottlerPresets()
         wireBottlerUnitToggle()
         wireBottlerAngelsCheckbox()
+        wireFlavourUnitPills()
         wireUpdateBanner()
 
         updateToggleVisuals()
@@ -237,12 +273,58 @@ class MainActivity : AppCompatActivity() {
         bottlerYearsBarrel = findViewById(R.id.bottlerYearsBarrel)
         bottlerAnnualLoss = findViewById(R.id.bottlerAnnualLoss)
 
+        // Flavour
+        flavourCard = findViewById(R.id.flavourCard)
+        flavourFinishedVolume = findViewById(R.id.flavourFinishedVolume)
+        flavourTargetAbv = findViewById(R.id.flavourTargetAbv)
+        flavourBaseAbv = findViewById(R.id.flavourBaseAbv)
+        flavourUnitVolume = findViewById(R.id.flavourUnitVolume)
+        flavourUnitTargetStrength = findViewById(R.id.flavourUnitTargetStrength)
+        flavourUnitBaseStrength = findViewById(R.id.flavourUnitBaseStrength)
+
+        flavourAddName = arrayOf(
+            findViewById(R.id.flavourAdd1Name),
+            findViewById(R.id.flavourAdd2Name),
+            findViewById(R.id.flavourAdd3Name)
+        )
+        flavourAddDose = arrayOf(
+            findViewById(R.id.flavourAdd1Dose),
+            findViewById(R.id.flavourAdd2Dose),
+            findViewById(R.id.flavourAdd3Dose)
+        )
+        flavourAddAbv = arrayOf(
+            findViewById(R.id.flavourAdd1Abv),
+            findViewById(R.id.flavourAdd2Abv),
+            findViewById(R.id.flavourAdd3Abv)
+        )
+        flavourAddDensity = arrayOf(
+            findViewById(R.id.flavourAdd1Density),
+            findViewById(R.id.flavourAdd2Density),
+            findViewById(R.id.flavourAdd3Density)
+        )
+        flavourAddUnitMl = arrayOf(
+            findViewById(R.id.flavourAdd1UnitMl),
+            findViewById(R.id.flavourAdd2UnitMl),
+            findViewById(R.id.flavourAdd3UnitMl)
+        )
+        flavourAddUnitG = arrayOf(
+            findViewById(R.id.flavourAdd1UnitG),
+            findViewById(R.id.flavourAdd2UnitG),
+            findViewById(R.id.flavourAdd3UnitG)
+        )
+        flavourAddUnitDrops = arrayOf(
+            findViewById(R.id.flavourAdd1UnitDrops),
+            findViewById(R.id.flavourAdd2UnitDrops),
+            findViewById(R.id.flavourAdd3UnitDrops)
+        )
+
         // Results
         resultsCard = findViewById(R.id.resultsCard)
         resultsGroupDilution = findViewById(R.id.resultsGroupDilution)
         resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
         resultsGroupSolve = findViewById(R.id.resultsGroupSolve)
         resultsGroupBottler = findViewById(R.id.resultsGroupBottler)
+        resultsGroupFlavour = findViewById(R.id.resultsGroupFlavour)
 
         resRow1Label = findViewById(R.id.resRow1Label)
         resRow2Label = findViewById(R.id.resRow2Label)
@@ -268,6 +350,17 @@ class MainActivity : AppCompatActivity() {
         bottlerStockCharge = findViewById(R.id.bottlerStockCharge)
         bottlerWaterAdd = findViewById(R.id.bottlerWaterAdd)
         bottlerContraction = findViewById(R.id.bottlerContraction)
+
+        flavHeadline = findViewById(R.id.flavHeadline)
+        flavBaseSpirit = findViewById(R.id.flavBaseSpirit)
+        flavWaterAdd = findViewById(R.id.flavWaterAdd)
+        flavAdd1VolLabel = findViewById(R.id.flavAdd1VolLabel)
+        flavAdd1Vol = findViewById(R.id.flavAdd1Vol)
+        flavAdd2VolLabel = findViewById(R.id.flavAdd2VolLabel)
+        flavAdd2Vol = findViewById(R.id.flavAdd2Vol)
+        flavAdd3VolLabel = findViewById(R.id.flavAdd3VolLabel)
+        flavAdd3Vol = findViewById(R.id.flavAdd3Vol)
+        flavPureAlc = findViewById(R.id.flavPureAlc)
 
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
@@ -353,7 +446,11 @@ class MainActivity : AppCompatActivity() {
             solveAStrength, solveBStrength, solveBatchSize,
             bottlerBottleSize, bottlerPackSize, bottlerCases,
             bottlerTargetAbv, bottlerStockAbv, bottlerAvailableStock,
-            bottlerWastage, bottlerYearsBarrel, bottlerAnnualLoss
+            bottlerWastage, bottlerYearsBarrel, bottlerAnnualLoss,
+            flavourFinishedVolume, flavourTargetAbv, flavourBaseAbv,
+            flavourAddName[0], flavourAddDose[0], flavourAddAbv[0], flavourAddDensity[0],
+            flavourAddName[1], flavourAddDose[1], flavourAddAbv[1], flavourAddDensity[1],
+            flavourAddName[2], flavourAddDose[2], flavourAddAbv[2], flavourAddDensity[2]
         ).forEach { it.addTextChangedListener(watcher) }
     }
 
@@ -379,6 +476,11 @@ class MainActivity : AppCompatActivity() {
         scaleField(solveBStrength, factor)
         scaleField(bottlerTargetAbv, factor)
         scaleField(bottlerStockAbv, factor)
+        scaleField(flavourTargetAbv, factor)
+        scaleField(flavourBaseAbv, factor)
+        scaleField(flavourAddAbv[0], factor)
+        scaleField(flavourAddAbv[1], factor)
+        scaleField(flavourAddAbv[2], factor)
         isProofMode = proof
         updateToggleVisuals()
         updateUnitLabels()
@@ -394,6 +496,7 @@ class MainActivity : AppCompatActivity() {
         scaleField(compBVolume, factor)
         scaleField(solveBatchSize, factor)
         scaleField(bottlerAvailableStock, factor)
+        scaleField(flavourFinishedVolume, factor)
         isImperialMode = imperial
         updateToggleVisuals()
         updateUnitLabels()
@@ -455,6 +558,10 @@ class MainActivity : AppCompatActivity() {
         bottlerUnitTargetStrength.text = strengthUnit
         bottlerUnitStockStrength.text = strengthUnit
         bottlerUnitAvailableStock.text = volumeUnit
+
+        flavourUnitTargetStrength.text = strengthUnit
+        flavourUnitBaseStrength.text = strengthUnit
+        flavourUnitVolume.text = volumeUnit
     }
 
     // ---------------------------------------------------------------
@@ -480,6 +587,7 @@ class MainActivity : AppCompatActivity() {
 
         cutCard.visibility = if (topTab == TopTab.CUT) View.VISIBLE else View.GONE
         bottlerCard.visibility = if (topTab == TopTab.BOTTLER) View.VISIBLE else View.GONE
+        flavourCard.visibility = if (topTab == TopTab.FLAVOUR) View.VISIBLE else View.GONE
     }
 
     // ---------------------------------------------------------------
@@ -534,7 +642,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Bottler: presets, unit toggle, angels' share
+    // Bottler: presets, unit toggle, angels share
     // ---------------------------------------------------------------
 
     private fun wireBottlerPresets() {
@@ -582,6 +690,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
+    // Flavour: additive unit pills
+    // ---------------------------------------------------------------
+
+    private fun wireFlavourUnitPills() {
+        for (i in 0 until 3) {
+            flavourAddUnitMl[i].setOnClickListener { setFlavourUnit(i, SpiritsMath.DoseUnit.ML_PER_L) }
+            flavourAddUnitG[i].setOnClickListener { setFlavourUnit(i, SpiritsMath.DoseUnit.G_PER_L) }
+            flavourAddUnitDrops[i].setOnClickListener { setFlavourUnit(i, SpiritsMath.DoseUnit.DROPS_PER_L) }
+        }
+    }
+
+    private fun setFlavourUnit(slot: Int, unit: SpiritsMath.DoseUnit) {
+        if (flavourAddUnit[slot] == unit) return
+        flavourAddUnit[slot] = unit
+        paintToggle(flavourAddUnitMl[slot], active = unit == SpiritsMath.DoseUnit.ML_PER_L)
+        paintToggle(flavourAddUnitG[slot], active = unit == SpiritsMath.DoseUnit.G_PER_L)
+        paintToggle(flavourAddUnitDrops[slot], active = unit == SpiritsMath.DoseUnit.DROPS_PER_L)
+        recalculate()
+    }
+
+    // ---------------------------------------------------------------
     // Reading helpers
     // ---------------------------------------------------------------
 
@@ -626,7 +755,7 @@ class MainActivity : AppCompatActivity() {
                 Mode.BLEND_SOLVE -> calculateSolve()
             }
             TopTab.BOTTLER -> calculateBottler()
-            TopTab.FLAVOUR -> showComingSoon()
+            TopTab.FLAVOUR -> calculateFlavour()
         }
     }
 
@@ -655,10 +784,10 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
 
         resRow1Label.text = getString(R.string.result_stock_to_charge)
         resRow2Label.text = getString(R.string.result_water_to_add)
-
         resWater.text = formatVolume(result.stockToChargeLiters)
         resFinalVol.text = formatVolume(result.waterToAddLiters)
         resPureAlc.text = formatVolume(result.pureAlcoholLiters)
@@ -691,10 +820,10 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
 
         resRow1Label.text = getString(R.string.result_water_to_add)
         resRow2Label.text = getString(R.string.result_final_volume)
-
         resWater.text = formatVolume(result.waterToAddLiters)
         resFinalVol.text = formatVolume(result.finalVolumeLiters)
         resPureAlc.text = formatVolume(result.pureAlcoholLiters)
@@ -728,6 +857,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.VISIBLE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
 
         combHeadline.text = formatVolume(result.pooledVolumeLiters) + " at " + formatStrength(result.pooledAbv)
         combPooledVol.text = formatVolume(result.pooledVolumeLiters)
@@ -758,6 +888,7 @@ class MainActivity : AppCompatActivity() {
             resultsGroupCombine.visibility = View.GONE
             resultsGroupSolve.visibility = View.GONE
             resultsGroupBottler.visibility = View.GONE
+            resultsGroupFlavour.visibility = View.GONE
             resWarning.text = getString(R.string.msg_solve_out_of_range)
             return
         }
@@ -804,6 +935,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.VISIBLE
         resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
 
         solveHeadline.text = formatVolume(result.batchSizeLiters) + " batch"
         solveSampleA.text = formatVolume(result.sampleVolumeA)
@@ -866,9 +998,10 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.VISIBLE
+        resultsGroupFlavour.visibility = View.GONE
 
         val headline = formatVolume(result.stockToChargeLiters) + " of " +
-                formatStrength(stockAbv) + " stock"
+            formatStrength(stockAbv) + " stock"
         bottlerHeadline.text = headline
 
         bottlerOrderVolume.text = formatVolume(result.orderVolumeLiters)
@@ -893,7 +1026,61 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Coming soon
+    // Flavour calculation
+    // ---------------------------------------------------------------
+
+    private fun calculateFlavour() {
+        val finishedVolume = readVolume(flavourFinishedVolume)
+        val target = readStrength(flavourTargetAbv)
+        val base = readStrength(flavourBaseAbv)
+
+        if (finishedVolume == null || target == null || base == null ||
+            finishedVolume <= 0.0 || target <= 0.0 || base <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        val additives = (0 until 3).map { i ->
+            SpiritsMath.AdditiveInput(
+                name = flavourAddName[i].text?.toString().orEmpty(),
+                dose = flavourAddDose[i].text?.toString()?.toDoubleOrNull() ?: 0.0,
+                unit = flavourAddUnit[i],
+                abv = readStrength(flavourAddAbv[i]) ?: 0.0,
+                density = flavourAddDensity[i].text?.toString()?.toDoubleOrNull() ?: 1.0
+            )
+        }
+
+        try {
+            val result = SpiritsMath.calculateFlavour(finishedVolume, target, base, additives)
+            showFlavourResults(result)
+        } catch (_: IllegalArgumentException) {
+            resultsCard.visibility = View.GONE
+        }
+    }
+
+    private fun showFlavourResults(result: SpiritsMath.FlavourResult) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.GONE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupSolve.visibility = View.GONE
+        resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.VISIBLE
+
+        val effectiveTarget = if (result.finalVolumeLiters > 0.0)
+            (result.pureAlcoholLiters / result.finalVolumeLiters) * 100.0 else 0.0
+        flavHeadline.text = formatVolume(result.finalVolumeLiters) + " at " + formatStrength(effectiveTarget)
+
+        flavBaseSpirit.text = formatVolume(result.baseSpiritLiters)
+        flavWaterAdd.text = formatVolume(result.waterToAddLiters)
+        flavAdd1Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(0) { 0.0 })
+        flavAdd2Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(1) { 0.0 })
+        flavAdd3Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(2) { 0.0 })
+        flavPureAlc.text = formatVolume(result.pureAlcoholLiters)
+        resWarning.text = ""
+    }
+
+    // ---------------------------------------------------------------
+    // Coming soon (reserved, currently unused)
     // ---------------------------------------------------------------
 
     private fun showComingSoon() {
@@ -902,6 +1089,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
         resWarning.text = getString(R.string.msg_coming_soon)
     }
 

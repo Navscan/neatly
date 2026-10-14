@@ -84,4 +84,24 @@
     <string name="bottler_msg_shortfall">Shortfall: %1$s</string>
     <string name="bottler_msg_surplus">Surplus: %1$s</string>
     <string name="bottler_msg_sufficient">Sufficient stock available.</string>
+
+    <!-- Flavour tab -->
+    <string name="flavour_additive_1">Additive 1</string>
+    <string name="flavour_additive_2">Additive 2</string>
+    <string name="flavour_additive_3">Additive 3</string>
+
+    <string name="label_base_spirit_strength">Base spirit strength</string>
+
+    <string name="hint_additive_name">Name</string>
+    <string name="hint_additive_dose">Dose</string>
+    <string name="hint_additive_abv">ABV</string>
+    <string name="hint_additive_density">Density</string>
+
+    <string name="unit_ml_per_l">mL/L</string>
+    <string name="unit_g_per_l">g/L</string>
+    <string name="unit_drops_per_l">drops/L</string>
+
+    <string name="result_base_spirit">Base spirit to charge</string>
+    <string name="msg_flavour_incomplete">Enter finished volume, target, and base strength.</string>
+    <string name="msg_flavour_target_exceeds_base">Target strength must be at or below base spirit strength.</string>
 </resources>

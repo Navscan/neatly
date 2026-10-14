@@ -809,9 +809,9 @@
                         android:letterSpacing="0.02"
                         android:visibility="gone" />
                 </LinearLayout>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/bottlerCard"
             android:layout_width="match_parent"
@@ -1367,7 +1367,802 @@
                             android:background="@color/border_strong" />
                     </LinearLayout>
                 </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/flavourCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/border"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_finished_volume"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
+
+                        <EditText
+                            android:id="@+id/flavourFinishedVolume"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:id="@+id/flavourUnitVolume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_liters"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_target_strength"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
+
+                        <EditText
+                            android:id="@+id/flavourTargetAbv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:id="@+id/flavourUnitTargetStrength"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_abv"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_base_spirit_strength"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
+
+                        <EditText
+                            android:id="@+id/flavourBaseAbv"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:id="@+id/flavourUnitBaseStrength"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_abv"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/flavour_additive_1"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/flavourAdd1Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/ink"
+                        android:background="@null"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="6dp"
+                        android:inputType="text"
+                        android:importantForAutofill="no"
+                        android:hint="@string/hint_additive_name" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_dose"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd1Dose"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/pill_container"
+                            android:padding="2dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/flavourAdd1UnitMl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_ml_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_accent"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03"
+                                android:background="@drawable/pill_active" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd1UnitG"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_g_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd1UnitDrops"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_drops_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_abv"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd1Abv"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_density"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd1Density"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="1.00" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border_strong"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/flavour_additive_2"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/flavourAdd2Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/ink"
+                        android:background="@null"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="6dp"
+                        android:inputType="text"
+                        android:importantForAutofill="no"
+                        android:hint="@string/hint_additive_name" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_dose"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd2Dose"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/pill_container"
+                            android:padding="2dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/flavourAdd2UnitMl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_ml_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_accent"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03"
+                                android:background="@drawable/pill_active" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd2UnitG"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_g_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd2UnitDrops"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_drops_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_abv"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd2Abv"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_density"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd2Density"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="1.00" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border_strong"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/flavour_additive_3"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="10dp" />
+
+                    <EditText
+                        android:id="@+id/flavourAdd3Name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textColor="@color/ink"
+                        android:background="@null"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="6dp"
+                        android:inputType="text"
+                        android:importantForAutofill="no"
+                        android:hint="@string/hint_additive_name" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom"
+                        android:layout_marginBottom="12dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_dose"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd3Dose"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="@drawable/pill_container"
+                            android:padding="2dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="8dp">
+
+                            <TextView
+                                android:id="@+id/flavourAdd3UnitMl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_ml_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/on_accent"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03"
+                                android:background="@drawable/pill_active" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd3UnitG"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_g_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+
+                            <TextView
+                                android:id="@+id/flavourAdd3UnitDrops"
+                                android:layout_width="wrap_content"
+                                android:layout_height="26dp"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="8dp"
+                                android:gravity="center"
+                                android:text="@string/unit_drops_per_l"
+                                android:textSize="10sp"
+                                android:textColor="@color/ink_muted"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.03" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_abv"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd3Abv"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="0" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_additive_density"
+                                android:textSize="12sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <EditText
+                                android:id="@+id/flavourAdd3Density"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="22sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="1.00" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border_strong" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -1864,6 +2659,182 @@
 
                         <TextView
                             android:id="@+id/bottlerContraction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/resultsGroupFlavour"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/flavHeadline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/playfair_display"
+                        android:layout_marginBottom="14dp" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_base_spirit"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavBaseSpirit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_water_to_add"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavWaterAdd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:id="@+id/flavAdd1VolLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/flavour_additive_1"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavAdd1Vol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:id="@+id/flavAdd2VolLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/flavour_additive_2"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavAdd2Vol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:id="@+id/flavAdd3VolLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/flavour_additive_3"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavAdd3Vol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_pure_alcohol"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavPureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="24sp"

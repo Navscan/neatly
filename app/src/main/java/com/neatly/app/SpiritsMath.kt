@@ -176,11 +176,9 @@ object SpiritsMath {
         }
 
         val aIsHigh = abvA >= abvB
-
         val partsHigh = targetAbv - low
         val partsLow = high - targetAbv
         val totalParts = partsHigh + partsLow
-
         val highFraction = partsHigh / totalParts
         val lowFraction = partsLow / totalParts
 
@@ -226,7 +224,7 @@ object SpiritsMath {
      * @param caseCount           Number of cases in the order.
      * @param targetAbv           Finished ABV (e.g. 43.0).
      * @param stockAbv            Available spirit ABV (e.g. 72.0).
-     * @param wastagePercent      0.0 – 10.0. Applied to the order volume.
+     * @param wastagePercent      0.0 - 10.0. Applied to the order volume.
      * @param angelsShareEnabled  When true, computes starting barrel
      *                            volume needed to end up with [withWastageLiters].
      * @param yearsInBarrel       Only used if [angelsShareEnabled].
@@ -253,7 +251,6 @@ object SpiritsMath {
         val orderVolumeLiters = (bottleVolumeMl / 1000.0) * packSize * caseCount
         val wastageMultiplier = 1.0 + (wastagePercent / 100.0)
         val withWastage = orderVolumeLiters * wastageMultiplier
-
         val stockToCharge = withWastage * (targetAbv / stockAbv)
         val waterPer100 = waterPer100L(stockAbv, targetAbv)
         val waterToAdd = (stockToCharge / 100.0) * waterPer100
@@ -290,4 +287,99 @@ object SpiritsMath {
     fun usProofToAbv(proof: Double): Double = proof / 2.0
     fun litersToUsGallons(liters: Double): Double = liters / LITERS_PER_US_GALLON
     fun usGallonsToLiters(gallons: Double): Double = gallons * LITERS_PER_US_GALLON
+
+    // ---------------------------------------------------------------
+    // Flavour: additive dosing for flavoured spirits, liqueurs, aperitifs.
+    //
+    // Pure alcohol mass balance. No OIML contraction: sugar syrups break
+    // the polynomial's assumptions. Volume is treated as additive.
+    //
+    // Dose rates are per litre of FINAL blend volume. Drops are 20 per mL.
+    // Gram doses convert to volume via [AdditiveInput.density].
+    // ---------------------------------------------------------------
+
+    enum class DoseUnit {
+        ML_PER_L,
+        G_PER_L,
+        DROPS_PER_L
+    }
+
+    /**
+     * A single additive slot.
+     *
+     * @param name     Free-text label (e.g. Vanilla concentrate).
+     * @param dose     Numeric dose rate per litre of final blend volume.
+     * @param unit     Dose rate basis. See [DoseUnit].
+     * @param abv      Additive ABV in % v/v. Defaults to 0 for water-based.
+     * @param density  Density in g/mL. Only used for [DoseUnit.G_PER_L].
+     */
+    data class AdditiveInput(
+        val name: String,
+        val dose: Double,
+        val unit: DoseUnit,
+        val abv: Double = 0.0,
+        val density: Double = 1.0
+    )
+
+    data class FlavourResult(
+        val baseSpiritLiters: Double,
+        val waterToAddLiters: Double,
+        val finalVolumeLiters: Double,
+        val pureAlcoholLiters: Double,
+        val additiveVolumesLiters: List<Double>
+    )
+
+    /**
+     * Additive dosing calculator.
+     *
+     * Dose rates are per litre of final blend volume. Drops are 20 per mL.
+     * Gram doses are converted to volume via [AdditiveInput.density].
+     *
+     * @throws IllegalArgumentException when target exceeds base strength,
+     *         when any volume is non-positive, or when additive alcohol
+     *         alone exceeds the target (negative base spirit).
+     */
+    fun calculateFlavour(
+        finishedVolumeLiters: Double,
+        targetAbv: Double,
+        baseAbv: Double,
+        additives: List<AdditiveInput>
+    ): FlavourResult {
+        require(finishedVolumeLiters > 0.0) { "Finished volume must be greater than zero." }
+        require(targetAbv > 0.0 && baseAbv > 0.0) { "Strength values must be greater than zero." }
+        require(targetAbv <= baseAbv) { "Target strength must be at or below base spirit strength." }
+
+        val additiveVolumes = additives.map { a ->
+            when (a.unit) {
+                DoseUnit.ML_PER_L -> a.dose * finishedVolumeLiters / 1000.0
+                DoseUnit.G_PER_L -> {
+                    require(a.density > 0.0) { "Density must be greater than zero." }
+                    a.dose * finishedVolumeLiters / (a.density * 1000.0)
+                }
+                DoseUnit.DROPS_PER_L -> a.dose * finishedVolumeLiters / 20.0 / 1000.0
+            }
+        }
+
+        val totalAdditiveVolume = additiveVolumes.sum()
+        val totalAdditivePure = additives.mapIndexed { i, a ->
+            additiveVolumes[i] * a.abv / 100.0
+        }.sum()
+
+        val targetPure = finishedVolumeLiters * targetAbv / 100.0
+        val baseVolume = (targetPure - totalAdditivePure) * 100.0 / baseAbv
+
+        require(baseVolume > 0.0) {
+            "Additive alcohol exceeds the target. Lower additive ABV or raise the target."
+        }
+
+        val waterToAdd = finishedVolumeLiters - baseVolume - totalAdditiveVolume
+
+        return FlavourResult(
+            baseSpiritLiters = baseVolume,
+            waterToAddLiters = waterToAdd,
+            finalVolumeLiters = finishedVolumeLiters,
+            pureAlcoholLiters = targetPure,
+            additiveVolumesLiters = additiveVolumes
+        )
+    }
 }
