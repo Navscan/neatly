@@ -86,7 +86,17 @@ class MainActivity : AppCompatActivity() {
         updateToggleVisuals()
         updateUnitLabels()
         updateSubModeLabels()
-        checkForUpdate()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Re-check for updates every time the app comes to the foreground.
+        // The Updater itself throttles to one API call every 15 minutes.
+        // We skip the check entirely if the banner is already visible, so
+        // we don't re-download the same APK on every resume.
+        if (updateBanner.visibility != View.VISIBLE) {
+            checkForUpdate()
+        }
     }
 
     private fun bindViews() {
@@ -181,10 +191,6 @@ class MainActivity : AppCompatActivity() {
         diluteWithAbv.addTextChangedListener(watcher)
     }
 
-    // ---------------------------------------------------------------
-    // Context toggles
-    // ---------------------------------------------------------------
-
     private fun wireUnitToggles() {
         unitAbv.setOnClickListener { setStrengthMode(proof = false) }
         unitProof.setOnClickListener { setStrengthMode(proof = true) }
@@ -266,10 +272,6 @@ class MainActivity : AppCompatActivity() {
         unitVolume.text = volumeUnit
     }
 
-    // ---------------------------------------------------------------
-    // Sub-mode handling
-    // ---------------------------------------------------------------
-
     private fun wireSubTabs() {
         subVolume.setOnClickListener { selectSubTab(SubMode.VOLUME, subVolume) }
         subOnHand.setOnClickListener { selectSubTab(SubMode.ON_HAND, subOnHand) }
@@ -312,10 +314,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Input reading — always canonical (litres, ABV)
-    // ---------------------------------------------------------------
-
     private fun readVolumeLiters(): Double? {
         val raw = sourceVolume.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
@@ -342,10 +340,6 @@ class MainActivity : AppCompatActivity() {
             String.format(Locale.US, "%.3f L", liters)
         }
     }
-
-    // ---------------------------------------------------------------
-    // Calculation
-    // ---------------------------------------------------------------
 
     private fun recalculate() {
         if (subMode == SubMode.BLEND) return
@@ -389,10 +383,6 @@ class MainActivity : AppCompatActivity() {
         resContraction.text = formatVolume(result.contractionLiters)
         resWarning.text = ""
     }
-
-    // ---------------------------------------------------------------
-    // Top tabs
-    // ---------------------------------------------------------------
 
     private fun wireMainTabs() {
         tabCut.setOnClickListener { selectMainTab(tabCut) }

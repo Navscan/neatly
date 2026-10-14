@@ -19,21 +19,16 @@ import java.net.URL
 /**
  * In-app auto-updater.
  *
- * On launch:
+ * On launch and on every return to foreground:
  *   1. Fetch https://api.github.com/repos/<owner>/<repo>/releases/latest
- *      (cached for 6 hours).
+ *      (cached for 15 minutes).
  *   2. Compare the release's version.json versionCode against
  *      BuildConfig.VERSION_CODE.
  *   3. If remote > local AND the active network is unmetered, silently
  *      download the APK into cacheDir/updates/.
  *   4. Call [onUpdateReady] so the caller can show a footer indicator.
  *
- * Tapping the indicator calls [install], which requests the
- * MANAGE_UNKNOWN_APP_SOURCES permission if needed, then fires the
- * system installer via FileProvider.
- *
- * All failures are silent. The updater never blocks the UI, never shows
- * toasts, and never nags the user.
+ * All failures are silent.
  */
 object Updater {
 
@@ -43,7 +38,10 @@ object Updater {
         "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
     private const val USER_AGENT = "Neatly-Android"
 
-    private const val CACHE_TTL_MS = 6L * 60L * 60L * 1000L
+    // 15 minutes between checks. Aggressive enough to catch updates
+    // within a normal session, well within GitHub's 60 req/hour limit.
+    private const val CACHE_TTL_MS = 15L * 60L * 1000L
+
     private const val APK_FILENAME = "Neatly.apk"
     private const val VERSION_FILENAME = "version.json"
 
@@ -55,7 +53,7 @@ object Updater {
 
     /**
      * Non-blocking check. Always returns quickly. Safe to call from
-     * Activity.onCreate().
+     * onResume().
      */
     suspend fun checkForUpdate(context: Context, onUpdateReady: () -> Unit) {
         try {
@@ -65,6 +63,7 @@ object Updater {
             val release = fetchLatestRelease() ?: return
             val remoteCode = fetchRemoteVersionCode(release) ?: return
 
+            // Mark checked only after a successful API round-trip.
             markChecked(context)
 
             if (remoteCode <= BuildConfig.VERSION_CODE) return
@@ -207,19 +206,10 @@ object Updater {
         context.startActivity(intent)
     }
 
-    /**
-     * True when the app already has permission to install unknown apps.
-     * On Android 8.0+ this must be checked before firing the installer.
-     */
     fun canInstall(context: Context): Boolean {
         return context.packageManager.canRequestPackageInstalls()
     }
 
-    /**
-     * Open the system Settings page for granting install-unknown-apps.
-     * Caller must use ActivityResultLauncher to detect when the user
-     * returns, then re-check [canInstall] and fire [install].
-     */
     fun requestInstallPermission(activity: Activity) {
         val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
             data = Uri.parse("package:${activity.packageName}")
