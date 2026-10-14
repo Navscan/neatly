@@ -1,7 +1,7 @@
 package com.neatly.app
 
 /**
- * Spirits dilution math engine.
+ * Spirits dilution and blending math engine.
  *
  * Uses a third-degree 2D polynomial fit to empirical ethanol-water
  * contraction data. The underlying dataset covers source ABV from 39% to
@@ -51,8 +51,8 @@ object SpiritsMath {
     )
 
     /**
-     * Volume-mode dilution: dilute with water only, using the empirical
-     * contraction polynomial.
+     * Water-dilution calculation: add water to [volumeLiters] of
+     * [sourceAbv] to reach [targetAbv].
      */
     fun calculate(volumeLiters: Double, sourceAbv: Double, targetAbv: Double): Result {
         require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
@@ -74,60 +74,138 @@ object SpiritsMath {
         )
     }
 
-    /**
-     * On Hand mode: dilute source spirit with either water
-     * (diluteWithAbv = 0) or another spirit at diluteWithAbv.
-     *
-     * When diluteWithAbv = 0, uses the same polynomial as [calculate].
-     * When diluteWithAbv > 0, uses Pearson's square with a contraction
-     * correction derived from the polynomial's water-dilution behaviour.
-     */
-    fun calculateOnHand(
-        sourceLiters: Double,
-        sourceAbv: Double,
-        targetAbv: Double,
-        diluteWithAbv: Double
-    ): Result {
-        require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
-        require(targetAbv > 0.0 && sourceAbv > 0.0) { "Strength values must be greater than zero." }
-        require(sourceLiters > 0.0) { "Volume must be greater than zero." }
-        require(diluteWithAbv >= 0.0) { "Dilution strength cannot be negative." }
-        require(diluteWithAbv < targetAbv) { "Dilution strength must be below target strength." }
+    // ---------------------------------------------------------------
+    // Blend: combine two known volumes and strengths.
+    // ---------------------------------------------------------------
 
-        // Water dilution — identical to Volume mode.
-        if (diluteWithAbv <= 0.0) {
-            return calculate(sourceLiters, sourceAbv, targetAbv)
+    data class BlendResult(
+        val pooledVolumeLiters: Double,
+        val pooledAbv: Double,
+        val pureAlcoholLiters: Double,
+        val contractionLiters: Double
+    )
+
+    /**
+     * Combines two known quantities of spirit and returns the pooled
+     * result, accounting for contraction. The contraction estimate is
+     * derived by treating the blend as a weighted average of two
+     * water-dilution scenarios weighted by the alcohol contributions
+     * of each component.
+     */
+    fun blendCombine(
+        volumeA: Double,
+        abvA: Double,
+        volumeB: Double,
+        abvB: Double
+    ): BlendResult {
+        require(volumeA > 0.0 && volumeB > 0.0) { "Volumes must be greater than zero." }
+        require(abvA > 0.0 && abvB > 0.0) { "Strengths must be greater than zero." }
+
+        val pureA = volumeA * (abvA / 100.0)
+        val pureB = volumeB * (abvB / 100.0)
+        val totalPure = pureA + pureB
+        val apparentVolume = volumeA + volumeB
+
+        // Apparent pooled ABV (ignoring contraction).
+        val apparentAbv = (totalPure / apparentVolume) * 100.0
+
+        // Estimate contraction by looking at the two components as if
+        // each were being diluted to the apparent pooled strength, and
+        // summing the water each would need.
+        val higher: Pair<Double, Double>
+        val lower: Pair<Double, Double>
+        if (abvA >= abvB) {
+            higher = volumeA to abvA
+            lower = volumeB to abvB
+        } else {
+            higher = volumeB to abvB
+            lower = volumeA to abvA
         }
 
-        // Spirit dilution. First, estimate the contraction using the
-        // water-only case as a proxy, scaled by how "water-like" the
-        // diluting spirit is.
-        val waterOnlyWater = (sourceLiters / 100.0) * waterPer100L(sourceAbv, targetAbv)
-        val waterOnlyPure = sourceLiters * (sourceAbv / 100.0)
-        val waterOnlyFinal = waterOnlyPure / (targetAbv / 100.0)
-        val waterOnlyContraction = sourceLiters + waterOnlyWater - waterOnlyFinal
+        // Contraction contribution from diluting the higher component
+        // down to the pooled strength.
+        val higherTarget = apparentAbv.coerceIn(0.1, higher.second - 0.1)
+        val higherWater = (higher.first / 100.0) * waterPer100L(higher.second, higherTarget)
+        val higherPure = higher.first * (higher.second / 100.0)
+        val higherFinal = higherPure / (higherTarget / 100.0)
+        val higherContraction = higher.first + higherWater - higherFinal
 
-        // A diluting spirit at C% ABV has (1 - C/T) as its water-equivalent
-        // fraction relative to the target.
-        val diluteWaterFraction = 1.0 - (diluteWithAbv / targetAbv)
-        val estimatedContraction = waterOnlyContraction * diluteWaterFraction
+        // Scale to the actual pooled batch.
+        val scale = totalPure / higherPure
+        val contraction = (higherContraction * scale).coerceAtLeast(0.0)
 
-        // Solve for W using the mass balance with the estimated contraction:
-        // V_s + W - contraction = (V_s * S_s + W * C) / T
-        // => W = [V_s * (S_s - T) + contraction * T] / (T - C)
-        val diluteVolume = (sourceLiters * (sourceAbv - targetAbv) + estimatedContraction * targetAbv) /
-                (targetAbv - diluteWithAbv)
+        val pooledVolume = apparentVolume - contraction
+        val pooledAbv = if (pooledVolume > 0.0) (totalPure / pooledVolume) * 100.0 else 0.0
 
-        val pureAlcohol = sourceLiters * (sourceAbv / 100.0) + diluteVolume * (diluteWithAbv / 100.0)
-        val finalVolume = pureAlcohol / (targetAbv / 100.0)
-        val apparentTotal = sourceLiters + diluteVolume
-        val contraction = apparentTotal - finalVolume
-
-        return Result(
-            waterToAddLiters = diluteVolume,
-            finalVolumeLiters = finalVolume,
-            pureAlcoholLiters = pureAlcohol,
+        return BlendResult(
+            pooledVolumeLiters = pooledVolume,
+            pooledAbv = pooledAbv,
+            pureAlcoholLiters = totalPure,
             contractionLiters = contraction
+        )
+    }
+
+    // ---------------------------------------------------------------
+    // Blend: solve for the ratio of two components needed to hit a
+    // target strength.
+    // ---------------------------------------------------------------
+
+    data class SolveResult(
+        val ratioA: Double,
+        val ratioB: Double,
+        val sampleVolumeA: Double,
+        val sampleVolumeB: Double
+    )
+
+    /**
+     * Pearson's square. Given two component strengths and a target
+     * strength that lies between them, returns the ratio A:B and a
+     * sample batch scaled so A + B = 100 L.
+     *
+     * Note: contraction is not modelled here — the ratio is derived
+     * from pure-alcohol mass balance, which is what the ratio is
+     * actually about. Final volumes in production include contraction,
+     * but the ratio between components does not change with it.
+     */
+    fun blendSolve(abvA: Double, abvB: Double, targetAbv: Double): SolveResult {
+        require(abvA > 0.0 && abvB > 0.0) { "Component strengths must be greater than zero." }
+        require(targetAbv > 0.0) { "Target strength must be greater than zero." }
+
+        val low = minOf(abvA, abvB)
+        val high = maxOf(abvA, abvB)
+        require(targetAbv in low..high && targetAbv != low && targetAbv != high) {
+            "Target must lie strictly between the two component strengths."
+        }
+
+        // Which of A/B is the "high" component?
+        val aIsHigh = abvA >= abvB
+
+        // Pearson's square: parts of high = |target - low|, parts of
+        // low = |high - target|.
+        val partsHigh = targetAbv - low
+        val partsLow = high - targetAbv
+        val totalParts = partsHigh + partsLow
+
+        val highFraction = partsHigh / totalParts
+        val lowFraction = partsLow / totalParts
+
+        val ratioHigh = highFraction / lowFraction  // high per 1 part low
+
+        val sampleVolumeA: Double
+        val sampleVolumeB: Double
+        if (aIsHigh) {
+            sampleVolumeA = highFraction * 100.0
+            sampleVolumeB = lowFraction * 100.0
+        } else {
+            sampleVolumeA = lowFraction * 100.0
+            sampleVolumeB = highFraction * 100.0
+        }
+
+        return SolveResult(
+            ratioA = sampleVolumeA / 100.0,
+            ratioB = sampleVolumeB / 100.0,
+            sampleVolumeA = sampleVolumeA,
+            sampleVolumeB = sampleVolumeB
         )
     }
 

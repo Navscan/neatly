@@ -23,45 +23,85 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
-    private enum class SubMode { VOLUME, ON_HAND, BLEND }
+    private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE }
 
+    // Core inputs
     private lateinit var sourceVolume: EditText
     private lateinit var sourceAbv: EditText
     private lateinit var targetAbv: EditText
-    private lateinit var diluteWithAbv: EditText
-    private lateinit var diluteWithGroup: View
+    private lateinit var compAVolume: EditText
+    private lateinit var compAStrength: EditText
+    private lateinit var compBVolume: EditText
+    private lateinit var compBStrength: EditText
+    private lateinit var solveAStrength: EditText
+    private lateinit var solveBStrength: EditText
+
+    // Layout groups
+    private lateinit var groupSingle: View
+    private lateinit var groupCombine: View
+    private lateinit var groupSolve: View
+    private lateinit var groupTarget: View
+    private lateinit var blendSubTabs: View
+
     private lateinit var labelVolume: TextView
     private lateinit var labelSourceStrength: TextView
 
+    // Sub-pill views
+    private lateinit var subBatch: TextView
+    private lateinit var subReduce: TextView
+    private lateinit var subBlend: TextView
+    private lateinit var subCombine: TextView
+    private lateinit var subSolve: TextView
+
+    // Results
     private lateinit var resultsCard: MaterialCardView
+    private lateinit var resultsGroupDilution: View
+    private lateinit var resultsGroupCombine: View
+    private lateinit var resultsGroupSolve: View
+
     private lateinit var resWater: TextView
     private lateinit var resFinalVol: TextView
     private lateinit var resPureAlc: TextView
     private lateinit var resContraction: TextView
+
+    private lateinit var combPooledVol: TextView
+    private lateinit var combPooledAbv: TextView
+    private lateinit var combPureAlc: TextView
+    private lateinit var combContraction: TextView
+
+    private lateinit var solveSampleA: TextView
+    private lateinit var solveSampleB: TextView
+
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
     private lateinit var wordmarkText: TextView
     private lateinit var updateBanner: MaterialCardView
 
+    // Toggle pills
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
     private lateinit var unitMetric: TextView
     private lateinit var unitImperial: TextView
+
+    // Unit suffix labels (they change with toggles)
     private lateinit var unitVolume: TextView
     private lateinit var unitSourceStrength: TextView
     private lateinit var unitTargetStrength: TextView
-    private lateinit var unitDiluteWith: TextView
+    private lateinit var unitCompAVolume: TextView
+    private lateinit var unitCompAStrength: TextView
+    private lateinit var unitCompBVolume: TextView
+    private lateinit var unitCompBStrength: TextView
+    private lateinit var unitSolveAStrength: TextView
+    private lateinit var unitSolveBStrength: TextView
 
+    // Top tabs
     private lateinit var tabCut: TextView
     private lateinit var tab100l: TextView
     private lateinit var tabFlavour: TextView
-    private lateinit var subVolume: TextView
-    private lateinit var subOnHand: TextView
-    private lateinit var subBlend: TextView
 
     private var isProofMode = false
     private var isImperialMode = false
-    private var subMode = SubMode.VOLUME
+    private var mode = Mode.BATCH
 
     private val installPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -85,15 +125,11 @@ class MainActivity : AppCompatActivity() {
         wireUpdateBanner()
         updateToggleVisuals()
         updateUnitLabels()
-        updateSubModeLabels()
+        applyMode()
     }
 
     override fun onResume() {
         super.onResume()
-        // Re-check for updates every time the app comes to the foreground.
-        // The Updater itself throttles to one API call every 15 minutes.
-        // We skip the check entirely if the banner is already visible, so
-        // we don't re-download the same APK on every resume.
         if (updateBanner.visibility != View.VISIBLE) {
             checkForUpdate()
         }
@@ -103,16 +139,46 @@ class MainActivity : AppCompatActivity() {
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
-        diluteWithAbv = findViewById(R.id.diluteWithAbv)
-        diluteWithGroup = findViewById(R.id.diluteWithGroup)
+        compAVolume = findViewById(R.id.compAVolume)
+        compAStrength = findViewById(R.id.compAStrength)
+        compBVolume = findViewById(R.id.compBVolume)
+        compBStrength = findViewById(R.id.compBStrength)
+        solveAStrength = findViewById(R.id.solveAStrength)
+        solveBStrength = findViewById(R.id.solveBStrength)
+
+        groupSingle = findViewById(R.id.groupSingle)
+        groupCombine = findViewById(R.id.groupCombine)
+        groupSolve = findViewById(R.id.groupSolve)
+        groupTarget = findViewById(R.id.groupTarget)
+        blendSubTabs = findViewById(R.id.blendSubTabs)
+
         labelVolume = findViewById(R.id.labelVolume)
         labelSourceStrength = findViewById(R.id.labelSourceStrength)
 
+        subBatch = findViewById(R.id.subBatch)
+        subReduce = findViewById(R.id.subReduce)
+        subBlend = findViewById(R.id.subBlend)
+        subCombine = findViewById(R.id.subCombine)
+        subSolve = findViewById(R.id.subSolve)
+
         resultsCard = findViewById(R.id.resultsCard)
+        resultsGroupDilution = findViewById(R.id.resultsGroupDilution)
+        resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
+        resultsGroupSolve = findViewById(R.id.resultsGroupSolve)
+
         resWater = findViewById(R.id.resWater)
         resFinalVol = findViewById(R.id.resFinalVol)
         resPureAlc = findViewById(R.id.resPureAlc)
         resContraction = findViewById(R.id.resContraction)
+
+        combPooledVol = findViewById(R.id.combPooledVol)
+        combPooledAbv = findViewById(R.id.combPooledAbv)
+        combPureAlc = findViewById(R.id.combPureAlc)
+        combContraction = findViewById(R.id.combContraction)
+
+        solveSampleA = findViewById(R.id.solveSampleA)
+        solveSampleB = findViewById(R.id.solveSampleB)
+
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
         wordmarkText = findViewById(R.id.wordmarkText)
@@ -122,17 +188,20 @@ class MainActivity : AppCompatActivity() {
         unitProof = findViewById(R.id.unitProof)
         unitMetric = findViewById(R.id.unitMetric)
         unitImperial = findViewById(R.id.unitImperial)
+
         unitVolume = findViewById(R.id.unitVolume)
         unitSourceStrength = findViewById(R.id.unitSourceStrength)
         unitTargetStrength = findViewById(R.id.unitTargetStrength)
-        unitDiluteWith = findViewById(R.id.unitDiluteWith)
+        unitCompAVolume = findViewById(R.id.unitCompAVolume)
+        unitCompAStrength = findViewById(R.id.unitCompAStrength)
+        unitCompBVolume = findViewById(R.id.unitCompBVolume)
+        unitCompBStrength = findViewById(R.id.unitCompBStrength)
+        unitSolveAStrength = findViewById(R.id.unitSolveAStrength)
+        unitSolveBStrength = findViewById(R.id.unitSolveBStrength)
 
         tabCut = findViewById(R.id.tabCut)
         tab100l = findViewById(R.id.tab100l)
         tabFlavour = findViewById(R.id.tabFlavour)
-        subVolume = findViewById(R.id.subVolume)
-        subOnHand = findViewById(R.id.subOnHand)
-        subBlend = findViewById(R.id.subBlend)
     }
 
     private fun buildWordmark() {
@@ -185,11 +254,16 @@ class MainActivity : AppCompatActivity() {
                 recalculate()
             }
         }
-        sourceVolume.addTextChangedListener(watcher)
-        sourceAbv.addTextChangedListener(watcher)
-        targetAbv.addTextChangedListener(watcher)
-        diluteWithAbv.addTextChangedListener(watcher)
+        listOf(
+            sourceVolume, sourceAbv, targetAbv,
+            compAVolume, compAStrength, compBVolume, compBStrength,
+            solveAStrength, solveBStrength
+        ).forEach { it.addTextChangedListener(watcher) }
     }
+
+    // ---------------------------------------------------------------
+    // Unit toggles
+    // ---------------------------------------------------------------
 
     private fun wireUnitToggles() {
         unitAbv.setOnClickListener { setStrengthMode(proof = false) }
@@ -203,7 +277,10 @@ class MainActivity : AppCompatActivity() {
         val factor = if (proof) 2.0 else 0.5
         scaleField(sourceAbv, factor)
         scaleField(targetAbv, factor)
-        scaleField(diluteWithAbv, factor)
+        scaleField(compAStrength, factor)
+        scaleField(compBStrength, factor)
+        scaleField(solveAStrength, factor)
+        scaleField(solveBStrength, factor)
         isProofMode = proof
         updateToggleVisuals()
         updateUnitLabels()
@@ -215,6 +292,8 @@ class MainActivity : AppCompatActivity() {
         val factor = if (imperial) 1.0 / SpiritsMath.LITERS_PER_US_GALLON
                      else SpiritsMath.LITERS_PER_US_GALLON
         scaleField(sourceVolume, factor)
+        scaleField(compAVolume, factor)
+        scaleField(compBVolume, factor)
         isImperialMode = imperial
         updateToggleVisuals()
         updateUnitLabels()
@@ -236,28 +315,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateToggleVisuals() {
-        if (isProofMode) {
-            unitProof.setBackgroundResource(R.drawable.pill_active)
-            unitProof.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitAbv.setBackgroundResource(0)
-            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-        } else {
-            unitAbv.setBackgroundResource(R.drawable.pill_active)
-            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitProof.setBackgroundResource(0)
-            unitProof.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-        }
+        paintToggle(unitAbv, active = !isProofMode)
+        paintToggle(unitProof, active = isProofMode)
+        paintToggle(unitMetric, active = !isImperialMode)
+        paintToggle(unitImperial, active = isImperialMode)
+    }
 
-        if (isImperialMode) {
-            unitImperial.setBackgroundResource(R.drawable.pill_active)
-            unitImperial.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitMetric.setBackgroundResource(0)
-            unitMetric.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+    private fun paintToggle(view: TextView, active: Boolean) {
+        if (active) {
+            view.setBackgroundResource(R.drawable.pill_active)
+            view.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
         } else {
-            unitMetric.setBackgroundResource(R.drawable.pill_active)
-            unitMetric.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitImperial.setBackgroundResource(0)
-            unitImperial.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+            view.setBackgroundResource(0)
+            view.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
         }
     }
 
@@ -266,70 +336,87 @@ class MainActivity : AppCompatActivity() {
                            else getString(R.string.unit_abv)
         val volumeUnit = if (isImperialMode) getString(R.string.unit_gallons)
                          else getString(R.string.unit_liters)
+
         unitSourceStrength.text = strengthUnit
         unitTargetStrength.text = strengthUnit
-        unitDiluteWith.text = strengthUnit
+        unitCompAStrength.text = strengthUnit
+        unitCompBStrength.text = strengthUnit
+        unitSolveAStrength.text = strengthUnit
+        unitSolveBStrength.text = strengthUnit
+
         unitVolume.text = volumeUnit
+        unitCompAVolume.text = volumeUnit
+        unitCompBVolume.text = volumeUnit
     }
+
+    // ---------------------------------------------------------------
+    // Sub-mode switching
+    // ---------------------------------------------------------------
 
     private fun wireSubTabs() {
-        subVolume.setOnClickListener { selectSubTab(SubMode.VOLUME, subVolume) }
-        subOnHand.setOnClickListener { selectSubTab(SubMode.ON_HAND, subOnHand) }
-        subBlend.setOnClickListener { selectSubTab(SubMode.BLEND, subBlend) }
+        subBatch.setOnClickListener { setMode(Mode.BATCH) }
+        subReduce.setOnClickListener { setMode(Mode.REDUCE) }
+        subBlend.setOnClickListener {
+            // When Blend is tapped, default to Combine.
+            setMode(Mode.BLEND_COMBINE)
+        }
+        subCombine.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
+        subSolve.setOnClickListener { setMode(Mode.BLEND_SOLVE) }
     }
 
-    private fun selectSubTab(mode: SubMode, selected: TextView) {
-        listOf(subVolume, subOnHand, subBlend).forEach { tv ->
-            if (tv === selected) {
-                tv.setBackgroundResource(R.drawable.pill_active)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            } else {
-                tv.setBackgroundResource(0)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-            }
-        }
-        subMode = mode
-        updateSubModeLabels()
+    private fun setMode(newMode: Mode) {
+        mode = newMode
+        applyMode()
+        recalculate()
+    }
+
+    private fun applyMode() {
+        // Top sub-pill styling
+        paintToggle(subBatch, active = mode == Mode.BATCH)
+        paintToggle(subReduce, active = mode == Mode.REDUCE)
+        paintToggle(subBlend, active = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE)
+
+        // Blend sub-tab row visibility
+        val blendActive = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE
+        blendSubTabs.visibility = if (blendActive) View.VISIBLE else View.GONE
+        paintToggle(subCombine, active = mode == Mode.BLEND_COMBINE)
+        paintToggle(subSolve, active = mode == Mode.BLEND_SOLVE)
+
+        // Input groups
+        groupSingle.visibility = if (mode == Mode.BATCH || mode == Mode.REDUCE) View.VISIBLE else View.GONE
+        groupCombine.visibility = if (mode == Mode.BLEND_COMBINE) View.VISIBLE else View.GONE
+        groupSolve.visibility = if (mode == Mode.BLEND_SOLVE) View.VISIBLE else View.GONE
+
+        // Target field visibility
+        groupTarget.visibility = if (mode == Mode.BLEND_COMBINE) View.GONE else View.VISIBLE
+
+        // Field labels for Batch vs Reduce
         when (mode) {
-            SubMode.VOLUME, SubMode.ON_HAND -> recalculate()
-            SubMode.BLEND -> showComingSoon()
+            Mode.BATCH -> {
+                labelVolume.text = getString(R.string.label_batch_volume)
+                labelSourceStrength.text = getString(R.string.label_batch_strength)
+            }
+            Mode.REDUCE -> {
+                labelVolume.text = getString(R.string.label_stock_volume)
+                labelSourceStrength.text = getString(R.string.label_stock_strength)
+            }
+            else -> { /* not shown */ }
         }
     }
 
-    private fun updateSubModeLabels() {
-        when (subMode) {
-            SubMode.VOLUME -> {
-                labelVolume.text = getString(R.string.label_first_volume)
-                labelSourceStrength.text = getString(R.string.label_first_strength)
-                diluteWithGroup.visibility = View.GONE
-            }
-            SubMode.ON_HAND -> {
-                labelVolume.text = getString(R.string.label_volume_on_hand)
-                labelSourceStrength.text = getString(R.string.label_strength_on_hand)
-                diluteWithGroup.visibility = View.VISIBLE
-            }
-            SubMode.BLEND -> {
-                // Blend not yet implemented; labels don't matter.
-            }
-        }
-    }
+    // ---------------------------------------------------------------
+    // Input reading (canonical: litres, ABV)
+    // ---------------------------------------------------------------
 
-    private fun readVolumeLiters(): Double? {
-        val raw = sourceVolume.text?.toString().orEmpty()
+    private fun readVolume(field: EditText): Double? {
+        val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
         return if (isImperialMode) SpiritsMath.usGallonsToLiters(value) else value
     }
 
-    private fun readStrengthAbv(field: EditText): Double? {
+    private fun readStrength(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
-        return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
-    }
-
-    private fun readDiluteWithAbv(): Double {
-        val raw = diluteWithAbv.text?.toString().orEmpty()
-        if (raw.isBlank()) return 0.0
-        val value = raw.toDoubleOrNull() ?: return 0.0
         return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
     }
 
@@ -341,48 +428,135 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun recalculate() {
-        if (subMode == SubMode.BLEND) return
-
-        val volume = readVolumeLiters()
-        val source = readStrengthAbv(sourceAbv)
-        val target = readStrengthAbv(targetAbv)
-
-        if (volume == null || source == null || target == null) {
-            resultsCard.visibility = View.GONE
-            return
+    private fun formatStrength(abv: Double): String {
+        return if (isProofMode) {
+            String.format(Locale.US, "%.1f proof", SpiritsMath.abvToUsProof(abv))
+        } else {
+            String.format(Locale.US, "%.2f %% ABV", abv)
         }
+    }
 
-        if (target >= source || target <= 0.0 || source <= 0.0 || volume <= 0.0) {
+    // ---------------------------------------------------------------
+    // Calculation dispatcher
+    // ---------------------------------------------------------------
+
+    private fun recalculate() {
+        when (mode) {
+            Mode.BATCH -> calculateDilution(useStockLabels = false)
+            Mode.REDUCE -> calculateDilution(useStockLabels = true)
+            Mode.BLEND_COMBINE -> calculateCombine()
+            Mode.BLEND_SOLVE -> calculateSolve()
+        }
+    }
+
+    private fun calculateDilution(useStockLabels: Boolean) {
+        val volume = readVolume(sourceVolume)
+        val source = readStrength(sourceAbv)
+        val target = readStrength(targetAbv)
+
+        if (volume == null || source == null || target == null ||
+            target >= source || target <= 0.0 || source <= 0.0 || volume <= 0.0) {
             resultsCard.visibility = View.GONE
             return
         }
 
         try {
-            val result = if (subMode == SubMode.ON_HAND) {
-                val diluteWith = readDiluteWithAbv()
-                if (diluteWith >= target) {
-                    resultsCard.visibility = View.GONE
-                    return
-                }
-                SpiritsMath.calculateOnHand(volume, source, target, diluteWith)
-            } else {
-                SpiritsMath.calculate(volume, source, target)
-            }
-            renderResult(result)
+            val result = SpiritsMath.calculate(volume, source, target)
+            showDilutionResults(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun renderResult(result: SpiritsMath.Result) {
+    private fun showDilutionResults(result: SpiritsMath.Result) {
         resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.VISIBLE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupSolve.visibility = View.GONE
+
         resWater.text = formatVolume(result.waterToAddLiters)
         resFinalVol.text = formatVolume(result.finalVolumeLiters)
         resPureAlc.text = formatVolume(result.pureAlcoholLiters)
         resContraction.text = formatVolume(result.contractionLiters)
         resWarning.text = ""
     }
+
+    private fun calculateCombine() {
+        val volA = readVolume(compAVolume)
+        val abvA = readStrength(compAStrength)
+        val volB = readVolume(compBVolume)
+        val abvB = readStrength(compBStrength)
+
+        if (volA == null || abvA == null || volB == null || abvB == null ||
+            volA <= 0.0 || volB <= 0.0 || abvA <= 0.0 || abvB <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        try {
+            val result = SpiritsMath.blendCombine(volA, abvA, volB, abvB)
+            showCombineResults(result)
+        } catch (_: IllegalArgumentException) {
+            resultsCard.visibility = View.GONE
+        }
+    }
+
+    private fun showCombineResults(result: SpiritsMath.BlendResult) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.GONE
+        resultsGroupCombine.visibility = View.VISIBLE
+        resultsGroupSolve.visibility = View.GONE
+
+        combPooledVol.text = formatVolume(result.pooledVolumeLiters)
+        combPooledAbv.text = formatStrength(result.pooledAbv)
+        combPureAlc.text = formatVolume(result.pureAlcoholLiters)
+        combContraction.text = formatVolume(result.contractionLiters)
+        resWarning.text = ""
+    }
+
+    private fun calculateSolve() {
+        val abvA = readStrength(solveAStrength)
+        val abvB = readStrength(solveBStrength)
+        val target = readStrength(targetAbv)
+
+        if (abvA == null || abvB == null || target == null) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        val low = minOf(abvA, abvB)
+        val high = maxOf(abvA, abvB)
+        if (target <= low || target >= high) {
+            resultsCard.visibility = View.VISIBLE
+            resultsGroupDilution.visibility = View.GONE
+            resultsGroupCombine.visibility = View.GONE
+            resultsGroupSolve.visibility = View.GONE
+            resWarning.text = getString(R.string.msg_solve_out_of_range)
+            return
+        }
+
+        try {
+            val result = SpiritsMath.blendSolve(abvA, abvB, target)
+            showSolveResults(result)
+        } catch (_: IllegalArgumentException) {
+            resultsCard.visibility = View.GONE
+        }
+    }
+
+    private fun showSolveResults(result: SpiritsMath.SolveResult) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.GONE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupSolve.visibility = View.VISIBLE
+
+        solveSampleA.text = formatVolume(result.sampleVolumeA)
+        solveSampleB.text = formatVolume(result.sampleVolumeB)
+        resWarning.text = ""
+    }
+
+    // ---------------------------------------------------------------
+    // Top tabs & misc
+    // ---------------------------------------------------------------
 
     private fun wireMainTabs() {
         tabCut.setOnClickListener { selectMainTab(tabCut) }
@@ -392,28 +566,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun selectMainTab(selected: TextView) {
         listOf(tabCut, tab100l, tabFlavour).forEach { tv ->
-            if (tv === selected) {
-                tv.setBackgroundResource(R.drawable.pill_active)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            } else {
-                tv.setBackgroundResource(0)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-            }
+            paintToggle(tv, active = tv === selected)
         }
         if (selected !== tabCut) {
-            showComingSoon()
+            resultsCard.visibility = View.VISIBLE
+            resultsGroupDilution.visibility = View.GONE
+            resultsGroupCombine.visibility = View.GONE
+            resultsGroupSolve.visibility = View.GONE
+            resWarning.text = getString(R.string.msg_coming_soon)
         } else {
             recalculate()
         }
-    }
-
-    private fun showComingSoon() {
-        resultsCard.visibility = View.VISIBLE
-        resWater.text = ""
-        resFinalVol.text = ""
-        resPureAlc.text = ""
-        resContraction.text = ""
-        resWarning.text = getString(R.string.msg_coming_soon)
     }
 
     private fun wireUpdateBanner() {

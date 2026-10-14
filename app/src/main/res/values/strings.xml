@@ -9,17 +9,23 @@
     <string name="tab_100l">100 L</string>
     <string name="tab_flavour">Flavour</string>
 
-    <string name="subtab_volume">Volume</string>
-    <string name="subtab_onhand">On hand</string>
+    <string name="subtab_batch">Batch</string>
+    <string name="subtab_reduce">Reduce</string>
     <string name="subtab_blend">Blend</string>
 
-    <string name="label_first_volume">First volume</string>
-    <string name="label_first_strength">First strength</string>
+    <string name="subtab_combine">Combine</string>
+    <string name="subtab_solve">Solve</string>
+
+    <string name="label_batch_volume">Batch volume</string>
+    <string name="label_batch_strength">Batch strength</string>
+    <string name="label_stock_volume">Stock volume</string>
+    <string name="label_stock_strength">Stock strength</string>
     <string name="label_target_strength">Target strength</string>
 
-    <string name="label_volume_on_hand">Volume on hand</string>
-    <string name="label_strength_on_hand">Strength on hand</string>
-    <string name="label_dilute_with">Dilute with</string>
+    <string name="label_component_a_volume">Component A volume</string>
+    <string name="label_component_a_strength">Component A strength</string>
+    <string name="label_component_b_volume">Component B volume</string>
+    <string name="label_component_b_strength">Component B strength</string>
 
     <string name="unit_liters">L</string>
     <string name="unit_gallons">gal</string>
@@ -31,11 +37,15 @@
     <string name="results_title">Results</string>
     <string name="result_water_to_add">Water to add</string>
     <string name="result_final_volume">Final volume</string>
+    <string name="result_final_abv">Final strength</string>
+    <string name="result_component_a">Component A (per 100 L)</string>
+    <string name="result_component_b">Component B (per 100 L)</string>
     <string name="result_pure_alcohol">Pure alcohol</string>
     <string name="result_contraction">Contraction</string>
 
-    <string name="msg_fill_all_fields">Enter all three values.</string>
+    <string name="msg_fill_all_fields">Enter all values.</string>
     <string name="msg_target_too_high">Target strength must be lower than source strength.</string>
+    <string name="msg_solve_out_of_range">Target must lie between the two component strengths.</string>
     <string name="msg_coming_soon">Coming in the next build.</string>
     <string name="msg_calc_error">Calculation failed.</string>
 

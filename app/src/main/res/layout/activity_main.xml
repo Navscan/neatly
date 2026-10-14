@@ -179,15 +179,15 @@
                     android:orientation="horizontal"
                     android:background="@drawable/pill_container"
                     android:padding="3dp"
-                    android:layout_marginBottom="22dp">
+                    android:layout_marginBottom="12dp">
 
                     <TextView
-                        android:id="@+id/subVolume"
+                        android:id="@+id/subBatch"
                         android:layout_width="0dp"
                         android:layout_height="34dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/subtab_volume"
+                        android:text="@string/subtab_batch"
                         android:textSize="12sp"
                         android:textColor="@color/on_accent"
                         android:fontFamily="sans-serif-medium"
@@ -195,12 +195,12 @@
                         android:background="@drawable/pill_active" />
 
                     <TextView
-                        android:id="@+id/subOnHand"
+                        android:id="@+id/subReduce"
                         android:layout_width="0dp"
                         android:layout_height="34dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/subtab_onhand"
+                        android:text="@string/subtab_reduce"
                         android:textSize="12sp"
                         android:textColor="@color/ink_muted"
                         android:fontFamily="sans-serif-medium"
@@ -220,116 +220,498 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/blendSubTabs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="20dp">
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp"
+                    android:layout_marginBottom="22dp"
+                    android:visibility="gone">
 
                     <TextView
-                        android:id="@+id/labelVolume"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_first_volume"
-                        android:textSize="13sp"
+                        android:id="@+id/subCombine"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/subtab_combine"
+                        android:textSize="11sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/subSolve"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/subtab_solve"
+                        android:textSize="11sp"
                         android:textColor="@color/ink_muted"
-                        android:letterSpacing="0.02" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="bottom">
-
-                        <EditText
-                            android:id="@+id/sourceVolume"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="28sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display"
-                            android:background="@null"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="6dp"
-                            android:inputType="numberDecimal"
-                            android:importantForAutofill="no"
-                            android:hint="0" />
-
-                        <TextView
-                            android:id="@+id/unitVolume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/unit_liters"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_light"
-                            android:letterSpacing="0.04"
-                            android:paddingBottom="10dp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border_strong" />
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/labelSourceStrength"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_first_strength"
-                        android:textSize="13sp"
-                        android:textColor="@color/ink_muted"
-                        android:letterSpacing="0.02" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/groupSingle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="bottom">
-
-                        <EditText
-                            android:id="@+id/sourceAbv"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="28sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display"
-                            android:background="@null"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="6dp"
-                            android:inputType="numberDecimal"
-                            android:importantForAutofill="no"
-                            android:hint="0" />
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
 
                         <TextView
-                            android:id="@+id/unitSourceStrength"
+                            android:id="@+id/labelVolume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/unit_abv"
+                            android:text="@string/label_batch_volume"
                             android:textSize="13sp"
-                            android:textColor="@color/ink_light"
-                            android:letterSpacing="0.04"
-                            android:paddingBottom="10dp" />
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/sourceVolume"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitVolume"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_liters"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
                     </LinearLayout>
 
-                    <View
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border_strong" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:id="@+id/labelSourceStrength"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_batch_strength"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/sourceAbv"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitSourceStrength"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/groupCombine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="20dp">
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_a_volume"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/compAVolume"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitCompAVolume"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_liters"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_a_strength"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/compAStrength"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitCompAStrength"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_b_volume"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/compBVolume"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitCompBVolume"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_liters"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_b_strength"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/compBStrength"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitCompBStrength"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/groupSolve"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_a_strength"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/solveAStrength"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitSolveAStrength"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_component_b_strength"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/solveBStrength"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:id="@+id/unitSolveBStrength"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/groupTarget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -377,59 +759,6 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/diluteWithGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_dilute_with"
-                        android:textSize="13sp"
-                        android:textColor="@color/ink_muted"
-                        android:letterSpacing="0.02" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="bottom">
-
-                        <EditText
-                            android:id="@+id/diluteWithAbv"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="28sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display"
-                            android:background="@null"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="6dp"
-                            android:inputType="numberDecimal"
-                            android:importantForAutofill="no"
-                            android:text="0" />
-
-                        <TextView
-                            android:id="@+id/unitDiluteWith"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/unit_abv"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_light"
-                            android:letterSpacing="0.04"
-                            android:paddingBottom="10dp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border_strong" />
-                </LinearLayout>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -461,105 +790,280 @@
                     android:layout_marginBottom="14dp" />
 
                 <LinearLayout
+                    android:id="@+id/resultsGroupDilution"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/result_water_to_add"
-                        android:textSize="15sp"
-                        android:textColor="@color/ink_muted" />
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
 
-                    <TextView
-                        android:id="@+id/resWater"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_water_to_add"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/resWater"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="24sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display" />
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_final_volume"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/resFinalVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_pure_alcohol"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/resPureAlc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_contraction"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/resContraction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
                 <LinearLayout
+                    android:id="@+id/resultsGroupCombine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/result_final_volume"
-                        android:textSize="15sp"
-                        android:textColor="@color/ink_muted" />
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
 
-                    <TextView
-                        android:id="@+id/resFinalVol"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_final_volume"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/combPooledVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="24sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display" />
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_final_abv"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/combPooledAbv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_pure_alcohol"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/combPureAlc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_contraction"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/combContraction"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
                 <LinearLayout
+                    android:id="@+id/resultsGroupSolve"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/result_pure_alcohol"
-                        android:textSize="15sp"
-                        android:textColor="@color/ink_muted" />
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
 
-                    <TextView
-                        android:id="@+id/resPureAlc"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_component_a"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/solveSampleA"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="24sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display" />
-                </LinearLayout>
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_component_b"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/result_contraction"
-                        android:textSize="15sp"
-                        android:textColor="@color/ink_muted" />
-
-                    <TextView
-                        android:id="@+id/resContraction"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="24sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display" />
+                        <TextView
+                            android:id="@+id/solveSampleB"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <TextView
