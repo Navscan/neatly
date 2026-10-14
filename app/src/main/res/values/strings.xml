@@ -13,11 +13,13 @@
     <string name="subtab_onhand">On hand</string>
     <string name="subtab_blend">Blend</string>
 
-    <string name="label_finished_volume">Finished volume</string>
     <string name="label_first_volume">First volume</string>
     <string name="label_first_strength">First strength</string>
     <string name="label_target_strength">Target strength</string>
-    <string name="label_spirit_strength">Spirit strength</string>
+
+    <string name="label_volume_on_hand">Volume on hand</string>
+    <string name="label_strength_on_hand">Strength on hand</string>
+    <string name="label_dilute_with">Dilute with</string>
 
     <string name="unit_liters">L</string>
     <string name="unit_gallons">gal</string>

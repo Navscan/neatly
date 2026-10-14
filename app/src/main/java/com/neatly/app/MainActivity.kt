@@ -23,9 +23,16 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
+    private enum class SubMode { VOLUME, ON_HAND, BLEND }
+
     private lateinit var sourceVolume: EditText
     private lateinit var sourceAbv: EditText
     private lateinit var targetAbv: EditText
+    private lateinit var diluteWithAbv: EditText
+    private lateinit var diluteWithGroup: View
+    private lateinit var labelVolume: TextView
+    private lateinit var labelSourceStrength: TextView
+
     private lateinit var resultsCard: MaterialCardView
     private lateinit var resWater: TextView
     private lateinit var resFinalVol: TextView
@@ -43,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitVolume: TextView
     private lateinit var unitSourceStrength: TextView
     private lateinit var unitTargetStrength: TextView
+    private lateinit var unitDiluteWith: TextView
 
     private lateinit var tabCut: TextView
     private lateinit var tab100l: TextView
@@ -53,6 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     private var isProofMode = false
     private var isImperialMode = false
+    private var subMode = SubMode.VOLUME
 
     private val installPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -76,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         wireUpdateBanner()
         updateToggleVisuals()
         updateUnitLabels()
+        updateSubModeLabels()
         checkForUpdate()
     }
 
@@ -83,6 +93,11 @@ class MainActivity : AppCompatActivity() {
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
+        diluteWithAbv = findViewById(R.id.diluteWithAbv)
+        diluteWithGroup = findViewById(R.id.diluteWithGroup)
+        labelVolume = findViewById(R.id.labelVolume)
+        labelSourceStrength = findViewById(R.id.labelSourceStrength)
+
         resultsCard = findViewById(R.id.resultsCard)
         resWater = findViewById(R.id.resWater)
         resFinalVol = findViewById(R.id.resFinalVol)
@@ -100,6 +115,7 @@ class MainActivity : AppCompatActivity() {
         unitVolume = findViewById(R.id.unitVolume)
         unitSourceStrength = findViewById(R.id.unitSourceStrength)
         unitTargetStrength = findViewById(R.id.unitTargetStrength)
+        unitDiluteWith = findViewById(R.id.unitDiluteWith)
 
         tabCut = findViewById(R.id.tabCut)
         tab100l = findViewById(R.id.tab100l)
@@ -162,12 +178,11 @@ class MainActivity : AppCompatActivity() {
         sourceVolume.addTextChangedListener(watcher)
         sourceAbv.addTextChangedListener(watcher)
         targetAbv.addTextChangedListener(watcher)
+        diluteWithAbv.addTextChangedListener(watcher)
     }
 
     // ---------------------------------------------------------------
-    // Context toggles: strength (ABV / PROOF) and measurement (METRIC / US)
-    // Both are independent. Each flips the display language and converts
-    // every value in place so the physical scenario stays identical.
+    // Context toggles
     // ---------------------------------------------------------------
 
     private fun wireUnitToggles() {
@@ -182,6 +197,7 @@ class MainActivity : AppCompatActivity() {
         val factor = if (proof) 2.0 else 0.5
         scaleField(sourceAbv, factor)
         scaleField(targetAbv, factor)
+        scaleField(diluteWithAbv, factor)
         isProofMode = proof
         updateToggleVisuals()
         updateUnitLabels()
@@ -246,12 +262,58 @@ class MainActivity : AppCompatActivity() {
                          else getString(R.string.unit_liters)
         unitSourceStrength.text = strengthUnit
         unitTargetStrength.text = strengthUnit
+        unitDiluteWith.text = strengthUnit
         unitVolume.text = volumeUnit
     }
 
     // ---------------------------------------------------------------
-    // Input reading: always returns values in the internal canonical
-    // units (litres, ABV) regardless of display mode.
+    // Sub-mode handling
+    // ---------------------------------------------------------------
+
+    private fun wireSubTabs() {
+        subVolume.setOnClickListener { selectSubTab(SubMode.VOLUME, subVolume) }
+        subOnHand.setOnClickListener { selectSubTab(SubMode.ON_HAND, subOnHand) }
+        subBlend.setOnClickListener { selectSubTab(SubMode.BLEND, subBlend) }
+    }
+
+    private fun selectSubTab(mode: SubMode, selected: TextView) {
+        listOf(subVolume, subOnHand, subBlend).forEach { tv ->
+            if (tv === selected) {
+                tv.setBackgroundResource(R.drawable.pill_active)
+                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
+            } else {
+                tv.setBackgroundResource(0)
+                tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+            }
+        }
+        subMode = mode
+        updateSubModeLabels()
+        when (mode) {
+            SubMode.VOLUME, SubMode.ON_HAND -> recalculate()
+            SubMode.BLEND -> showComingSoon()
+        }
+    }
+
+    private fun updateSubModeLabels() {
+        when (subMode) {
+            SubMode.VOLUME -> {
+                labelVolume.text = getString(R.string.label_first_volume)
+                labelSourceStrength.text = getString(R.string.label_first_strength)
+                diluteWithGroup.visibility = View.GONE
+            }
+            SubMode.ON_HAND -> {
+                labelVolume.text = getString(R.string.label_volume_on_hand)
+                labelSourceStrength.text = getString(R.string.label_strength_on_hand)
+                diluteWithGroup.visibility = View.VISIBLE
+            }
+            SubMode.BLEND -> {
+                // Blend not yet implemented; labels don't matter.
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Input reading — always canonical (litres, ABV)
     // ---------------------------------------------------------------
 
     private fun readVolumeLiters(): Double? {
@@ -266,10 +328,12 @@ class MainActivity : AppCompatActivity() {
         return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
     }
 
-    // ---------------------------------------------------------------
-    // Output formatting: renders internal canonical values into the
-    // currently displayed unit language.
-    // ---------------------------------------------------------------
+    private fun readDiluteWithAbv(): Double {
+        val raw = diluteWithAbv.text?.toString().orEmpty()
+        if (raw.isBlank()) return 0.0
+        val value = raw.toDoubleOrNull() ?: return 0.0
+        return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
+    }
 
     private fun formatVolume(liters: Double): String {
         return if (isImperialMode) {
@@ -279,7 +343,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Calculation
+    // ---------------------------------------------------------------
+
     private fun recalculate() {
+        if (subMode == SubMode.BLEND) return
+
         val volume = readVolumeLiters()
         val source = readStrengthAbv(sourceAbv)
         val target = readStrengthAbv(targetAbv)
@@ -295,7 +365,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            val result = SpiritsMath.calculate(volume, source, target)
+            val result = if (subMode == SubMode.ON_HAND) {
+                val diluteWith = readDiluteWithAbv()
+                if (diluteWith >= target) {
+                    resultsCard.visibility = View.GONE
+                    return
+                }
+                SpiritsMath.calculateOnHand(volume, source, target, diluteWith)
+            } else {
+                SpiritsMath.calculate(volume, source, target)
+            }
             renderResult(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
@@ -310,6 +389,10 @@ class MainActivity : AppCompatActivity() {
         resContraction.text = formatVolume(result.contractionLiters)
         resWarning.text = ""
     }
+
+    // ---------------------------------------------------------------
+    // Top tabs
+    // ---------------------------------------------------------------
 
     private fun wireMainTabs() {
         tabCut.setOnClickListener { selectMainTab(tabCut) }
@@ -328,27 +411,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         if (selected !== tabCut) {
-            showComingSoon()
-        }
-    }
-
-    private fun wireSubTabs() {
-        subVolume.setOnClickListener { selectSubTab(subVolume) }
-        subOnHand.setOnClickListener { selectSubTab(subOnHand) }
-        subBlend.setOnClickListener { selectSubTab(subBlend) }
-    }
-
-    private fun selectSubTab(selected: TextView) {
-        listOf(subVolume, subOnHand, subBlend).forEach { tv ->
-            if (tv === selected) {
-                tv.setBackgroundResource(R.drawable.pill_active)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            } else {
-                tv.setBackgroundResource(0)
-                tv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-            }
-        }
-        if (selected !== subVolume) {
             showComingSoon()
         } else {
             recalculate()

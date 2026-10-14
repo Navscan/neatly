@@ -12,13 +12,9 @@ package com.neatly.app
  * All internal math runs in ABV (% v/v) and litres, referenced to 20 C.
  * Unit toggles in the UI translate on the way in and out; they never
  * change the coefficients here.
- *
- * This is intentionally a self-contained object: no networking, no Android
- * dependencies. It can be tested on the JVM.
  */
 object SpiritsMath {
 
-    // Polynomial coefficients derived from the empirical dataset.
     private const val C0 = 61.223438
     private const val C1 = 6.696005
     private const val C2 = -10.971703
@@ -30,13 +26,8 @@ object SpiritsMath {
     private const val C8 = 0.001384
     private const val C9 = -0.002073
 
-    // Litres per US gallon.
     const val LITERS_PER_US_GALLON = 3.785411784
 
-    /**
-     * Liters of water to add per 100 L of [sourceAbv] to reach [targetAbv],
-     * accounting for ethanol-water contraction.
-     */
     fun waterPer100L(sourceAbv: Double, targetAbv: Double): Double {
         val s = sourceAbv
         val t = targetAbv
@@ -60,10 +51,8 @@ object SpiritsMath {
     )
 
     /**
-     * Full dilution calculation for a user-supplied volume, always in
-     * litres and ABV at 20 C.
-     *
-     * @throws IllegalArgumentException when target >= source, or either is <= 0.
+     * Volume-mode dilution: dilute with water only, using the empirical
+     * contraction polynomial.
      */
     fun calculate(volumeLiters: Double, sourceAbv: Double, targetAbv: Double): Result {
         require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
@@ -85,25 +74,69 @@ object SpiritsMath {
         )
     }
 
+    /**
+     * On Hand mode: dilute source spirit with either water
+     * (diluteWithAbv = 0) or another spirit at diluteWithAbv.
+     *
+     * When diluteWithAbv = 0, uses the same polynomial as [calculate].
+     * When diluteWithAbv > 0, uses Pearson's square with a contraction
+     * correction derived from the polynomial's water-dilution behaviour.
+     */
+    fun calculateOnHand(
+        sourceLiters: Double,
+        sourceAbv: Double,
+        targetAbv: Double,
+        diluteWithAbv: Double
+    ): Result {
+        require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
+        require(targetAbv > 0.0 && sourceAbv > 0.0) { "Strength values must be greater than zero." }
+        require(sourceLiters > 0.0) { "Volume must be greater than zero." }
+        require(diluteWithAbv >= 0.0) { "Dilution strength cannot be negative." }
+        require(diluteWithAbv < targetAbv) { "Dilution strength must be below target strength." }
+
+        // Water dilution — identical to Volume mode.
+        if (diluteWithAbv <= 0.0) {
+            return calculate(sourceLiters, sourceAbv, targetAbv)
+        }
+
+        // Spirit dilution. First, estimate the contraction using the
+        // water-only case as a proxy, scaled by how "water-like" the
+        // diluting spirit is.
+        val waterOnlyWater = (sourceLiters / 100.0) * waterPer100L(sourceAbv, targetAbv)
+        val waterOnlyPure = sourceLiters * (sourceAbv / 100.0)
+        val waterOnlyFinal = waterOnlyPure / (targetAbv / 100.0)
+        val waterOnlyContraction = sourceLiters + waterOnlyWater - waterOnlyFinal
+
+        // A diluting spirit at C% ABV has (1 - C/T) as its water-equivalent
+        // fraction relative to the target.
+        val diluteWaterFraction = 1.0 - (diluteWithAbv / targetAbv)
+        val estimatedContraction = waterOnlyContraction * diluteWaterFraction
+
+        // Solve for W using the mass balance with the estimated contraction:
+        // V_s + W - contraction = (V_s * S_s + W * C) / T
+        // => W = [V_s * (S_s - T) + contraction * T] / (T - C)
+        val diluteVolume = (sourceLiters * (sourceAbv - targetAbv) + estimatedContraction * targetAbv) /
+                (targetAbv - diluteWithAbv)
+
+        val pureAlcohol = sourceLiters * (sourceAbv / 100.0) + diluteVolume * (diluteWithAbv / 100.0)
+        val finalVolume = pureAlcohol / (targetAbv / 100.0)
+        val apparentTotal = sourceLiters + diluteVolume
+        val contraction = apparentTotal - finalVolume
+
+        return Result(
+            waterToAddLiters = diluteVolume,
+            finalVolumeLiters = finalVolume,
+            pureAlcoholLiters = pureAlcohol,
+            contractionLiters = contraction
+        )
+    }
+
     // ---------------------------------------------------------------
     // Unit conversions.
-    // The math engine always runs in ABV and litres. These helpers
-    // translate user-facing values on the way in and out.
     // ---------------------------------------------------------------
 
-    /**
-     * US Proof = 2 * ABV, at reference temperature 20 C. (TTB nominally
-     * specifies 60 F; we stay at 20 C for consistency with the polynomial
-     * and revisit temperature correction in a later version.)
-     */
     fun abvToUsProof(abv: Double): Double = abv * 2.0
-
-    /** Inverse of [abvToUsProof]. */
     fun usProofToAbv(proof: Double): Double = proof / 2.0
-
-    /** Litres to US gallons. */
     fun litersToUsGallons(liters: Double): Double = liters / LITERS_PER_US_GALLON
-
-    /** US gallons to litres. */
     fun usGallonsToLiters(gallons: Double): Double = gallons * LITERS_PER_US_GALLON
 }
