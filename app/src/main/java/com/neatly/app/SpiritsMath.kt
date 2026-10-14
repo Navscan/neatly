@@ -27,6 +27,7 @@ object SpiritsMath {
     private const val C9 = -0.002073
 
     const val LITERS_PER_US_GALLON = 3.785411784
+    const val KG_PER_US_POUND = 0.45359237
 
     fun waterPer100L(sourceAbv: Double, targetAbv: Double): Double {
         val s = sourceAbv
@@ -258,9 +259,6 @@ object SpiritsMath {
         val apparentVolume = stockToCharge + waterToAdd
         val contraction = apparentVolume - withWastage
 
-        // Angels' share: given a final volume, what was the starting volume?
-        // start * (1 - annualLoss%)^years = final
-        // => start = final / (1 - annualLoss%)^years
         val angelsShareStartVolume = if (angelsShareEnabled && yearsInBarrel > 0.0 && annualLossPercent > 0.0) {
             val retention = Math.pow(1.0 - (annualLossPercent / 100.0), yearsInBarrel)
             if (retention > 0.0) stockToCharge / retention else stockToCharge
@@ -304,15 +302,6 @@ object SpiritsMath {
         DROPS_PER_L
     }
 
-    /**
-     * A single additive slot.
-     *
-     * @param name     Free-text label (e.g. Vanilla concentrate).
-     * @param dose     Numeric dose rate per litre of final blend volume.
-     * @param unit     Dose rate basis. See [DoseUnit].
-     * @param abv      Additive ABV in % v/v. Defaults to 0 for water-based.
-     * @param density  Density in g/mL. Only used for [DoseUnit.G_PER_L].
-     */
     data class AdditiveInput(
         val name: String,
         val dose: Double,
@@ -329,16 +318,6 @@ object SpiritsMath {
         val additiveVolumesLiters: List<Double>
     )
 
-    /**
-     * Additive dosing calculator.
-     *
-     * Dose rates are per litre of final blend volume. Drops are 20 per mL.
-     * Gram doses are converted to volume via [AdditiveInput.density].
-     *
-     * @throws IllegalArgumentException when target exceeds base strength,
-     *         when any volume is non-positive, or when additive alcohol
-     *         alone exceeds the target (negative base spirit).
-     */
     fun calculateFlavour(
         finishedVolumeLiters: Double,
         targetAbv: Double,
@@ -382,4 +361,82 @@ object SpiritsMath {
             additiveVolumesLiters = additiveVolumes
         )
     }
+
+    // ---------------------------------------------------------------
+    // Mass-mode conversions (v1.15).
+    //
+    // Ethanol-water density at 20 C, ABV % v/v. These values are
+    // approximate to within ~0.5% of the OIML reference tables.
+    // Adequate for production planning; refine from a standards
+    // source before any use where the difference matters.
+    //
+    // Only valid for post-distillation product (ethanol + water).
+    // Do NOT use for molasses, syrup, wort, or wash.
+    // ---------------------------------------------------------------
+
+    private val DENSITY_TABLE: Array<Pair<Double, Double>> = arrayOf(
+        0.0 to 0.9982,
+        5.0 to 0.9917,
+        10.0 to 0.9847,
+        15.0 to 0.9791,
+        20.0 to 0.9746,
+        25.0 to 0.9686,
+        30.0 to 0.9628,
+        35.0 to 0.9554,
+        40.0 to 0.9480,
+        45.0 to 0.9392,
+        50.0 to 0.9300,
+        55.0 to 0.9197,
+        60.0 to 0.9095,
+        65.0 to 0.8976,
+        70.0 to 0.8855,
+        75.0 to 0.8727,
+        80.0 to 0.8585,
+        85.0 to 0.8445,
+        90.0 to 0.8290,
+        95.0 to 0.8122,
+        100.0 to 0.7893
+    )
+
+    const val DENSITY_WATER = 0.9982
+    const val DENSITY_PURE_ETHANOL = 0.7893
+
+    /**
+     * Density of an ethanol-water solution at 20 C, in g/mL, for the
+     * given ABV % v/v. Linear interpolation between tabulated values.
+     */
+    fun densityAt(abv: Double): Double {
+        val a = abv.coerceIn(0.0, 100.0)
+        for (i in 0 until DENSITY_TABLE.size - 1) {
+            val (a0, d0) = DENSITY_TABLE[i]
+            val (a1, d1) = DENSITY_TABLE[i + 1]
+            if (a <= a1) {
+                val t = (a - a0) / (a1 - a0)
+                return d0 + t * (d1 - d0)
+            }
+        }
+        return DENSITY_TABLE.last().second
+    }
+
+    /**
+     * Convert kilograms of ethanol-water solution at [abv] % v/v to
+     * litres at 20 C.
+     */
+    fun kgToLitres(kg: Double, abv: Double): Double = kg / densityAt(abv)
+
+    /**
+     * Convert litres of ethanol-water solution at [abv] % v/v to
+     * kilograms at 20 C.
+     */
+    fun litresToKg(litres: Double, abv: Double): Double = litres * densityAt(abv)
+
+    /**
+     * Convert kilograms to US pounds.
+     */
+    fun kgToUsPounds(kg: Double): Double = kg / KG_PER_US_POUND
+
+    /**
+     * Convert US pounds to kilograms.
+     */
+    fun usPoundsToKg(lb: Double): Double = lb * KG_PER_US_POUND
 }

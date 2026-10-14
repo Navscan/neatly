@@ -74,7 +74,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:background="@drawable/pill_container"
-                    android:padding="3dp">
+                    android:padding="3dp"
+                    android:layout_marginBottom="6dp">
 
                     <TextView
                         android:id="@+id/unitMetric"
@@ -94,6 +95,37 @@
                         android:layout_height="30dp"
                         android:gravity="center"
                         android:text="@string/unit_imperial"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp">
+
+                    <TextView
+                        android:id="@+id/unitVol"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_vol"
+                        android:textSize="11sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/unitMass"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_mass"
                         android:textSize="11sp"
                         android:textColor="@color/ink_muted"
                         android:fontFamily="sans-serif-medium"

@@ -104,4 +104,10 @@
     <string name="result_base_spirit">Base spirit to charge</string>
     <string name="msg_flavour_incomplete">Enter finished volume, target, and base strength.</string>
     <string name="msg_flavour_target_exceeds_base">Target strength must be at or below base spirit strength.</string>
+
+    <!-- Mass mode (v1.15) -->
+    <string name="unit_vol">VOL</string>
+    <string name="unit_mass">MASS</string>
+    <string name="unit_kg">kg</string>
+    <string name="unit_lb">lb</string>
 </resources>

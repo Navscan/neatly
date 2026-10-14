@@ -157,6 +157,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitProof: TextView
     private lateinit var unitMetric: TextView
     private lateinit var unitImperial: TextView
+    private lateinit var unitVol: TextView
+    private lateinit var unitMass: TextView
 
     // Cut unit labels (dynamic)
     private lateinit var unitVolume: TextView
@@ -179,6 +181,7 @@ class MainActivity : AppCompatActivity() {
     private var mode = Mode.BATCH
     private var isProofMode = false
     private var isImperialMode = false
+    private var isMassMode = false
     private var bottlerInCl = false
 
     private val installPermissionLauncher = registerForActivityResult(
@@ -372,6 +375,8 @@ class MainActivity : AppCompatActivity() {
         unitProof = findViewById(R.id.unitProof)
         unitMetric = findViewById(R.id.unitMetric)
         unitImperial = findViewById(R.id.unitImperial)
+        unitVol = findViewById(R.id.unitVol)
+        unitMass = findViewById(R.id.unitMass)
 
         // Cut unit labels
         unitVolume = findViewById(R.id.unitVolume)
@@ -463,6 +468,8 @@ class MainActivity : AppCompatActivity() {
         unitProof.setOnClickListener { setStrengthMode(proof = true) }
         unitMetric.setOnClickListener { setMeasurementMode(imperial = false) }
         unitImperial.setOnClickListener { setMeasurementMode(imperial = true) }
+        unitVol.setOnClickListener { setMassMode(mass = false) }
+        unitMass.setOnClickListener { setMassMode(mass = true) }
     }
 
     private fun setStrengthMode(proof: Boolean) {
@@ -489,8 +496,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun setMeasurementMode(imperial: Boolean) {
         if (imperial == isImperialMode) return
-        val factor = if (imperial) 1.0 / SpiritsMath.LITERS_PER_US_GALLON
+
+        val factor: Double
+        if (isMassMode) {
+            factor = if (imperial) 1.0 / SpiritsMath.KG_PER_US_POUND
+                     else SpiritsMath.KG_PER_US_POUND
+        } else {
+            factor = if (imperial) 1.0 / SpiritsMath.LITERS_PER_US_GALLON
                      else SpiritsMath.LITERS_PER_US_GALLON
+        }
+
         scaleField(sourceVolume, factor)
         scaleField(compAVolume, factor)
         scaleField(compBVolume, factor)
@@ -501,6 +516,62 @@ class MainActivity : AppCompatActivity() {
         updateToggleVisuals()
         updateUnitLabels()
         recalculate()
+    }
+
+    private fun setMassMode(mass: Boolean) {
+        if (mass == isMassMode) return
+
+        // Convert every volume field in place, preserving physical scenario.
+        val volumeFields = listOf(
+            sourceVolume, compAVolume, compBVolume, solveBatchSize,
+            bottlerAvailableStock, flavourFinishedVolume
+        )
+        for (field in volumeFields) {
+            val raw = field.text?.toString().orEmpty()
+            if (raw.isBlank()) continue
+            val v = raw.toDoubleOrNull() ?: continue
+            val abv = abvForVolumeField(field)
+
+            val converted: Double = if (mass) {
+                // VOL -> MASS: value is in current volume unit (L or gal)
+                val litres = if (isImperialMode) SpiritsMath.usGallonsToLiters(v) else v
+                val kg = SpiritsMath.litresToKg(litres, abv)
+                if (isImperialMode) SpiritsMath.kgToUsPounds(kg) else kg
+            } else {
+                // MASS -> VOL: value is in current mass unit (kg or lb)
+                val kg = if (isImperialMode) SpiritsMath.usPoundsToKg(v) else v
+                val litres = SpiritsMath.kgToLitres(kg, abv)
+                if (isImperialMode) SpiritsMath.litersToUsGallons(litres) else litres
+            }
+            field.setText(formatNumber(converted))
+            field.setSelection(field.text?.length ?: 0)
+        }
+
+        isMassMode = mass
+        updateToggleVisuals()
+        updateUnitLabels()
+        recalculate()
+    }
+
+    /**
+     * Returns the ABV % v/v that applies to the fluid in [field], used for
+     * mass-mode density conversion. Falls back to 40% if the relevant
+     * strength field is empty or unparseable.
+     */
+    private fun abvForVolumeField(field: EditText): Double {
+        return when (field) {
+            sourceVolume -> if (mode == Mode.REDUCE) {
+                readStrength(sourceAbv) ?: 40.0
+            } else {
+                readStrength(targetAbv) ?: 40.0
+            }
+            compAVolume -> readStrength(compAStrength) ?: 40.0
+            compBVolume -> readStrength(compBStrength) ?: 40.0
+            solveBatchSize -> readStrength(targetAbv) ?: 40.0
+            bottlerAvailableStock -> readStrength(bottlerStockAbv) ?: 40.0
+            flavourFinishedVolume -> readStrength(flavourTargetAbv) ?: 40.0
+            else -> 40.0
+        }
     }
 
     private fun scaleField(field: EditText, factor: Double) {
@@ -522,6 +593,8 @@ class MainActivity : AppCompatActivity() {
         paintToggle(unitProof, active = isProofMode)
         paintToggle(unitMetric, active = !isImperialMode)
         paintToggle(unitImperial, active = isImperialMode)
+        paintToggle(unitVol, active = !isMassMode)
+        paintToggle(unitMass, active = isMassMode)
     }
 
     private fun paintToggle(view: TextView, active: Boolean) {
@@ -537,8 +610,13 @@ class MainActivity : AppCompatActivity() {
     private fun updateUnitLabels() {
         val strengthUnit = if (isProofMode) getString(R.string.unit_proof)
                            else getString(R.string.unit_abv)
-        val volumeUnit = if (isImperialMode) getString(R.string.unit_gallons)
-                         else getString(R.string.unit_liters)
+
+        val volumeOrMassUnit = if (isMassMode) {
+            if (isImperialMode) getString(R.string.unit_lb) else getString(R.string.unit_kg)
+        } else {
+            if (isImperialMode) getString(R.string.unit_gallons) else getString(R.string.unit_liters)
+        }
+
         val bottleUnit = if (bottlerInCl) getString(R.string.bottler_unit_cl)
                          else getString(R.string.bottler_unit_ml)
 
@@ -549,19 +627,19 @@ class MainActivity : AppCompatActivity() {
         unitSolveAStrength.text = strengthUnit
         unitSolveBStrength.text = strengthUnit
 
-        unitVolume.text = volumeUnit
-        unitCompAVolume.text = volumeUnit
-        unitCompBVolume.text = volumeUnit
-        unitSolveBatchSize.text = volumeUnit
+        unitVolume.text = volumeOrMassUnit
+        unitCompAVolume.text = volumeOrMassUnit
+        unitCompBVolume.text = volumeOrMassUnit
+        unitSolveBatchSize.text = volumeOrMassUnit
 
         bottlerUnitBottleSize.text = bottleUnit
         bottlerUnitTargetStrength.text = strengthUnit
         bottlerUnitStockStrength.text = strengthUnit
-        bottlerUnitAvailableStock.text = volumeUnit
+        bottlerUnitAvailableStock.text = volumeOrMassUnit
 
         flavourUnitTargetStrength.text = strengthUnit
         flavourUnitBaseStrength.text = strengthUnit
-        flavourUnitVolume.text = volumeUnit
+        flavourUnitVolume.text = volumeOrMassUnit
     }
 
     // ---------------------------------------------------------------
@@ -714,10 +792,23 @@ class MainActivity : AppCompatActivity() {
     // Reading helpers
     // ---------------------------------------------------------------
 
+    /**
+     * Reads a volume field and returns litres regardless of display mode.
+     * VOL+metric: input is litres, returned as-is.
+     * VOL+US:     input is US gallons, converted.
+     * MASS+metric: input is kg, converted via density at the field's ABV.
+     * MASS+US:    input is lb, converted to kg then to litres.
+     */
     private fun readVolume(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
-        return if (isImperialMode) SpiritsMath.usGallonsToLiters(value) else value
+        return if (isMassMode) {
+            val kg = if (isImperialMode) SpiritsMath.usPoundsToKg(value) else value
+            val abv = abvForVolumeField(field)
+            SpiritsMath.kgToLitres(kg, abv)
+        } else {
+            if (isImperialMode) SpiritsMath.usGallonsToLiters(value) else value
+        }
     }
 
     private fun readStrength(field: EditText): Double? {
@@ -726,11 +817,25 @@ class MainActivity : AppCompatActivity() {
         return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
     }
 
-    private fun formatVolume(liters: Double): String {
-        return if (isImperialMode) {
-            String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+    /**
+     * Formats a volume output. The [abv] argument is the ABV % v/v of the
+     * fluid being reported and is used only in mass mode to convert litres
+     * to kg (and then to lb when imperial).
+     */
+    private fun formatVolume(liters: Double, abv: Double): String {
+        return if (isMassMode) {
+            val kg = SpiritsMath.litresToKg(liters, abv)
+            if (isImperialMode) {
+                String.format(Locale.US, "%.3f lb", SpiritsMath.kgToUsPounds(kg))
+            } else {
+                String.format(Locale.US, "%.3f kg", kg)
+            }
         } else {
-            String.format(Locale.US, "%.3f L", liters)
+            if (isImperialMode) {
+                String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+            } else {
+                String.format(Locale.US, "%.3f L", liters)
+            }
         }
     }
 
@@ -772,13 +877,13 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val result = SpiritsMath.calculateBatch(finishedVolume, stock, target)
-            showBatchResults(result)
+            showBatchResults(result, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun showBatchResults(result: SpiritsMath.BatchResult) {
+    private fun showBatchResults(result: SpiritsMath.BatchResult, stockAbv: Double) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.VISIBLE
         resultsGroupCombine.visibility = View.GONE
@@ -788,10 +893,10 @@ class MainActivity : AppCompatActivity() {
 
         resRow1Label.text = getString(R.string.result_stock_to_charge)
         resRow2Label.text = getString(R.string.result_water_to_add)
-        resWater.text = formatVolume(result.stockToChargeLiters)
-        resFinalVol.text = formatVolume(result.waterToAddLiters)
-        resPureAlc.text = formatVolume(result.pureAlcoholLiters)
-        resContraction.text = formatVolume(result.contractionLiters)
+        resWater.text = formatVolume(result.stockToChargeLiters, stockAbv)
+        resFinalVol.text = formatVolume(result.waterToAddLiters, 0.0)
+        resPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
+        resContraction.text = formatVolume(result.contractionLiters, 0.0)
         resWarning.text = ""
     }
 
@@ -808,13 +913,13 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val result = SpiritsMath.calculate(volume, source, target)
-            showReduceResults(result)
+            showReduceResults(result, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun showReduceResults(result: SpiritsMath.Result) {
+    private fun showReduceResults(result: SpiritsMath.Result, targetAbv: Double) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.VISIBLE
         resultsGroupCombine.visibility = View.GONE
@@ -824,10 +929,10 @@ class MainActivity : AppCompatActivity() {
 
         resRow1Label.text = getString(R.string.result_water_to_add)
         resRow2Label.text = getString(R.string.result_final_volume)
-        resWater.text = formatVolume(result.waterToAddLiters)
-        resFinalVol.text = formatVolume(result.finalVolumeLiters)
-        resPureAlc.text = formatVolume(result.pureAlcoholLiters)
-        resContraction.text = formatVolume(result.contractionLiters)
+        resWater.text = formatVolume(result.waterToAddLiters, 0.0)
+        resFinalVol.text = formatVolume(result.finalVolumeLiters, targetAbv)
+        resPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
+        resContraction.text = formatVolume(result.contractionLiters, 0.0)
         resWarning.text = ""
     }
 
@@ -859,11 +964,12 @@ class MainActivity : AppCompatActivity() {
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
 
-        combHeadline.text = formatVolume(result.pooledVolumeLiters) + " at " + formatStrength(result.pooledAbv)
-        combPooledVol.text = formatVolume(result.pooledVolumeLiters)
-        combPooledAbv.text = formatStrength(result.pooledAbv)
-        combPureAlc.text = formatVolume(result.pureAlcoholLiters)
-        combContraction.text = formatVolume(result.contractionLiters)
+        val pooledAbv = result.pooledAbv
+        combHeadline.text = formatVolume(result.pooledVolumeLiters, pooledAbv) + " at " + formatStrength(pooledAbv)
+        combPooledVol.text = formatVolume(result.pooledVolumeLiters, pooledAbv)
+        combPooledAbv.text = formatStrength(pooledAbv)
+        combPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
+        combContraction.text = formatVolume(result.contractionLiters, 0.0)
         resWarning.text = ""
     }
 
@@ -900,7 +1006,7 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val result = SpiritsMath.blendSolve(abvA, abvB, target, batchSize)
-            showSolveResults(result)
+            showSolveResults(result, abvA, abvB, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
@@ -929,7 +1035,12 @@ class MainActivity : AppCompatActivity() {
         targetHint.visibility = View.VISIBLE
     }
 
-    private fun showSolveResults(result: SpiritsMath.SolveResult) {
+    private fun showSolveResults(
+        result: SpiritsMath.SolveResult,
+        abvA: Double,
+        abvB: Double,
+        targetAbv: Double
+    ) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
@@ -937,10 +1048,10 @@ class MainActivity : AppCompatActivity() {
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
 
-        solveHeadline.text = formatVolume(result.batchSizeLiters) + " batch"
-        solveSampleA.text = formatVolume(result.sampleVolumeA)
-        solveSampleB.text = formatVolume(result.sampleVolumeB)
-        solvePureAlc.text = formatVolume(result.pureAlcoholLiters)
+        solveHeadline.text = formatVolume(result.batchSizeLiters, targetAbv) + " batch"
+        solveSampleA.text = formatVolume(result.sampleVolumeA, abvA)
+        solveSampleB.text = formatVolume(result.sampleVolumeB, abvB)
+        solvePureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resWarning.text = ""
     }
 
@@ -986,13 +1097,17 @@ class MainActivity : AppCompatActivity() {
                 yearsInBarrel = years,
                 annualLossPercent = annualLoss
             )
-            showBottlerResults(result, stock)
+            showBottlerResults(result, target, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun showBottlerResults(result: SpiritsMath.BottlerResult, stockAbv: Double) {
+    private fun showBottlerResults(
+        result: SpiritsMath.BottlerResult,
+        targetAbv: Double,
+        stockAbv: Double
+    ) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
@@ -1000,15 +1115,15 @@ class MainActivity : AppCompatActivity() {
         resultsGroupBottler.visibility = View.VISIBLE
         resultsGroupFlavour.visibility = View.GONE
 
-        val headline = formatVolume(result.stockToChargeLiters) + " of " +
+        val headline = formatVolume(result.stockToChargeLiters, stockAbv) + " of " +
             formatStrength(stockAbv) + " stock"
         bottlerHeadline.text = headline
 
-        bottlerOrderVolume.text = formatVolume(result.orderVolumeLiters)
-        bottlerWithWastage.text = formatVolume(result.withWastageLiters)
-        bottlerStockCharge.text = formatVolume(result.stockToChargeLiters)
-        bottlerWaterAdd.text = formatVolume(result.waterToAddLiters)
-        bottlerContraction.text = formatVolume(result.contractionLiters)
+        bottlerOrderVolume.text = formatVolume(result.orderVolumeLiters, targetAbv)
+        bottlerWithWastage.text = formatVolume(result.withWastageLiters, targetAbv)
+        bottlerStockCharge.text = formatVolume(result.stockToChargeLiters, stockAbv)
+        bottlerWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
+        bottlerContraction.text = formatVolume(result.contractionLiters, 0.0)
 
         // Available stock check
         val available = readVolume(bottlerAvailableStock)
@@ -1016,11 +1131,11 @@ class MainActivity : AppCompatActivity() {
             available == null || available <= 0.0 -> ""
             available >= result.stockToChargeLiters -> {
                 val surplus = available - result.stockToChargeLiters
-                getString(R.string.bottler_msg_surplus, formatVolume(surplus))
+                getString(R.string.bottler_msg_surplus, formatVolume(surplus, stockAbv))
             }
             else -> {
                 val shortfall = result.stockToChargeLiters - available
-                getString(R.string.bottler_msg_shortfall, formatVolume(shortfall))
+                getString(R.string.bottler_msg_shortfall, formatVolume(shortfall, stockAbv))
             }
         }
     }
@@ -1052,13 +1167,17 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val result = SpiritsMath.calculateFlavour(finishedVolume, target, base, additives)
-            showFlavourResults(result)
+            showFlavourResults(result, target, base)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun showFlavourResults(result: SpiritsMath.FlavourResult) {
+    private fun showFlavourResults(
+        result: SpiritsMath.FlavourResult,
+        targetAbv: Double,
+        baseAbv: Double
+    ) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
@@ -1067,15 +1186,25 @@ class MainActivity : AppCompatActivity() {
         resultsGroupFlavour.visibility = View.VISIBLE
 
         val effectiveTarget = if (result.finalVolumeLiters > 0.0)
-            (result.pureAlcoholLiters / result.finalVolumeLiters) * 100.0 else 0.0
-        flavHeadline.text = formatVolume(result.finalVolumeLiters) + " at " + formatStrength(effectiveTarget)
+            (result.pureAlcoholLiters / result.finalVolumeLiters) * 100.0 else targetAbv
+        flavHeadline.text = formatVolume(result.finalVolumeLiters, effectiveTarget) +
+            " at " + formatStrength(effectiveTarget)
 
-        flavBaseSpirit.text = formatVolume(result.baseSpiritLiters)
-        flavWaterAdd.text = formatVolume(result.waterToAddLiters)
-        flavAdd1Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(0) { 0.0 })
-        flavAdd2Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(1) { 0.0 })
-        flavAdd3Vol.text = formatVolume(result.additiveVolumesLiters.getOrElse(2) { 0.0 })
-        flavPureAlc.text = formatVolume(result.pureAlcoholLiters)
+        flavBaseSpirit.text = formatVolume(result.baseSpiritLiters, baseAbv)
+        flavWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
+        flavAdd1Vol.text = formatVolume(
+            result.additiveVolumesLiters.getOrElse(0) { 0.0 },
+            readStrength(flavourAddAbv[0]) ?: 0.0
+        )
+        flavAdd2Vol.text = formatVolume(
+            result.additiveVolumesLiters.getOrElse(1) { 0.0 },
+            readStrength(flavourAddAbv[1]) ?: 0.0
+        )
+        flavAdd3Vol.text = formatVolume(
+            result.additiveVolumesLiters.getOrElse(2) { 0.0 },
+            readStrength(flavourAddAbv[2]) ?: 0.0
+        )
+        flavPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resWarning.text = ""
     }
 
