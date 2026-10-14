@@ -58,10 +58,6 @@ object SpiritsMath {
         val contractionLiters: Double
     )
 
-    /**
-     * Reduce mode: add water to a known volume of stock to reach a
-     * target strength.
-     */
     fun calculate(volumeLiters: Double, sourceAbv: Double, targetAbv: Double): Result {
         require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
         require(targetAbv > 0.0 && sourceAbv > 0.0) { "Strength values must be greater than zero." }
@@ -82,18 +78,6 @@ object SpiritsMath {
         )
     }
 
-    /**
-     * Batch mode: charge a tank to finish at exactly [finishedVolumeLiters]
-     * at [targetAbv], given stock spirit at [stockAbv].
-     *
-     * Returns how much stock to charge and how much water to add.
-     *
-     * The math:
-     *   pure alcohol needed    = finishedVolume * targetAbv
-     *   pure alcohol from stock = stockVolume * stockAbv
-     *   => stockVolume = finishedVolume * targetAbv / stockAbv
-     *   water to add    = stockVolume * waterPer100L(stockAbv, targetAbv) / 100
-     */
     fun calculateBatch(
         finishedVolumeLiters: Double,
         stockAbv: Double,
@@ -118,10 +102,6 @@ object SpiritsMath {
             contractionLiters = contraction
         )
     }
-
-    // ---------------------------------------------------------------
-    // Blend: combine two known volumes and strengths.
-    // ---------------------------------------------------------------
 
     data class BlendResult(
         val pooledVolumeLiters: Double,
@@ -172,11 +152,6 @@ object SpiritsMath {
         )
     }
 
-    // ---------------------------------------------------------------
-    // Blend: solve for the ratio of two components needed to hit a
-    // target strength, scaled to a specified batch size.
-    // ---------------------------------------------------------------
-
     data class SolveResult(
         val batchSizeLiters: Double,
         val sampleVolumeA: Double,
@@ -184,12 +159,6 @@ object SpiritsMath {
         val pureAlcoholLiters: Double
     )
 
-    /**
-     * Pearson's square. Given two component strengths and a target
-     * strength that lies strictly between them, returns the ratio A:B
-     * and the litre quantities of each component needed for a
-     * [batchSizeLiters] batch.
-     */
     fun blendSolve(
         abvA: Double,
         abvB: Double,
@@ -225,7 +194,6 @@ object SpiritsMath {
             sampleVolumeB = highFraction * batchSizeLiters
         }
 
-        // Pure alcohol for the batch = sum of the two components.
         val pureAlcohol = sampleVolumeA * (abvA / 100.0) + sampleVolumeB * (abvB / 100.0)
 
         return SolveResult(
@@ -233,6 +201,84 @@ object SpiritsMath {
             sampleVolumeA = sampleVolumeA,
             sampleVolumeB = sampleVolumeB,
             pureAlcoholLiters = pureAlcohol
+        )
+    }
+
+    // ---------------------------------------------------------------
+    // Bottler: order-driven production planning.
+    // ---------------------------------------------------------------
+
+    data class BottlerResult(
+        val orderVolumeLiters: Double,
+        val withWastageLiters: Double,
+        val stockToChargeLiters: Double,
+        val waterToAddLiters: Double,
+        val pureAlcoholLiters: Double,
+        val contractionLiters: Double,
+        val angelsShareStartVolume: Double
+    )
+
+    /**
+     * Production planner.
+     *
+     * @param bottleVolumeMl      Bottle size in millilitres (e.g. 750).
+     * @param packSize            Bottles per case (e.g. 12).
+     * @param caseCount           Number of cases in the order.
+     * @param targetAbv           Finished ABV (e.g. 43.0).
+     * @param stockAbv            Available spirit ABV (e.g. 72.0).
+     * @param wastagePercent      0.0 – 10.0. Applied to the order volume.
+     * @param angelsShareEnabled  When true, computes starting barrel
+     *                            volume needed to end up with [withWastageLiters].
+     * @param yearsInBarrel       Only used if [angelsShareEnabled].
+     * @param annualLossPercent   Only used if [angelsShareEnabled].
+     */
+    fun calculateBottler(
+        bottleVolumeMl: Double,
+        packSize: Int,
+        caseCount: Int,
+        targetAbv: Double,
+        stockAbv: Double,
+        wastagePercent: Double,
+        angelsShareEnabled: Boolean,
+        yearsInBarrel: Double,
+        annualLossPercent: Double
+    ): BottlerResult {
+        require(bottleVolumeMl > 0.0) { "Bottle size must be greater than zero." }
+        require(packSize > 0) { "Pack size must be greater than zero." }
+        require(caseCount > 0) { "Case count must be greater than zero." }
+        require(targetAbv > 0.0) { "Target strength must be greater than zero." }
+        require(stockAbv > targetAbv) { "Stock strength must be higher than target strength." }
+        require(wastagePercent >= 0.0) { "Wastage cannot be negative." }
+
+        val orderVolumeLiters = (bottleVolumeMl / 1000.0) * packSize * caseCount
+        val wastageMultiplier = 1.0 + (wastagePercent / 100.0)
+        val withWastage = orderVolumeLiters * wastageMultiplier
+
+        val stockToCharge = withWastage * (targetAbv / stockAbv)
+        val waterPer100 = waterPer100L(stockAbv, targetAbv)
+        val waterToAdd = (stockToCharge / 100.0) * waterPer100
+        val pureAlcohol = stockToCharge * (stockAbv / 100.0)
+        val apparentVolume = stockToCharge + waterToAdd
+        val contraction = apparentVolume - withWastage
+
+        // Angels' share: given a final volume, what was the starting volume?
+        // start * (1 - annualLoss%)^years = final
+        // => start = final / (1 - annualLoss%)^years
+        val angelsShareStartVolume = if (angelsShareEnabled && yearsInBarrel > 0.0 && annualLossPercent > 0.0) {
+            val retention = Math.pow(1.0 - (annualLossPercent / 100.0), yearsInBarrel)
+            if (retention > 0.0) stockToCharge / retention else stockToCharge
+        } else {
+            stockToCharge
+        }
+
+        return BottlerResult(
+            orderVolumeLiters = orderVolumeLiters,
+            withWastageLiters = withWastage,
+            stockToChargeLiters = stockToCharge,
+            waterToAddLiters = waterToAdd,
+            pureAlcoholLiters = pureAlcohol,
+            contractionLiters = contraction,
+            angelsShareStartVolume = angelsShareStartVolume
         )
     }
 

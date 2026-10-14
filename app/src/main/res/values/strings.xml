@@ -3,10 +3,10 @@
     <string name="app_name">Neatly</string>
     <string name="wordmark_n">N</string>
     <string name="wordmark_rest">eatly</string>
-    <string name="tagline">Cut spirit to strength, read a 100 L production table, and dose flavour concentrates without losing the alcohol.</string>
+    <string name="tagline">Cut spirit to strength, plan bottling runs, and dose flavour concentrates without losing the alcohol.</string>
 
     <string name="tab_cut">Cut</string>
-    <string name="tab_100l">100 L</string>
+    <string name="tab_bottler">Bottler</string>
     <string name="tab_flavour">Flavour</string>
 
     <string name="subtab_batch">Batch</string>
@@ -58,4 +58,32 @@
     <string name="update_ready">Update ready · Tap to install</string>
 
     <string name="footer_format">Neatly v%1$s ©PayBridge (Pty) Ltd %2$d</string>
+
+    <!-- ============ BOTTLER ============ -->
+
+    <string name="bottler_preset_global">GLOBAL</string>
+    <string name="bottler_preset_eu">EU · UK</string>
+    <string name="bottler_preset_us">US</string>
+    <string name="bottler_preset_rsa">RSA</string>
+
+    <string name="bottler_unit_ml">mL</string>
+    <string name="bottler_unit_cl">cl</string>
+
+    <string name="bottler_label_bottle_size">Bottle size</string>
+    <string name="bottler_label_pack_size">Pack size</string>
+    <string name="bottler_label_cases">Cases</string>
+    <string name="bottler_label_available_stock">Available stock (optional)</string>
+    <string name="bottler_label_wastage">Wastage</string>
+    <string name="bottler_label_angels_share">Include angels' share</string>
+    <string name="bottler_label_years_barrel">Years in barrel</string>
+    <string name="bottler_label_annual_loss">Annual loss</string>
+
+    <string name="bottler_result_order_requires">Order requires</string>
+    <string name="bottler_result_with_wastage">With wastage</string>
+    <string name="bottler_result_stock_to_charge">Stock to charge</string>
+    <string name="bottler_result_water_to_add">Water to add</string>
+    <string name="bottler_result_contraction">Contraction</string>
+    <string name="bottler_msg_shortfall">Shortfall: %1$s</string>
+    <string name="bottler_msg_surplus">Surplus: %1$s</string>
+    <string name="bottler_msg_sufficient">Sufficient stock available.</string>
 </resources>
