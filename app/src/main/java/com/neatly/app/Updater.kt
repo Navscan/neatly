@@ -20,15 +20,15 @@ import java.net.URL
  * In-app auto-updater.
  *
  * On launch and on every return to foreground:
- *   1. Fetch https://api.github.com/repos/<owner>/<repo>/releases/latest
- *      (cached for 15 minutes).
- *   2. Compare the release's version.json versionCode against
- *      BuildConfig.VERSION_CODE.
- *   3. If remote > local AND the active network is unmetered, silently
- *      download the APK into cacheDir/updates/.
- *   4. Call [onUpdateReady] so the caller can show a footer indicator.
+ *   1. Fetch GitHub's latest release metadata (cached 15 minutes).
+ *   2. Compare version.json versionCode against BuildConfig.VERSION_CODE.
+ *   3. If remote > local AND the active network is unmetered, download
+ *      the APK into cacheDir/updates/.
+ *   4. Set [pendingApk] and signal readiness so the UI can show a banner.
  *
- * All failures are silent.
+ * The public entry point returns an [UpdateStatus] so the UI can display
+ * what happened on the last check. All network operations run on
+ * Dispatchers.IO — see [checkForUpdate].
  */
 object Updater {
 
@@ -38,8 +38,6 @@ object Updater {
         "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
     private const val USER_AGENT = "Neatly-Android"
 
-    // 15 minutes between checks. Aggressive enough to catch updates
-    // within a normal session, well within GitHub's 60 req/hour limit.
     private const val CACHE_TTL_MS = 15L * 60L * 1000L
 
     private const val APK_FILENAME = "Neatly.apk"
@@ -51,28 +49,51 @@ object Updater {
     var pendingApk: File? = null
         private set
 
+    var lastStatus: UpdateStatus = UpdateStatus.IDLE
+        private set
+
+    enum class UpdateStatus {
+        IDLE,
+        METERED,
+        THROTTLED,
+        NETWORK_ERROR,
+        UP_TO_DATE,
+        UPDATE_READY,
+        DOWNLOAD_FAILED
+    }
+
     /**
-     * Non-blocking check. Always returns quickly. Safe to call from
-     * onResume().
+     * Non-blocking from the caller's perspective. All blocking network
+     * work runs on Dispatchers.IO. Callers on the main thread are safe.
      */
-    suspend fun checkForUpdate(context: Context, onUpdateReady: () -> Unit) {
+    suspend fun checkForUpdate(context: Context): UpdateStatus {
+        val status = withContext(Dispatchers.IO) {
+            performCheck(context)
+        }
+        lastStatus = status
+        return status
+    }
+
+    /**
+     * Runs entirely on a background thread. Returns the outcome.
+     */
+    private fun performCheck(context: Context): UpdateStatus {
         try {
-            if (!isUnmetered(context)) return
-            if (throttled(context)) return
+            if (!isUnmetered(context)) return UpdateStatus.METERED
+            if (throttled(context)) return UpdateStatus.THROTTLED
 
-            val release = fetchLatestRelease() ?: return
-            val remoteCode = fetchRemoteVersionCode(release) ?: return
+            val release = fetchLatestRelease() ?: return UpdateStatus.NETWORK_ERROR
+            val remoteCode = fetchRemoteVersionCode(release) ?: return UpdateStatus.NETWORK_ERROR
 
-            // Mark checked only after a successful API round-trip.
             markChecked(context)
 
-            if (remoteCode <= BuildConfig.VERSION_CODE) return
+            if (remoteCode <= BuildConfig.VERSION_CODE) return UpdateStatus.UP_TO_DATE
 
-            val apk = downloadApk(context, release) ?: return
+            val apk = downloadApk(context, release) ?: return UpdateStatus.DOWNLOAD_FAILED
             pendingApk = apk
-            withContext(Dispatchers.Main) { onUpdateReady() }
+            return UpdateStatus.UPDATE_READY
         } catch (_: Throwable) {
-            // Silent by design.
+            return UpdateStatus.NETWORK_ERROR
         }
     }
 
@@ -162,32 +183,59 @@ object Updater {
         val dir = File(context.cacheDir, "updates").apply { mkdirs() }
         val out = File(dir, APK_FILENAME)
 
-        val conn = (URL(apkUrl).openConnection() as HttpURLConnection).apply {
-            requestMethod = "GET"
-            setRequestProperty("User-Agent", USER_AGENT)
-            instanceFollowRedirects = true
-            connectTimeout = 15000
-            readTimeout = 30000
-        }
         return try {
-            if (conn.responseCode != 200) return null
-            conn.inputStream.use { input ->
-                out.outputStream().use { output ->
-                    input.copyTo(output, bufferSize = 64 * 1024)
-                }
-            }
-            out
+            downloadWithRedirects(apkUrl, out, redirectsLeft = 5)
+            if (out.length() > 0L) out else null
         } catch (_: Throwable) {
             out.delete()
             null
+        }
+    }
+
+    /**
+     * GitHub serves release assets via a redirect from github.com to
+     * objects.githubusercontent.com. Java's HttpURLConnection does not
+     * reliably preserve custom headers across cross-host redirects, and
+     * GitHub returns 403 if the User-Agent is dropped. We follow the
+     * redirect chain manually, re-applying the User-Agent on every hop.
+     */
+    private fun downloadWithRedirects(urlStr: String, out: File, redirectsLeft: Int) {
+        if (redirectsLeft <= 0) throw IllegalStateException("Too many redirects")
+
+        val conn = (URL(urlStr).openConnection() as HttpURLConnection).apply {
+            requestMethod = "GET"
+            setRequestProperty("User-Agent", USER_AGENT)
+            setRequestProperty("Accept", "application/octet-stream")
+            instanceFollowRedirects = false
+            connectTimeout = 15000
+            readTimeout = 30000
+        }
+        try {
+            val code = conn.responseCode
+            when (code) {
+                in 200..299 -> {
+                    conn.inputStream.use { input ->
+                        out.outputStream().use { output ->
+                            input.copyTo(output, bufferSize = 64 * 1024)
+                        }
+                    }
+                }
+                in 300..399 -> {
+                    val location = conn.getHeaderField("Location")
+                        ?: throw IllegalStateException("Redirect with no Location")
+                    downloadWithRedirects(location, out, redirectsLeft - 1)
+                }
+                else -> throw IllegalStateException("HTTP $code")
+            }
         } finally {
             conn.disconnect()
         }
     }
 
     /**
-     * Fire the system installer. Requires the caller to have already
-     * granted REQUEST_INSTALL_PACKAGES in the manifest.
+     * Fire the system installer. Requires REQUEST_INSTALL_PACKAGES in
+     * the manifest, and (on API 26+) the caller must have granted
+     * "install unknown apps".
      */
     fun install(context: Context) {
         val apk = pendingApk ?: return

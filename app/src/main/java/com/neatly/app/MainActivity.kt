@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
 
     private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE }
 
-    // Core inputs
     private lateinit var sourceVolume: EditText
     private lateinit var sourceAbv: EditText
     private lateinit var targetAbv: EditText
@@ -36,7 +35,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var solveAStrength: EditText
     private lateinit var solveBStrength: EditText
 
-    // Layout groups
     private lateinit var groupSingle: View
     private lateinit var groupCombine: View
     private lateinit var groupSolve: View
@@ -46,14 +44,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var labelVolume: TextView
     private lateinit var labelSourceStrength: TextView
 
-    // Sub-pill views
     private lateinit var subBatch: TextView
     private lateinit var subReduce: TextView
     private lateinit var subBlend: TextView
     private lateinit var subCombine: TextView
     private lateinit var subSolve: TextView
 
-    // Results
     private lateinit var resultsCard: MaterialCardView
     private lateinit var resultsGroupDilution: View
     private lateinit var resultsGroupCombine: View
@@ -77,13 +73,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wordmarkText: TextView
     private lateinit var updateBanner: MaterialCardView
 
-    // Toggle pills
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
     private lateinit var unitMetric: TextView
     private lateinit var unitImperial: TextView
 
-    // Unit suffix labels (they change with toggles)
     private lateinit var unitVolume: TextView
     private lateinit var unitSourceStrength: TextView
     private lateinit var unitTargetStrength: TextView
@@ -94,7 +88,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitSolveAStrength: TextView
     private lateinit var unitSolveBStrength: TextView
 
-    // Top tabs
     private lateinit var tabCut: TextView
     private lateinit var tab100l: TextView
     private lateinit var tabFlavour: TextView
@@ -261,10 +254,6 @@ class MainActivity : AppCompatActivity() {
         ).forEach { it.addTextChangedListener(watcher) }
     }
 
-    // ---------------------------------------------------------------
-    // Unit toggles
-    // ---------------------------------------------------------------
-
     private fun wireUnitToggles() {
         unitAbv.setOnClickListener { setStrengthMode(proof = false) }
         unitProof.setOnClickListener { setStrengthMode(proof = true) }
@@ -349,17 +338,10 @@ class MainActivity : AppCompatActivity() {
         unitCompBVolume.text = volumeUnit
     }
 
-    // ---------------------------------------------------------------
-    // Sub-mode switching
-    // ---------------------------------------------------------------
-
     private fun wireSubTabs() {
         subBatch.setOnClickListener { setMode(Mode.BATCH) }
         subReduce.setOnClickListener { setMode(Mode.REDUCE) }
-        subBlend.setOnClickListener {
-            // When Blend is tapped, default to Combine.
-            setMode(Mode.BLEND_COMBINE)
-        }
+        subBlend.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subCombine.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subSolve.setOnClickListener { setMode(Mode.BLEND_SOLVE) }
     }
@@ -371,26 +353,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyMode() {
-        // Top sub-pill styling
         paintToggle(subBatch, active = mode == Mode.BATCH)
         paintToggle(subReduce, active = mode == Mode.REDUCE)
         paintToggle(subBlend, active = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE)
 
-        // Blend sub-tab row visibility
         val blendActive = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE
         blendSubTabs.visibility = if (blendActive) View.VISIBLE else View.GONE
         paintToggle(subCombine, active = mode == Mode.BLEND_COMBINE)
         paintToggle(subSolve, active = mode == Mode.BLEND_SOLVE)
 
-        // Input groups
         groupSingle.visibility = if (mode == Mode.BATCH || mode == Mode.REDUCE) View.VISIBLE else View.GONE
         groupCombine.visibility = if (mode == Mode.BLEND_COMBINE) View.VISIBLE else View.GONE
         groupSolve.visibility = if (mode == Mode.BLEND_SOLVE) View.VISIBLE else View.GONE
 
-        // Target field visibility
         groupTarget.visibility = if (mode == Mode.BLEND_COMBINE) View.GONE else View.VISIBLE
 
-        // Field labels for Batch vs Reduce
         when (mode) {
             Mode.BATCH -> {
                 labelVolume.text = getString(R.string.label_batch_volume)
@@ -400,13 +377,9 @@ class MainActivity : AppCompatActivity() {
                 labelVolume.text = getString(R.string.label_stock_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
             }
-            else -> { /* not shown */ }
+            else -> { }
         }
     }
-
-    // ---------------------------------------------------------------
-    // Input reading (canonical: litres, ABV)
-    // ---------------------------------------------------------------
 
     private fun readVolume(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
@@ -436,20 +409,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Calculation dispatcher
-    // ---------------------------------------------------------------
-
     private fun recalculate() {
         when (mode) {
-            Mode.BATCH -> calculateDilution(useStockLabels = false)
-            Mode.REDUCE -> calculateDilution(useStockLabels = true)
+            Mode.BATCH -> calculateDilution()
+            Mode.REDUCE -> calculateDilution()
             Mode.BLEND_COMBINE -> calculateCombine()
             Mode.BLEND_SOLVE -> calculateSolve()
         }
     }
 
-    private fun calculateDilution(useStockLabels: Boolean) {
+    private fun calculateDilution() {
         val volume = readVolume(sourceVolume)
         val source = readStrength(sourceAbv)
         val target = readStrength(targetAbv)
@@ -554,10 +523,6 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
-    // ---------------------------------------------------------------
-    // Top tabs & misc
-    // ---------------------------------------------------------------
-
     private fun wireMainTabs() {
         tabCut.setOnClickListener { selectMainTab(tabCut) }
         tab100l.setOnClickListener { selectMainTab(tab100l) }
@@ -595,8 +560,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkForUpdate() {
         lifecycleScope.launch {
-            Updater.checkForUpdate(this@MainActivity) {
+            val status = Updater.checkForUpdate(this@MainActivity)
+            if (status == Updater.UpdateStatus.UPDATE_READY) {
                 updateBanner.visibility = View.VISIBLE
+            } else {
+                updateBanner.visibility = View.GONE
             }
         }
     }
