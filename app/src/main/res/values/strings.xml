@@ -59,8 +59,6 @@
 
     <string name="footer_format">Neatly v%1$s ©PayBridge (Pty) Ltd %2$d</string>
 
-    <!-- ============ BOTTLER ============ -->
-
     <string name="bottler_preset_global">GLOBAL</string>
     <string name="bottler_preset_eu">EU · UK</string>
     <string name="bottler_preset_us">US</string>
@@ -74,7 +72,7 @@
     <string name="bottler_label_cases">Cases</string>
     <string name="bottler_label_available_stock">Available stock (optional)</string>
     <string name="bottler_label_wastage">Wastage</string>
-    <string name="bottler_label_angels_share">Include angels' share</string>
+    <string name="bottler_label_angels_share">Include angels&apos; share</string>
     <string name="bottler_label_years_barrel">Years in barrel</string>
     <string name="bottler_label_annual_loss">Annual loss</string>
 
