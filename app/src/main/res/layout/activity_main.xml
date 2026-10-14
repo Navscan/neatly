@@ -256,18 +256,6 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp"
-                    android:visibility="gone">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp" />
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/groupSingle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -283,7 +271,7 @@
                             android:id="@+id/labelVolume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_batch_volume"
+                            android:text="@string/label_finished_volume"
                             android:textSize="13sp"
                             android:textColor="@color/ink_muted"
                             android:letterSpacing="0.02" />
@@ -336,7 +324,7 @@
                             android:id="@+id/labelSourceStrength"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_batch_strength"
+                            android:text="@string/label_stock_strength"
                             android:textSize="13sp"
                             android:textColor="@color/ink_muted"
                             android:letterSpacing="0.02" />
@@ -611,7 +599,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_component_a_strength"
+                            android:text="@string/label_stronger_strength"
                             android:textSize="13sp"
                             android:textColor="@color/ink_muted"
                             android:letterSpacing="0.02" />
@@ -663,7 +651,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_component_b_strength"
+                            android:text="@string/label_lighter_strength"
                             android:textSize="13sp"
                             android:textColor="@color/ink_muted"
                             android:letterSpacing="0.02" />
@@ -694,6 +682,58 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/unit_abv"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_batch_size"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_muted"
+                            android:letterSpacing="0.02" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/solveBatchSize"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:text="100" />
+
+                            <TextView
+                                android:id="@+id/unitSolveBatchSize"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/unit_liters"
                                 android:textSize="13sp"
                                 android:textColor="@color/ink_light"
                                 android:letterSpacing="0.04"
@@ -757,6 +797,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="@color/border_strong" />
+
+                    <TextView
+                        android:id="@+id/targetHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink_light"
+                        android:letterSpacing="0.02"
+                        android:visibility="gone" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -803,6 +853,7 @@
                         android:paddingBottom="14dp">
 
                         <TextView
+                            android:id="@+id/resRow1Label"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -829,6 +880,7 @@
                         android:paddingBottom="14dp">
 
                         <TextView
+                            android:id="@+id/resRow2Label"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
@@ -904,6 +956,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/combHeadline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/playfair_display"
+                        android:layout_marginBottom="14dp" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -1015,6 +1078,17 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
+                    <TextView
+                        android:id="@+id/solveHeadline"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textColor="@color/ink"
+                        android:fontFamily="@font/playfair_display"
+                        android:layout_marginBottom="14dp" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -1058,6 +1132,32 @@
 
                         <TextView
                             android:id="@+id/solveSampleB"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_pure_alcohol"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/solvePureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="24sp"

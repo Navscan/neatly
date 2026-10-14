@@ -50,9 +50,17 @@ object SpiritsMath {
         val contractionLiters: Double
     )
 
+    data class BatchResult(
+        val stockToChargeLiters: Double,
+        val waterToAddLiters: Double,
+        val finalVolumeLiters: Double,
+        val pureAlcoholLiters: Double,
+        val contractionLiters: Double
+    )
+
     /**
-     * Water-dilution calculation: add water to [volumeLiters] of
-     * [sourceAbv] to reach [targetAbv].
+     * Reduce mode: add water to a known volume of stock to reach a
+     * target strength.
      */
     fun calculate(volumeLiters: Double, sourceAbv: Double, targetAbv: Double): Result {
         require(targetAbv < sourceAbv) { "Target strength must be lower than source strength." }
@@ -74,6 +82,43 @@ object SpiritsMath {
         )
     }
 
+    /**
+     * Batch mode: charge a tank to finish at exactly [finishedVolumeLiters]
+     * at [targetAbv], given stock spirit at [stockAbv].
+     *
+     * Returns how much stock to charge and how much water to add.
+     *
+     * The math:
+     *   pure alcohol needed    = finishedVolume * targetAbv
+     *   pure alcohol from stock = stockVolume * stockAbv
+     *   => stockVolume = finishedVolume * targetAbv / stockAbv
+     *   water to add    = stockVolume * waterPer100L(stockAbv, targetAbv) / 100
+     */
+    fun calculateBatch(
+        finishedVolumeLiters: Double,
+        stockAbv: Double,
+        targetAbv: Double
+    ): BatchResult {
+        require(targetAbv < stockAbv) { "Target strength must be lower than stock strength." }
+        require(targetAbv > 0.0 && stockAbv > 0.0) { "Strength values must be greater than zero." }
+        require(finishedVolumeLiters > 0.0) { "Finished volume must be greater than zero." }
+
+        val stockToCharge = finishedVolumeLiters * (targetAbv / stockAbv)
+        val waterPer100 = waterPer100L(stockAbv, targetAbv)
+        val waterToAdd = (stockToCharge / 100.0) * waterPer100
+        val pureAlcohol = stockToCharge * (stockAbv / 100.0)
+        val apparentVolume = stockToCharge + waterToAdd
+        val contraction = apparentVolume - finishedVolumeLiters
+
+        return BatchResult(
+            stockToChargeLiters = stockToCharge,
+            waterToAddLiters = waterToAdd,
+            finalVolumeLiters = finishedVolumeLiters,
+            pureAlcoholLiters = pureAlcohol,
+            contractionLiters = contraction
+        )
+    }
+
     // ---------------------------------------------------------------
     // Blend: combine two known volumes and strengths.
     // ---------------------------------------------------------------
@@ -85,13 +130,6 @@ object SpiritsMath {
         val contractionLiters: Double
     )
 
-    /**
-     * Combines two known quantities of spirit and returns the pooled
-     * result, accounting for contraction. The contraction estimate is
-     * derived by treating the blend as a weighted average of two
-     * water-dilution scenarios weighted by the alcohol contributions
-     * of each component.
-     */
     fun blendCombine(
         volumeA: Double,
         abvA: Double,
@@ -105,32 +143,21 @@ object SpiritsMath {
         val pureB = volumeB * (abvB / 100.0)
         val totalPure = pureA + pureB
         val apparentVolume = volumeA + volumeB
-
-        // Apparent pooled ABV (ignoring contraction).
         val apparentAbv = (totalPure / apparentVolume) * 100.0
 
-        // Estimate contraction by looking at the two components as if
-        // each were being diluted to the apparent pooled strength, and
-        // summing the water each would need.
         val higher: Pair<Double, Double>
-        val lower: Pair<Double, Double>
         if (abvA >= abvB) {
             higher = volumeA to abvA
-            lower = volumeB to abvB
         } else {
             higher = volumeB to abvB
-            lower = volumeA to abvA
         }
 
-        // Contraction contribution from diluting the higher component
-        // down to the pooled strength.
         val higherTarget = apparentAbv.coerceIn(0.1, higher.second - 0.1)
         val higherWater = (higher.first / 100.0) * waterPer100L(higher.second, higherTarget)
         val higherPure = higher.first * (higher.second / 100.0)
         val higherFinal = higherPure / (higherTarget / 100.0)
         val higherContraction = higher.first + higherWater - higherFinal
 
-        // Scale to the actual pooled batch.
         val scale = totalPure / higherPure
         val contraction = (higherContraction * scale).coerceAtLeast(0.0)
 
@@ -147,41 +174,40 @@ object SpiritsMath {
 
     // ---------------------------------------------------------------
     // Blend: solve for the ratio of two components needed to hit a
-    // target strength.
+    // target strength, scaled to a specified batch size.
     // ---------------------------------------------------------------
 
     data class SolveResult(
-        val ratioA: Double,
-        val ratioB: Double,
+        val batchSizeLiters: Double,
         val sampleVolumeA: Double,
-        val sampleVolumeB: Double
+        val sampleVolumeB: Double,
+        val pureAlcoholLiters: Double
     )
 
     /**
      * Pearson's square. Given two component strengths and a target
-     * strength that lies between them, returns the ratio A:B and a
-     * sample batch scaled so A + B = 100 L.
-     *
-     * Note: contraction is not modelled here — the ratio is derived
-     * from pure-alcohol mass balance, which is what the ratio is
-     * actually about. Final volumes in production include contraction,
-     * but the ratio between components does not change with it.
+     * strength that lies strictly between them, returns the ratio A:B
+     * and the litre quantities of each component needed for a
+     * [batchSizeLiters] batch.
      */
-    fun blendSolve(abvA: Double, abvB: Double, targetAbv: Double): SolveResult {
+    fun blendSolve(
+        abvA: Double,
+        abvB: Double,
+        targetAbv: Double,
+        batchSizeLiters: Double
+    ): SolveResult {
         require(abvA > 0.0 && abvB > 0.0) { "Component strengths must be greater than zero." }
         require(targetAbv > 0.0) { "Target strength must be greater than zero." }
+        require(batchSizeLiters > 0.0) { "Batch size must be greater than zero." }
 
         val low = minOf(abvA, abvB)
         val high = maxOf(abvA, abvB)
-        require(targetAbv in low..high && targetAbv != low && targetAbv != high) {
+        require(targetAbv > low && targetAbv < high) {
             "Target must lie strictly between the two component strengths."
         }
 
-        // Which of A/B is the "high" component?
         val aIsHigh = abvA >= abvB
 
-        // Pearson's square: parts of high = |target - low|, parts of
-        // low = |high - target|.
         val partsHigh = targetAbv - low
         val partsLow = high - targetAbv
         val totalParts = partsHigh + partsLow
@@ -189,23 +215,24 @@ object SpiritsMath {
         val highFraction = partsHigh / totalParts
         val lowFraction = partsLow / totalParts
 
-        val ratioHigh = highFraction / lowFraction  // high per 1 part low
-
         val sampleVolumeA: Double
         val sampleVolumeB: Double
         if (aIsHigh) {
-            sampleVolumeA = highFraction * 100.0
-            sampleVolumeB = lowFraction * 100.0
+            sampleVolumeA = highFraction * batchSizeLiters
+            sampleVolumeB = lowFraction * batchSizeLiters
         } else {
-            sampleVolumeA = lowFraction * 100.0
-            sampleVolumeB = highFraction * 100.0
+            sampleVolumeA = lowFraction * batchSizeLiters
+            sampleVolumeB = highFraction * batchSizeLiters
         }
 
+        // Pure alcohol for the batch = sum of the two components.
+        val pureAlcohol = sampleVolumeA * (abvA / 100.0) + sampleVolumeB * (abvB / 100.0)
+
         return SolveResult(
-            ratioA = sampleVolumeA / 100.0,
-            ratioB = sampleVolumeB / 100.0,
+            batchSizeLiters = batchSizeLiters,
             sampleVolumeA = sampleVolumeA,
-            sampleVolumeB = sampleVolumeB
+            sampleVolumeB = sampleVolumeB,
+            pureAlcoholLiters = pureAlcohol
         )
     }
 

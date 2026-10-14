@@ -34,12 +34,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var compBStrength: EditText
     private lateinit var solveAStrength: EditText
     private lateinit var solveBStrength: EditText
+    private lateinit var solveBatchSize: EditText
 
     private lateinit var groupSingle: View
     private lateinit var groupCombine: View
     private lateinit var groupSolve: View
     private lateinit var groupTarget: View
     private lateinit var blendSubTabs: View
+    private lateinit var targetHint: TextView
 
     private lateinit var labelVolume: TextView
     private lateinit var labelSourceStrength: TextView
@@ -55,18 +57,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultsGroupCombine: View
     private lateinit var resultsGroupSolve: View
 
+    private lateinit var resRow1Label: TextView
+    private lateinit var resRow2Label: TextView
     private lateinit var resWater: TextView
     private lateinit var resFinalVol: TextView
     private lateinit var resPureAlc: TextView
     private lateinit var resContraction: TextView
 
+    private lateinit var combHeadline: TextView
     private lateinit var combPooledVol: TextView
     private lateinit var combPooledAbv: TextView
     private lateinit var combPureAlc: TextView
     private lateinit var combContraction: TextView
 
+    private lateinit var solveHeadline: TextView
     private lateinit var solveSampleA: TextView
     private lateinit var solveSampleB: TextView
+    private lateinit var solvePureAlc: TextView
 
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
@@ -87,6 +94,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitCompBStrength: TextView
     private lateinit var unitSolveAStrength: TextView
     private lateinit var unitSolveBStrength: TextView
+    private lateinit var unitSolveBatchSize: TextView
 
     private lateinit var tabCut: TextView
     private lateinit var tab100l: TextView
@@ -138,12 +146,14 @@ class MainActivity : AppCompatActivity() {
         compBStrength = findViewById(R.id.compBStrength)
         solveAStrength = findViewById(R.id.solveAStrength)
         solveBStrength = findViewById(R.id.solveBStrength)
+        solveBatchSize = findViewById(R.id.solveBatchSize)
 
         groupSingle = findViewById(R.id.groupSingle)
         groupCombine = findViewById(R.id.groupCombine)
         groupSolve = findViewById(R.id.groupSolve)
         groupTarget = findViewById(R.id.groupTarget)
         blendSubTabs = findViewById(R.id.blendSubTabs)
+        targetHint = findViewById(R.id.targetHint)
 
         labelVolume = findViewById(R.id.labelVolume)
         labelSourceStrength = findViewById(R.id.labelSourceStrength)
@@ -159,18 +169,23 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
         resultsGroupSolve = findViewById(R.id.resultsGroupSolve)
 
+        resRow1Label = findViewById(R.id.resRow1Label)
+        resRow2Label = findViewById(R.id.resRow2Label)
         resWater = findViewById(R.id.resWater)
         resFinalVol = findViewById(R.id.resFinalVol)
         resPureAlc = findViewById(R.id.resPureAlc)
         resContraction = findViewById(R.id.resContraction)
 
+        combHeadline = findViewById(R.id.combHeadline)
         combPooledVol = findViewById(R.id.combPooledVol)
         combPooledAbv = findViewById(R.id.combPooledAbv)
         combPureAlc = findViewById(R.id.combPureAlc)
         combContraction = findViewById(R.id.combContraction)
 
+        solveHeadline = findViewById(R.id.solveHeadline)
         solveSampleA = findViewById(R.id.solveSampleA)
         solveSampleB = findViewById(R.id.solveSampleB)
+        solvePureAlc = findViewById(R.id.solvePureAlc)
 
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
@@ -191,6 +206,7 @@ class MainActivity : AppCompatActivity() {
         unitCompBStrength = findViewById(R.id.unitCompBStrength)
         unitSolveAStrength = findViewById(R.id.unitSolveAStrength)
         unitSolveBStrength = findViewById(R.id.unitSolveBStrength)
+        unitSolveBatchSize = findViewById(R.id.unitSolveBatchSize)
 
         tabCut = findViewById(R.id.tabCut)
         tab100l = findViewById(R.id.tab100l)
@@ -250,7 +266,7 @@ class MainActivity : AppCompatActivity() {
         listOf(
             sourceVolume, sourceAbv, targetAbv,
             compAVolume, compAStrength, compBVolume, compBStrength,
-            solveAStrength, solveBStrength
+            solveAStrength, solveBStrength, solveBatchSize
         ).forEach { it.addTextChangedListener(watcher) }
     }
 
@@ -283,6 +299,7 @@ class MainActivity : AppCompatActivity() {
         scaleField(sourceVolume, factor)
         scaleField(compAVolume, factor)
         scaleField(compBVolume, factor)
+        scaleField(solveBatchSize, factor)
         isImperialMode = imperial
         updateToggleVisuals()
         updateUnitLabels()
@@ -336,6 +353,7 @@ class MainActivity : AppCompatActivity() {
         unitVolume.text = volumeUnit
         unitCompAVolume.text = volumeUnit
         unitCompBVolume.text = volumeUnit
+        unitSolveBatchSize.text = volumeUnit
     }
 
     private fun wireSubTabs() {
@@ -370,14 +388,18 @@ class MainActivity : AppCompatActivity() {
 
         when (mode) {
             Mode.BATCH -> {
-                labelVolume.text = getString(R.string.label_batch_volume)
-                labelSourceStrength.text = getString(R.string.label_batch_strength)
+                labelVolume.text = getString(R.string.label_finished_volume)
+                labelSourceStrength.text = getString(R.string.label_stock_strength)
             }
             Mode.REDUCE -> {
                 labelVolume.text = getString(R.string.label_stock_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
             }
             else -> { }
+        }
+
+        if (mode != Mode.BLEND_SOLVE) {
+            targetHint.visibility = View.GONE
         }
     }
 
@@ -411,14 +433,59 @@ class MainActivity : AppCompatActivity() {
 
     private fun recalculate() {
         when (mode) {
-            Mode.BATCH -> calculateDilution()
-            Mode.REDUCE -> calculateDilution()
+            Mode.BATCH -> calculateBatch()
+            Mode.REDUCE -> calculateReduce()
             Mode.BLEND_COMBINE -> calculateCombine()
             Mode.BLEND_SOLVE -> calculateSolve()
         }
     }
 
-    private fun calculateDilution() {
+    // ---------------------------------------------------------------
+    // Batch: input finished volume + stock strength + target
+    // Output: stock to charge, water to add
+    // ---------------------------------------------------------------
+
+    private fun calculateBatch() {
+        val finishedVolume = readVolume(sourceVolume)
+        val stock = readStrength(sourceAbv)
+        val target = readStrength(targetAbv)
+
+        if (finishedVolume == null || stock == null || target == null ||
+            target >= stock || target <= 0.0 || stock <= 0.0 || finishedVolume <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        try {
+            val result = SpiritsMath.calculateBatch(finishedVolume, stock, target)
+            showBatchResults(result)
+        } catch (_: IllegalArgumentException) {
+            resultsCard.visibility = View.GONE
+        }
+    }
+
+    private fun showBatchResults(result: SpiritsMath.BatchResult) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.VISIBLE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupSolve.visibility = View.GONE
+
+        resRow1Label.text = getString(R.string.result_stock_to_charge)
+        resRow2Label.text = getString(R.string.result_water_to_add)
+
+        resWater.text = formatVolume(result.stockToChargeLiters)
+        resFinalVol.text = formatVolume(result.waterToAddLiters)
+        resPureAlc.text = formatVolume(result.pureAlcoholLiters)
+        resContraction.text = formatVolume(result.contractionLiters)
+        resWarning.text = ""
+    }
+
+    // ---------------------------------------------------------------
+    // Reduce: input stock volume + stock strength + target
+    // Output: water to add, final volume
+    // ---------------------------------------------------------------
+
+    private fun calculateReduce() {
         val volume = readVolume(sourceVolume)
         val source = readStrength(sourceAbv)
         val target = readStrength(targetAbv)
@@ -431,17 +498,20 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val result = SpiritsMath.calculate(volume, source, target)
-            showDilutionResults(result)
+            showReduceResults(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
     }
 
-    private fun showDilutionResults(result: SpiritsMath.Result) {
+    private fun showReduceResults(result: SpiritsMath.Result) {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.VISIBLE
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
+
+        resRow1Label.text = getString(R.string.result_water_to_add)
+        resRow2Label.text = getString(R.string.result_final_volume)
 
         resWater.text = formatVolume(result.waterToAddLiters)
         resFinalVol.text = formatVolume(result.finalVolumeLiters)
@@ -449,6 +519,10 @@ class MainActivity : AppCompatActivity() {
         resContraction.text = formatVolume(result.contractionLiters)
         resWarning.text = ""
     }
+
+    // ---------------------------------------------------------------
+    // Combine: two known volumes + strengths → pooled result
+    // ---------------------------------------------------------------
 
     private fun calculateCombine() {
         val volA = readVolume(compAVolume)
@@ -476,6 +550,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.VISIBLE
         resultsGroupSolve.visibility = View.GONE
 
+        combHeadline.text = formatVolume(result.pooledVolumeLiters) + " at " + formatStrength(result.pooledAbv)
         combPooledVol.text = formatVolume(result.pooledVolumeLiters)
         combPooledAbv.text = formatStrength(result.pooledAbv)
         combPureAlc.text = formatVolume(result.pureAlcoholLiters)
@@ -483,12 +558,20 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
+    // ---------------------------------------------------------------
+    // Solve: two component strengths + target + batch size → ratio
+    // ---------------------------------------------------------------
+
     private fun calculateSolve() {
         val abvA = readStrength(solveAStrength)
         val abvB = readStrength(solveBStrength)
         val target = readStrength(targetAbv)
+        val batchSize = readVolume(solveBatchSize)
 
-        if (abvA == null || abvB == null || target == null) {
+        // Always update the hint in Solve mode based on what's valid.
+        updateSolveHint(abvA, abvB)
+
+        if (abvA == null || abvB == null || target == null || batchSize == null) {
             resultsCard.visibility = View.GONE
             return
         }
@@ -504,12 +587,40 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        if (batchSize <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
         try {
-            val result = SpiritsMath.blendSolve(abvA, abvB, target)
+            val result = SpiritsMath.blendSolve(abvA, abvB, target, batchSize)
             showSolveResults(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
         }
+    }
+
+    private fun updateSolveHint(abvA: Double?, abvB: Double?) {
+        if (mode != Mode.BLEND_SOLVE) {
+            targetHint.visibility = View.GONE
+            return
+        }
+        if (abvA == null || abvB == null) {
+            targetHint.visibility = View.GONE
+            return
+        }
+        val low = minOf(abvA, abvB)
+        val high = maxOf(abvA, abvB)
+        if (low <= 0.0 || high <= low) {
+            targetHint.visibility = View.GONE
+            return
+        }
+        targetHint.text = getString(
+            R.string.msg_solve_range_format,
+            formatStrength(low),
+            formatStrength(high)
+        )
+        targetHint.visibility = View.VISIBLE
     }
 
     private fun showSolveResults(result: SpiritsMath.SolveResult) {
@@ -518,8 +629,10 @@ class MainActivity : AppCompatActivity() {
         resultsGroupCombine.visibility = View.GONE
         resultsGroupSolve.visibility = View.VISIBLE
 
+        solveHeadline.text = formatVolume(result.batchSizeLiters) + " batch"
         solveSampleA.text = formatVolume(result.sampleVolumeA)
         solveSampleB.text = formatVolume(result.sampleVolumeB)
+        solvePureAlc.text = formatVolume(result.pureAlcoholLiters)
         resWarning.text = ""
     }
 
