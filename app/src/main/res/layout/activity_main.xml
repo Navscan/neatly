@@ -34,32 +34,71 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/pill_container"
-                android:padding="3dp">
+                android:orientation="vertical"
+                android:gravity="end">
 
-                <TextView
-                    android:id="@+id/unitAbv"
-                    android:layout_width="56dp"
-                    android:layout_height="32dp"
-                    android:gravity="center"
-                    android:text="@string/unit_abv"
-                    android:textSize="12sp"
-                    android:textColor="@color/on_accent"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.04"
-                    android:background="@drawable/pill_active" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp"
+                    android:layout_marginBottom="6dp">
 
-                <TextView
-                    android:id="@+id/unitProof"
-                    android:layout_width="56dp"
-                    android:layout_height="32dp"
-                    android:gravity="center"
-                    android:text="@string/unit_proof"
-                    android:textSize="12sp"
-                    android:textColor="@color/ink_muted"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.04" />
+                    <TextView
+                        android:id="@+id/unitAbv"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_abv"
+                        android:textSize="11sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/unitProof"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_proof"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp">
+
+                    <TextView
+                        android:id="@+id/unitMetric"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_metric"
+                        android:textSize="11sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/unitImperial"
+                        android:layout_width="56dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:text="@string/unit_imperial"
+                        android:textSize="11sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.04" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -216,6 +255,7 @@
                             android:hint="0" />
 
                         <TextView
+                            android:id="@+id/unitVolume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unit_liters"
@@ -267,6 +307,7 @@
                             android:hint="0" />
 
                         <TextView
+                            android:id="@+id/unitSourceStrength"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unit_abv"
@@ -317,6 +358,7 @@
                             android:hint="0" />
 
                         <TextView
+                            android:id="@+id/unitTargetStrength"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/unit_abv"

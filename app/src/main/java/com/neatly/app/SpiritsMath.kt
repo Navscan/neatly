@@ -9,6 +9,10 @@ package com.neatly.app
  * table to within 0.2 L per 100 L, and extrapolates to 96.4% ABV (practical
  * distillation ceiling) with physically accurate contraction behaviour.
  *
+ * All internal math runs in ABV (% v/v) and litres, referenced to 20 C.
+ * Unit toggles in the UI translate on the way in and out; they never
+ * change the coefficients here.
+ *
  * This is intentionally a self-contained object: no networking, no Android
  * dependencies. It can be tested on the JVM.
  */
@@ -25,6 +29,9 @@ object SpiritsMath {
     private const val C7 = -0.000054
     private const val C8 = 0.001384
     private const val C9 = -0.002073
+
+    // Litres per US gallon.
+    const val LITERS_PER_US_GALLON = 3.785411784
 
     /**
      * Liters of water to add per 100 L of [sourceAbv] to reach [targetAbv],
@@ -53,7 +60,8 @@ object SpiritsMath {
     )
 
     /**
-     * Full dilution calculation for a user-supplied volume.
+     * Full dilution calculation for a user-supplied volume, always in
+     * litres and ABV at 20 C.
      *
      * @throws IllegalArgumentException when target >= source, or either is <= 0.
      */
@@ -76,4 +84,26 @@ object SpiritsMath {
             contractionLiters = contraction
         )
     }
+
+    // ---------------------------------------------------------------
+    // Unit conversions.
+    // The math engine always runs in ABV and litres. These helpers
+    // translate user-facing values on the way in and out.
+    // ---------------------------------------------------------------
+
+    /**
+     * US Proof = 2 * ABV, at reference temperature 20 C. (TTB nominally
+     * specifies 60 F; we stay at 20 C for consistency with the polynomial
+     * and revisit temperature correction in a later version.)
+     */
+    fun abvToUsProof(abv: Double): Double = abv * 2.0
+
+    /** Inverse of [abvToUsProof]. */
+    fun usProofToAbv(proof: Double): Double = proof / 2.0
+
+    /** Litres to US gallons. */
+    fun litersToUsGallons(liters: Double): Double = liters / LITERS_PER_US_GALLON
+
+    /** US gallons to litres. */
+    fun usGallonsToLiters(gallons: Double): Double = gallons * LITERS_PER_US_GALLON
 }

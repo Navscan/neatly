@@ -38,12 +38,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
+    private lateinit var unitMetric: TextView
+    private lateinit var unitImperial: TextView
+    private lateinit var unitVolume: TextView
+    private lateinit var unitSourceStrength: TextView
+    private lateinit var unitTargetStrength: TextView
+
     private lateinit var tabCut: TextView
     private lateinit var tab100l: TextView
     private lateinit var tabFlavour: TextView
     private lateinit var subVolume: TextView
     private lateinit var subOnHand: TextView
     private lateinit var subBlend: TextView
+
+    private var isProofMode = false
+    private var isImperialMode = false
 
     private val installPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -61,10 +70,12 @@ class MainActivity : AppCompatActivity() {
         buildWordmark()
         populateFooter()
         wireInputs()
-        wireUnitToggle()
+        wireUnitToggles()
         wireMainTabs()
         wireSubTabs()
         wireUpdateBanner()
+        updateToggleVisuals()
+        updateUnitLabels()
         checkForUpdate()
     }
 
@@ -84,6 +95,12 @@ class MainActivity : AppCompatActivity() {
 
         unitAbv = findViewById(R.id.unitAbv)
         unitProof = findViewById(R.id.unitProof)
+        unitMetric = findViewById(R.id.unitMetric)
+        unitImperial = findViewById(R.id.unitImperial)
+        unitVolume = findViewById(R.id.unitVolume)
+        unitSourceStrength = findViewById(R.id.unitSourceStrength)
+        unitTargetStrength = findViewById(R.id.unitTargetStrength)
+
         tabCut = findViewById(R.id.tabCut)
         tab100l = findViewById(R.id.tab100l)
         tabFlavour = findViewById(R.id.tabFlavour)
@@ -134,20 +151,6 @@ class MainActivity : AppCompatActivity() {
         footerText.text = getString(R.string.footer_format, version, year)
     }
 
-    private fun wireUpdateBanner() {
-        updateBanner.setOnClickListener {
-            if (Updater.canInstall(this)) {
-                Updater.install(this)
-            } else {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                    Uri.parse("package:$packageName")
-                )
-                installPermissionLauncher.launch(intent)
-            }
-        }
-    }
-
     private fun wireInputs() {
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -161,19 +164,125 @@ class MainActivity : AppCompatActivity() {
         targetAbv.addTextChangedListener(watcher)
     }
 
-    private fun recalculate() {
-        val volText = sourceVolume.text?.toString().orEmpty()
-        val srcText = sourceAbv.text?.toString().orEmpty()
-        val tgtText = targetAbv.text?.toString().orEmpty()
+    // ---------------------------------------------------------------
+    // Context toggles: strength (ABV / PROOF) and measurement (METRIC / US)
+    // Both are independent. Each flips the display language and converts
+    // every value in place so the physical scenario stays identical.
+    // ---------------------------------------------------------------
 
-        if (volText.isBlank() || srcText.isBlank() || tgtText.isBlank()) {
-            resultsCard.visibility = View.GONE
-            return
+    private fun wireUnitToggles() {
+        unitAbv.setOnClickListener { setStrengthMode(proof = false) }
+        unitProof.setOnClickListener { setStrengthMode(proof = true) }
+        unitMetric.setOnClickListener { setMeasurementMode(imperial = false) }
+        unitImperial.setOnClickListener { setMeasurementMode(imperial = true) }
+    }
+
+    private fun setStrengthMode(proof: Boolean) {
+        if (proof == isProofMode) return
+        val factor = if (proof) 2.0 else 0.5
+        scaleField(sourceAbv, factor)
+        scaleField(targetAbv, factor)
+        isProofMode = proof
+        updateToggleVisuals()
+        updateUnitLabels()
+        recalculate()
+    }
+
+    private fun setMeasurementMode(imperial: Boolean) {
+        if (imperial == isImperialMode) return
+        val factor = if (imperial) 1.0 / SpiritsMath.LITERS_PER_US_GALLON
+                     else SpiritsMath.LITERS_PER_US_GALLON
+        scaleField(sourceVolume, factor)
+        isImperialMode = imperial
+        updateToggleVisuals()
+        updateUnitLabels()
+        recalculate()
+    }
+
+    private fun scaleField(field: EditText, factor: Double) {
+        val raw = field.text?.toString().orEmpty()
+        if (raw.isBlank()) return
+        val value = raw.toDoubleOrNull() ?: return
+        val scaled = value * factor
+        field.setText(formatNumber(scaled))
+        field.setSelection(field.text?.length ?: 0)
+    }
+
+    private fun formatNumber(value: Double): String {
+        if (value == value.toLong().toDouble()) return value.toLong().toString()
+        return String.format(Locale.US, "%.4f", value).trimEnd('0').trimEnd('.')
+    }
+
+    private fun updateToggleVisuals() {
+        if (isProofMode) {
+            unitProof.setBackgroundResource(R.drawable.pill_active)
+            unitProof.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
+            unitAbv.setBackgroundResource(0)
+            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+        } else {
+            unitAbv.setBackgroundResource(R.drawable.pill_active)
+            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
+            unitProof.setBackgroundResource(0)
+            unitProof.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
         }
 
-        val volume = volText.toDoubleOrNull()
-        val source = srcText.toDoubleOrNull()
-        val target = tgtText.toDoubleOrNull()
+        if (isImperialMode) {
+            unitImperial.setBackgroundResource(R.drawable.pill_active)
+            unitImperial.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
+            unitMetric.setBackgroundResource(0)
+            unitMetric.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+        } else {
+            unitMetric.setBackgroundResource(R.drawable.pill_active)
+            unitMetric.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
+            unitImperial.setBackgroundResource(0)
+            unitImperial.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
+        }
+    }
+
+    private fun updateUnitLabels() {
+        val strengthUnit = if (isProofMode) getString(R.string.unit_proof)
+                           else getString(R.string.unit_abv)
+        val volumeUnit = if (isImperialMode) getString(R.string.unit_gallons)
+                         else getString(R.string.unit_liters)
+        unitSourceStrength.text = strengthUnit
+        unitTargetStrength.text = strengthUnit
+        unitVolume.text = volumeUnit
+    }
+
+    // ---------------------------------------------------------------
+    // Input reading: always returns values in the internal canonical
+    // units (litres, ABV) regardless of display mode.
+    // ---------------------------------------------------------------
+
+    private fun readVolumeLiters(): Double? {
+        val raw = sourceVolume.text?.toString().orEmpty()
+        val value = raw.toDoubleOrNull() ?: return null
+        return if (isImperialMode) SpiritsMath.usGallonsToLiters(value) else value
+    }
+
+    private fun readStrengthAbv(field: EditText): Double? {
+        val raw = field.text?.toString().orEmpty()
+        val value = raw.toDoubleOrNull() ?: return null
+        return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
+    }
+
+    // ---------------------------------------------------------------
+    // Output formatting: renders internal canonical values into the
+    // currently displayed unit language.
+    // ---------------------------------------------------------------
+
+    private fun formatVolume(liters: Double): String {
+        return if (isImperialMode) {
+            String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+        } else {
+            String.format(Locale.US, "%.3f L", liters)
+        }
+    }
+
+    private fun recalculate() {
+        val volume = readVolumeLiters()
+        val source = readStrengthAbv(sourceAbv)
+        val target = readStrengthAbv(targetAbv)
 
         if (volume == null || source == null || target == null) {
             resultsCard.visibility = View.GONE
@@ -195,33 +304,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderResult(result: SpiritsMath.Result) {
         resultsCard.visibility = View.VISIBLE
-        resWater.text = formatLiters(result.waterToAddLiters)
-        resFinalVol.text = formatLiters(result.finalVolumeLiters)
-        resPureAlc.text = formatLiters(result.pureAlcoholLiters)
-        resContraction.text = formatLiters(result.contractionLiters)
+        resWater.text = formatVolume(result.waterToAddLiters)
+        resFinalVol.text = formatVolume(result.finalVolumeLiters)
+        resPureAlc.text = formatVolume(result.pureAlcoholLiters)
+        resContraction.text = formatVolume(result.contractionLiters)
         resWarning.text = ""
-    }
-
-    private fun formatLiters(value: Double): String =
-        String.format(Locale.US, "%.3f L", value)
-
-    private fun wireUnitToggle() {
-        unitAbv.setOnClickListener { selectUnit(proof = false) }
-        unitProof.setOnClickListener { selectUnit(proof = true) }
-    }
-
-    private fun selectUnit(proof: Boolean) {
-        if (proof) {
-            unitProof.setBackgroundResource(R.drawable.pill_active)
-            unitProof.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitAbv.setBackgroundResource(0)
-            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-        } else {
-            unitAbv.setBackgroundResource(R.drawable.pill_active)
-            unitAbv.setTextColor(ContextCompat.getColor(this, R.color.on_accent))
-            unitProof.setBackgroundResource(0)
-            unitProof.setTextColor(ContextCompat.getColor(this, R.color.ink_muted))
-        }
     }
 
     private fun wireMainTabs() {
@@ -275,6 +362,20 @@ class MainActivity : AppCompatActivity() {
         resPureAlc.text = ""
         resContraction.text = ""
         resWarning.text = getString(R.string.msg_coming_soon)
+    }
+
+    private fun wireUpdateBanner() {
+        updateBanner.setOnClickListener {
+            if (Updater.canInstall(this)) {
+                Updater.install(this)
+            } else {
+                val intent = Intent(
+                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:$packageName")
+                )
+                installPermissionLauncher.launch(intent)
+            }
+        }
     }
 
     private fun checkForUpdate() {

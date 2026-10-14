@@ -20,8 +20,11 @@
     <string name="label_spirit_strength">Spirit strength</string>
 
     <string name="unit_liters">L</string>
+    <string name="unit_gallons">gal</string>
     <string name="unit_abv">% ABV</string>
     <string name="unit_proof">PROOF</string>
+    <string name="unit_metric">METRIC</string>
+    <string name="unit_imperial">US</string>
 
     <string name="results_title">Results</string>
     <string name="result_water_to_add">Water to add</string>
