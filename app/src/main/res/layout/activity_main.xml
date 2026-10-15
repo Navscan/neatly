@@ -1433,10 +1433,54 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/enhModeFinished"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/enh_mode_finished"
+                        android:textSize="12sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/enhModeBase"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/enh_mode_base"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/enhModeHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/ink_light"
+                    android:letterSpacing="0.02"
+                    android:layout_marginBottom="20dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_marginBottom="20dp">
 
                     <TextView
+                        android:id="@+id/enhFirstLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_finished_volume"
@@ -2293,6 +2337,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushDiluteFinalToEnhVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_enhancing" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2398,6 +2455,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushCombineVolToEnhVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_enhancing" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2425,6 +2495,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushCombineAbvToEnhStrength"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_enhancing" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2655,6 +2738,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushBottlerWastageToEnhVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_enhancing" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2682,6 +2778,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushBottlerStockToDiluteVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_dilute" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2787,6 +2896,19 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushFlavBaseToDiluteVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_dilute" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />

@@ -287,7 +287,7 @@ object SpiritsMath {
     fun usGallonsToLiters(gallons: Double): Double = gallons * LITERS_PER_US_GALLON
 
     // ---------------------------------------------------------------
-    // Flavour: additive dosing for flavoured spirits, liqueurs, aperitifs.
+    // Enhancing: additive dosing for flavoured spirits, liqueurs, aperitifs.
     //
     // Pure alcohol mass balance. No OIML contraction: sugar syrups break
     // the polynomial's assumptions. Volume is treated as additive.
@@ -318,6 +318,16 @@ object SpiritsMath {
         val additiveVolumesLiters: List<Double>
     )
 
+    /**
+     * Additive dosing calculator, finished-volume direction.
+     *
+     * Dose rates are per litre of final blend volume. Drops are 20 per mL.
+     * Gram doses are converted to volume via [AdditiveInput.density].
+     *
+     * @throws IllegalArgumentException when target exceeds base strength,
+     *         when any volume is non-positive, or when additive alcohol
+     *         alone exceeds the target (negative base spirit).
+     */
     fun calculateFlavour(
         finishedVolumeLiters: Double,
         targetAbv: Double,
@@ -358,6 +368,72 @@ object SpiritsMath {
             waterToAddLiters = waterToAdd,
             finalVolumeLiters = finishedVolumeLiters,
             pureAlcoholLiters = targetPure,
+            additiveVolumesLiters = additiveVolumes
+        )
+    }
+
+    /**
+     * Additive dosing calculator, base-volume direction.
+     *
+     * The inverse of [calculateFlavour]. Given a base volume and target
+     * strength, computes the final blend volume, each additive's volume,
+     * and water to add. Same mass balance, opposite known.
+     *
+     * Derived from: V_base x S/100 + sum(V_i x a_i/100) = V_final x T/100
+     * and V_i = k_i x V_final, so:
+     *   V_final = V_base x S / (T - sum(k_i x a_i))
+     * where k_i is the dose coefficient in litres-of-additive per
+     * litre-of-final.
+     *
+     * @throws IllegalArgumentException when target exceeds base strength,
+     *         when any volume is non-positive, or when additive alcohol
+     *         alone equals or exceeds the target (division by zero).
+     */
+    fun calculateFlavourFromBase(
+        baseVolumeLiters: Double,
+        targetAbv: Double,
+        baseAbv: Double,
+        additives: List<AdditiveInput>
+    ): FlavourResult {
+        require(baseVolumeLiters > 0.0) { "Base volume must be greater than zero." }
+        require(targetAbv > 0.0 && baseAbv > 0.0) { "Strength values must be greater than zero." }
+        require(targetAbv <= baseAbv) { "Target strength must be at or below base spirit strength." }
+
+        // Dose coefficient per additive: litres of additive per litre of
+        // final blend volume.
+        val coefficients = additives.map { a ->
+            when (a.unit) {
+                DoseUnit.ML_PER_L -> a.dose / 1000.0
+                DoseUnit.G_PER_L -> {
+                    require(a.density > 0.0) { "Density must be greater than zero." }
+                    a.dose / (a.density * 1000.0)
+                }
+                DoseUnit.DROPS_PER_L -> a.dose / 20.0 / 1000.0
+            }
+        }
+
+        // Total additive alcohol contribution per litre of final blend,
+        // expressed as an ABV percentage.
+        val additiveAbvPerLitre = additives.mapIndexed { i, a ->
+            coefficients[i] * a.abv
+        }.sum()
+
+        val effectiveTarget = targetAbv - additiveAbvPerLitre
+        require(effectiveTarget > 0.0) {
+            "Additive alcohol exceeds the target. Lower additive ABV or raise the target."
+        }
+
+        val finalVolume = baseVolumeLiters * baseAbv / effectiveTarget
+        val additiveVolumes = coefficients.map { it * finalVolume }
+        val totalAdditiveVolume = additiveVolumes.sum()
+        val waterToAdd = finalVolume - baseVolumeLiters - totalAdditiveVolume
+        val pureAlcohol = finalVolume * targetAbv / 100.0
+
+        return FlavourResult(
+            baseSpiritLiters = baseVolumeLiters,
+            waterToAddLiters = waterToAdd,
+            finalVolumeLiters = finalVolume,
+            pureAlcoholLiters = pureAlcohol,
             additiveVolumesLiters = additiveVolumes
         )
     }

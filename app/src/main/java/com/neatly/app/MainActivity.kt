@@ -83,8 +83,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerYearsBarrel: EditText
     private lateinit var bottlerAnnualLoss: EditText
 
-    // Flavour inputs
+    // Enhancing inputs
     private lateinit var flavourCard: MaterialCardView
+    private lateinit var enhModeFinished: TextView
+    private lateinit var enhModeBase: TextView
+    private lateinit var enhModeHint: TextView
+    private lateinit var enhFirstLabel: TextView
     private lateinit var flavourFinishedVolume: EditText
     private lateinit var flavourTargetAbv: EditText
     private lateinit var flavourBaseAbv: EditText
@@ -153,6 +157,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var flavAdd3Vol: TextView
     private lateinit var flavPureAlc: TextView
 
+    // Push-forward chevrons
+    private lateinit var pushDiluteFinalToEnhVol: TextView
+    private lateinit var pushCombineVolToEnhVol: TextView
+    private lateinit var pushCombineAbvToEnhStrength: TextView
+    private lateinit var pushBottlerWastageToEnhVol: TextView
+    private lateinit var pushBottlerStockToDiluteVol: TextView
+    private lateinit var pushFlavBaseToDiluteVol: TextView
+
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
     private lateinit var wordmarkText: TextView
@@ -189,6 +201,11 @@ class MainActivity : AppCompatActivity() {
     private var isImperialMode = false
     private var isMassMode = false
     private var bottlerInCl = false
+    private var enhBaseMode = false
+    private var suppressSync = false
+
+    // Last computed results for push-forward.
+    private var lastCombinePooledAbv: Double? = null
 
     private val installPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -206,6 +223,7 @@ class MainActivity : AppCompatActivity() {
         buildWordmark()
         populateFooter()
         wireInputs()
+        wireSharedStrengths()
         wireUnitToggles()
         wireTopTabs()
         wireSubTabs()
@@ -213,11 +231,14 @@ class MainActivity : AppCompatActivity() {
         wireBottlerUnitToggle()
         wireBottlerAngelsCheckbox()
         wireFlavourUnitPills()
+        wireEnhancingMode()
+        wirePushButtons()
         wireUpdateBanner()
 
         updateToggleVisuals()
         updateUnitLabels()
         applyMassVisibility()
+        applyEnhancingMode()
         applyMode()
         applyTopTab()
     }
@@ -284,8 +305,12 @@ class MainActivity : AppCompatActivity() {
         bottlerYearsBarrel = findViewById(R.id.bottlerYearsBarrel)
         bottlerAnnualLoss = findViewById(R.id.bottlerAnnualLoss)
 
-        // Flavour
+        // Enhancing
         flavourCard = findViewById(R.id.flavourCard)
+        enhModeFinished = findViewById(R.id.enhModeFinished)
+        enhModeBase = findViewById(R.id.enhModeBase)
+        enhModeHint = findViewById(R.id.enhModeHint)
+        enhFirstLabel = findViewById(R.id.enhFirstLabel)
         flavourFinishedVolume = findViewById(R.id.flavourFinishedVolume)
         flavourTargetAbv = findViewById(R.id.flavourTargetAbv)
         flavourBaseAbv = findViewById(R.id.flavourBaseAbv)
@@ -375,6 +400,13 @@ class MainActivity : AppCompatActivity() {
         flavAdd3VolLabel = findViewById(R.id.flavAdd3VolLabel)
         flavAdd3Vol = findViewById(R.id.flavAdd3Vol)
         flavPureAlc = findViewById(R.id.flavPureAlc)
+
+        pushDiluteFinalToEnhVol = findViewById(R.id.pushDiluteFinalToEnhVol)
+        pushCombineVolToEnhVol = findViewById(R.id.pushCombineVolToEnhVol)
+        pushCombineAbvToEnhStrength = findViewById(R.id.pushCombineAbvToEnhStrength)
+        pushBottlerWastageToEnhVol = findViewById(R.id.pushBottlerWastageToEnhVol)
+        pushBottlerStockToDiluteVol = findViewById(R.id.pushBottlerStockToDiluteVol)
+        pushFlavBaseToDiluteVol = findViewById(R.id.pushFlavBaseToDiluteVol)
 
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
@@ -471,6 +503,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
+    // Shared strengths: base and target mirror across tabs.
+    // ---------------------------------------------------------------
+
+    private fun wireSharedStrengths() {
+        val baseStrengthFields = listOf(sourceAbv, bottlerStockAbv, flavourBaseAbv)
+        val targetStrengthFields = listOf(targetAbv, bottlerTargetAbv, flavourTargetAbv)
+        for (f in baseStrengthFields) f.addTextChangedListener(makeSharedWatcher(baseStrengthFields))
+        for (f in targetStrengthFields) f.addTextChangedListener(makeSharedWatcher(targetStrengthFields))
+    }
+
+    private fun makeSharedWatcher(group: List<EditText>): TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (suppressSync) return
+                val text = s?.toString() ?: return
+                suppressSync = true
+                try {
+                    for (f in group) {
+                        if (f.text?.toString() != text) {
+                            f.setText(text)
+                            f.setSelection(f.text?.length ?: 0)
+                        }
+                    }
+                } finally {
+                    suppressSync = false
+                }
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------
     // Header toggles
     // ---------------------------------------------------------------
 
@@ -486,19 +551,24 @@ class MainActivity : AppCompatActivity() {
     private fun setStrengthMode(proof: Boolean) {
         if (proof == isProofMode) return
         val factor = if (proof) 2.0 else 0.5
-        scaleField(sourceAbv, factor)
-        scaleField(targetAbv, factor)
-        scaleField(compAStrength, factor)
-        scaleField(compBStrength, factor)
-        scaleField(solveAStrength, factor)
-        scaleField(solveBStrength, factor)
-        scaleField(bottlerTargetAbv, factor)
-        scaleField(bottlerStockAbv, factor)
-        scaleField(flavourTargetAbv, factor)
-        scaleField(flavourBaseAbv, factor)
-        scaleField(flavourAddAbv[0], factor)
-        scaleField(flavourAddAbv[1], factor)
-        scaleField(flavourAddAbv[2], factor)
+        suppressSync = true
+        try {
+            scaleField(sourceAbv, factor)
+            scaleField(targetAbv, factor)
+            scaleField(compAStrength, factor)
+            scaleField(compBStrength, factor)
+            scaleField(solveAStrength, factor)
+            scaleField(solveBStrength, factor)
+            scaleField(bottlerTargetAbv, factor)
+            scaleField(bottlerStockAbv, factor)
+            scaleField(flavourTargetAbv, factor)
+            scaleField(flavourBaseAbv, factor)
+            scaleField(flavourAddAbv[0], factor)
+            scaleField(flavourAddAbv[1], factor)
+            scaleField(flavourAddAbv[2], factor)
+        } finally {
+            suppressSync = false
+        }
         isProofMode = proof
         updateToggleVisuals()
         updateUnitLabels()
@@ -580,7 +650,11 @@ class MainActivity : AppCompatActivity() {
             compBVolume -> readStrength(compBStrength) ?: 40.0
             solveBatchSize -> readStrength(targetAbv) ?: 40.0
             bottlerAvailableStock -> readStrength(bottlerStockAbv) ?: 40.0
-            flavourFinishedVolume -> readStrength(flavourTargetAbv) ?: 40.0
+            flavourFinishedVolume -> if (enhBaseMode) {
+                readStrength(flavourBaseAbv) ?: 40.0
+            } else {
+                readStrength(flavourTargetAbv) ?: 40.0
+            }
             else -> 40.0
         }
     }
@@ -713,6 +787,9 @@ class MainActivity : AppCompatActivity() {
 
         groupTarget.visibility = if (mode == Mode.BLEND_COMBINE) View.GONE else View.VISIBLE
 
+        pushDiluteFinalToEnhVol.visibility =
+            if (mode == Mode.REDUCE) View.VISIBLE else View.GONE
+
         when (mode) {
             Mode.BATCH -> {
                 labelVolume.text = getString(R.string.label_finished_volume)
@@ -785,7 +862,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Flavour: additive unit pills
+    // Enhancing: additive unit pills and mode toggle
     // ---------------------------------------------------------------
 
     private fun wireFlavourUnitPills() {
@@ -803,6 +880,81 @@ class MainActivity : AppCompatActivity() {
         paintToggle(flavourAddUnitG[slot], active = unit == SpiritsMath.DoseUnit.G_PER_L)
         paintToggle(flavourAddUnitDrops[slot], active = unit == SpiritsMath.DoseUnit.DROPS_PER_L)
         recalculate()
+    }
+
+    private fun wireEnhancingMode() {
+        enhModeFinished.setOnClickListener { setEnhancingMode(base = false) }
+        enhModeBase.setOnClickListener { setEnhancingMode(base = true) }
+    }
+
+    private fun setEnhancingMode(base: Boolean) {
+        if (base == enhBaseMode) return
+        enhBaseMode = base
+        applyEnhancingMode()
+        recalculate()
+    }
+
+    private fun applyEnhancingMode() {
+        paintToggle(enhModeFinished, active = !enhBaseMode)
+        paintToggle(enhModeBase, active = enhBaseMode)
+        if (enhBaseMode) {
+            enhFirstLabel.text = getString(R.string.label_base_volume_enh)
+            enhModeHint.text = getString(R.string.hint_enh_base)
+        } else {
+            enhFirstLabel.text = getString(R.string.enh_mode_finished)
+            enhModeHint.text = getString(R.string.hint_enh_finished)
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Push-forward
+    // ---------------------------------------------------------------
+
+    private fun wirePushButtons() {
+        pushDiluteFinalToEnhVol.setOnClickListener { pushToEnhancing(resFinalVol) }
+        pushCombineVolToEnhVol.setOnClickListener { pushToEnhancing(combPooledVol) }
+        pushBottlerWastageToEnhVol.setOnClickListener { pushToEnhancing(bottlerWithWastage) }
+        pushCombineAbvToEnhStrength.setOnClickListener { pushAbvToEnhancingBase() }
+        pushBottlerStockToDiluteVol.setOnClickListener { pushToDilute(bottlerStockCharge) }
+        pushFlavBaseToDiluteVol.setOnClickListener { pushToDilute(flavBaseSpirit) }
+    }
+
+    private fun parseLeadingNumber(text: CharSequence): Double? {
+        val s = text.toString().trim()
+        if (s.isEmpty()) return null
+        val spaceIdx = s.indexOf(' ')
+        val numStr = if (spaceIdx > 0) s.substring(0, spaceIdx) else s
+        return numStr.toDoubleOrNull()
+    }
+
+    private fun pushToEnhancing(source: TextView) {
+        val value = parseLeadingNumber(source.text) ?: return
+        if (value <= 0.0) return
+        if (!enhBaseMode) {
+            enhBaseMode = true
+            applyEnhancingMode()
+        }
+        flavourFinishedVolume.setText(formatNumber(value))
+        flavourFinishedVolume.setSelection(flavourFinishedVolume.text?.length ?: 0)
+        setTopTab(TopTab.FLAVOUR)
+    }
+
+    private fun pushAbvToEnhancingBase() {
+        val abv = lastCombinePooledAbv ?: return
+        if (abv <= 0.0) return
+        val value = if (isProofMode) SpiritsMath.abvToUsProof(abv) else abv
+        flavourBaseAbv.setText(formatNumber(value))
+        flavourBaseAbv.setSelection(flavourBaseAbv.text?.length ?: 0)
+        setTopTab(TopTab.FLAVOUR)
+    }
+
+    private fun pushToDilute(source: TextView) {
+        val value = parseLeadingNumber(source.text) ?: return
+        if (value <= 0.0) return
+        sourceVolume.setText(formatNumber(value))
+        sourceVolume.setSelection(sourceVolume.text?.length ?: 0)
+        setTopTab(TopTab.CUT)
+        setMode(Mode.REDUCE)
     }
 
     // ---------------------------------------------------------------
@@ -827,10 +979,6 @@ class MainActivity : AppCompatActivity() {
         return if (isProofMode) SpiritsMath.usProofToAbv(value) else value
     }
 
-    /**
-     * Primary unit only — used by headline strings which do not have room
-     * for a secondary display.
-     */
     private fun formatVolumePrimary(liters: Double, abv: Double): String {
         return if (isMassMode) {
             val kg = SpiritsMath.litresToKg(liters, abv)
@@ -848,11 +996,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Primary + secondary unit. Primary is the pill-selected dimensional
-     * reading; secondary is the same physical quantity expressed in the
-     * other dimension, rendered in smaller, lighter text.
-     */
     private fun formatVolume(liters: Double, abv: Double): CharSequence {
         val primary = formatVolumePrimary(liters, abv)
         val secondary: String = if (isMassMode) {
@@ -1015,6 +1158,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupFlavour.visibility = View.GONE
 
         val pooledAbv = result.pooledAbv
+        lastCombinePooledAbv = pooledAbv
         combHeadline.text = formatVolumePrimary(result.pooledVolumeLiters, pooledAbv) +
             " at " + formatStrength(pooledAbv)
         combPooledVol.text = formatVolume(result.pooledVolumeLiters, pooledAbv)
@@ -1191,16 +1335,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Flavour calculation
+    // Enhancing calculation
     // ---------------------------------------------------------------
 
     private fun calculateFlavour() {
-        val finishedVolume = readVolume(flavourFinishedVolume)
+        val firstValue = readVolume(flavourFinishedVolume)
         val target = readStrength(flavourTargetAbv)
         val base = readStrength(flavourBaseAbv)
 
-        if (finishedVolume == null || target == null || base == null ||
-            finishedVolume <= 0.0 || target <= 0.0 || base <= 0.0) {
+        if (firstValue == null || target == null || base == null ||
+            firstValue <= 0.0 || target <= 0.0 || base <= 0.0) {
             resultsCard.visibility = View.GONE
             return
         }
@@ -1216,7 +1360,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            val result = SpiritsMath.calculateFlavour(finishedVolume, target, base, additives)
+            val result = if (enhBaseMode) {
+                SpiritsMath.calculateFlavourFromBase(firstValue, target, base, additives)
+            } else {
+                SpiritsMath.calculateFlavour(firstValue, target, base, additives)
+            }
             showFlavourResults(result, target, base)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE

@@ -7,7 +7,7 @@
 
     <string name="tab_cut">Cut</string>
     <string name="tab_bottler">Bottler</string>
-    <string name="tab_flavour">Flavour</string>
+    <string name="tab_flavour">Enhancing</string>
 
     <string name="subtab_batch">Formulate</string>
     <string name="subtab_reduce">Dilute</string>
@@ -85,7 +85,7 @@
     <string name="bottler_msg_surplus">Surplus: %1$s</string>
     <string name="bottler_msg_sufficient">Sufficient stock available.</string>
 
-    <!-- Flavour tab -->
+    <!-- Enhancing tab -->
     <string name="flavour_additive_1">Additive 1</string>
     <string name="flavour_additive_2">Additive 2</string>
     <string name="flavour_additive_3">Additive 3</string>
@@ -114,4 +114,16 @@
     <!-- Mode hints (v1.16) -->
     <string name="hint_mode_formulate">Plan how much base spirit to draw to reach a target volume.</string>
     <string name="hint_mode_dilute">Dilute a known base volume to reach target strength.</string>
+
+    <!-- Enhancing mode toggle (v1.17) -->
+    <string name="enh_mode_finished">Finished volume</string>
+    <string name="enh_mode_base">Base volume</string>
+    <string name="label_base_volume_enh">Base volume</string>
+    <string name="hint_enh_finished">Specify finished volume. Base spirit is solved.</string>
+    <string name="hint_enh_base">Specify base volume. Finished volume is solved.</string>
+
+    <!-- Push-forward chevrons (v1.17) -->
+    <string name="cd_push_to_enhancing">Push to Enhancing</string>
+    <string name="cd_push_to_dilute">Push to Dilute</string>
+    <string name="push_arrow">→</string>
 </resources>
