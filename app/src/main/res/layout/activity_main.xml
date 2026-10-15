@@ -259,7 +259,7 @@
                     android:orientation="horizontal"
                     android:background="@drawable/pill_container"
                     android:padding="3dp"
-                    android:layout_marginBottom="22dp"
+                    android:layout_marginBottom="12dp"
                     android:visibility="gone">
 
                     <TextView
@@ -287,6 +287,16 @@
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/modeHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/ink_light"
+                    android:letterSpacing="0.02"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:id="@+id/groupSingle"
@@ -2235,6 +2245,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2262,6 +2273,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2289,6 +2301,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2309,30 +2322,38 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
                     <LinearLayout
+                        android:id="@+id/contractionRowDilution"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_contraction"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
-                        <TextView
-                            android:id="@+id/resContraction"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/result_contraction"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/resContraction"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -2358,6 +2379,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2384,6 +2406,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2410,6 +2433,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2430,30 +2454,38 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
                     <LinearLayout
+                        android:id="@+id/contractionRowCombine"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_contraction"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
-                        <TextView
-                            android:id="@+id/combContraction"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/result_contraction"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/combContraction"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -2479,6 +2511,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2505,6 +2538,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2531,6 +2565,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2574,6 +2609,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2600,6 +2636,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2626,6 +2663,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2652,6 +2690,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2672,30 +2711,38 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
                     <LinearLayout
+                        android:id="@+id/contractionRowBottler"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/bottler_result_contraction"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
-                        <TextView
-                            android:id="@+id/bottlerContraction"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_contraction"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerContraction"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -2721,6 +2768,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2747,6 +2795,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2773,6 +2822,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2800,6 +2850,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2827,6 +2878,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 
@@ -2854,6 +2906,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingTop="14dp"
                         android:paddingBottom="14dp">
 

@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.SpannableString
+import android.text.Spanned
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.view.View
 import android.widget.CheckBox
@@ -46,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groupTarget: View
     private lateinit var blendSubTabs: View
     private lateinit var targetHint: TextView
+    private lateinit var modeHint: TextView
 
     private lateinit var labelVolume: TextView
     private lateinit var labelSourceStrength: TextView
@@ -110,6 +113,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultsGroupSolve: View
     private lateinit var resultsGroupBottler: View
     private lateinit var resultsGroupFlavour: View
+    private lateinit var contractionRowDilution: View
+    private lateinit var contractionRowCombine: View
+    private lateinit var contractionRowBottler: View
 
     private lateinit var resRow1Label: TextView
     private lateinit var resRow2Label: TextView
@@ -211,6 +217,7 @@ class MainActivity : AppCompatActivity() {
 
         updateToggleVisuals()
         updateUnitLabels()
+        applyMassVisibility()
         applyMode()
         applyTopTab()
     }
@@ -242,6 +249,7 @@ class MainActivity : AppCompatActivity() {
         groupTarget = findViewById(R.id.groupTarget)
         blendSubTabs = findViewById(R.id.blendSubTabs)
         targetHint = findViewById(R.id.targetHint)
+        modeHint = findViewById(R.id.modeHint)
 
         labelVolume = findViewById(R.id.labelVolume)
         labelSourceStrength = findViewById(R.id.labelSourceStrength)
@@ -328,6 +336,9 @@ class MainActivity : AppCompatActivity() {
         resultsGroupSolve = findViewById(R.id.resultsGroupSolve)
         resultsGroupBottler = findViewById(R.id.resultsGroupBottler)
         resultsGroupFlavour = findViewById(R.id.resultsGroupFlavour)
+        contractionRowDilution = findViewById(R.id.contractionRowDilution)
+        contractionRowCombine = findViewById(R.id.contractionRowCombine)
+        contractionRowBottler = findViewById(R.id.contractionRowBottler)
 
         resRow1Label = findViewById(R.id.resRow1Label)
         resRow2Label = findViewById(R.id.resRow2Label)
@@ -521,7 +532,6 @@ class MainActivity : AppCompatActivity() {
     private fun setMassMode(mass: Boolean) {
         if (mass == isMassMode) return
 
-        // Convert every volume field in place, preserving physical scenario.
         val volumeFields = listOf(
             sourceVolume, compAVolume, compBVolume, solveBatchSize,
             bottlerAvailableStock, flavourFinishedVolume
@@ -533,12 +543,10 @@ class MainActivity : AppCompatActivity() {
             val abv = abvForVolumeField(field)
 
             val converted: Double = if (mass) {
-                // VOL -> MASS: value is in current volume unit (L or gal)
                 val litres = if (isImperialMode) SpiritsMath.usGallonsToLiters(v) else v
                 val kg = SpiritsMath.litresToKg(litres, abv)
                 if (isImperialMode) SpiritsMath.kgToUsPounds(kg) else kg
             } else {
-                // MASS -> VOL: value is in current mass unit (kg or lb)
                 val kg = if (isImperialMode) SpiritsMath.usPoundsToKg(v) else v
                 val litres = SpiritsMath.kgToLitres(kg, abv)
                 if (isImperialMode) SpiritsMath.litersToUsGallons(litres) else litres
@@ -550,14 +558,17 @@ class MainActivity : AppCompatActivity() {
         isMassMode = mass
         updateToggleVisuals()
         updateUnitLabels()
+        applyMassVisibility()
         recalculate()
     }
 
-    /**
-     * Returns the ABV % v/v that applies to the fluid in [field], used for
-     * mass-mode density conversion. Falls back to 40% if the relevant
-     * strength field is empty or unparseable.
-     */
+    private fun applyMassVisibility() {
+        val visibility = if (isMassMode) View.GONE else View.VISIBLE
+        contractionRowDilution.visibility = visibility
+        contractionRowCombine.visibility = visibility
+        contractionRowBottler.visibility = visibility
+    }
+
     private fun abvForVolumeField(field: EditText): Double {
         return when (field) {
             sourceVolume -> if (mode == Mode.REDUCE) {
@@ -706,12 +717,18 @@ class MainActivity : AppCompatActivity() {
             Mode.BATCH -> {
                 labelVolume.text = getString(R.string.label_finished_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
+                modeHint.text = getString(R.string.hint_mode_formulate)
+                modeHint.visibility = View.VISIBLE
             }
             Mode.REDUCE -> {
                 labelVolume.text = getString(R.string.label_stock_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
+                modeHint.text = getString(R.string.hint_mode_dilute)
+                modeHint.visibility = View.VISIBLE
             }
-            else -> { }
+            Mode.BLEND_COMBINE, Mode.BLEND_SOLVE -> {
+                modeHint.visibility = View.GONE
+            }
         }
 
         if (mode != Mode.BLEND_SOLVE) {
@@ -792,13 +809,6 @@ class MainActivity : AppCompatActivity() {
     // Reading helpers
     // ---------------------------------------------------------------
 
-    /**
-     * Reads a volume field and returns litres regardless of display mode.
-     * VOL+metric: input is litres, returned as-is.
-     * VOL+US:     input is US gallons, converted.
-     * MASS+metric: input is kg, converted via density at the field's ABV.
-     * MASS+US:    input is lb, converted to kg then to litres.
-     */
     private fun readVolume(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
@@ -818,11 +828,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Formats a volume output. The [abv] argument is the ABV % v/v of the
-     * fluid being reported and is used only in mass mode to convert litres
-     * to kg (and then to lb when imperial).
+     * Primary unit only — used by headline strings which do not have room
+     * for a secondary display.
      */
-    private fun formatVolume(liters: Double, abv: Double): String {
+    private fun formatVolumePrimary(liters: Double, abv: Double): String {
         return if (isMassMode) {
             val kg = SpiritsMath.litresToKg(liters, abv)
             if (isImperialMode) {
@@ -837,6 +846,47 @@ class MainActivity : AppCompatActivity() {
                 String.format(Locale.US, "%.3f L", liters)
             }
         }
+    }
+
+    /**
+     * Primary + secondary unit. Primary is the pill-selected dimensional
+     * reading; secondary is the same physical quantity expressed in the
+     * other dimension, rendered in smaller, lighter text.
+     */
+    private fun formatVolume(liters: Double, abv: Double): CharSequence {
+        val primary = formatVolumePrimary(liters, abv)
+        val secondary: String = if (isMassMode) {
+            if (isImperialMode) {
+                String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+            } else {
+                String.format(Locale.US, "%.3f L", liters)
+            }
+        } else {
+            val kg = SpiritsMath.litresToKg(liters, abv)
+            if (isImperialMode) {
+                String.format(Locale.US, "%.3f lb", SpiritsMath.kgToUsPounds(kg))
+            } else {
+                String.format(Locale.US, "%.3f kg", kg)
+            }
+        }
+
+        val full = "$primary ($secondary)"
+        val span = SpannableString(full)
+        val start = primary.length
+        val secondaryColor = ContextCompat.getColor(this, R.color.ink_light)
+
+        span.setSpan(
+            RelativeSizeSpan(0.65f),
+            start, full.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        span.setSpan(
+            ForegroundColorSpan(secondaryColor),
+            start, full.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return span
     }
 
     private fun formatStrength(abv: Double): String {
@@ -965,7 +1015,8 @@ class MainActivity : AppCompatActivity() {
         resultsGroupFlavour.visibility = View.GONE
 
         val pooledAbv = result.pooledAbv
-        combHeadline.text = formatVolume(result.pooledVolumeLiters, pooledAbv) + " at " + formatStrength(pooledAbv)
+        combHeadline.text = formatVolumePrimary(result.pooledVolumeLiters, pooledAbv) +
+            " at " + formatStrength(pooledAbv)
         combPooledVol.text = formatVolume(result.pooledVolumeLiters, pooledAbv)
         combPooledAbv.text = formatStrength(pooledAbv)
         combPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
@@ -1048,7 +1099,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
 
-        solveHeadline.text = formatVolume(result.batchSizeLiters, targetAbv) + " batch"
+        solveHeadline.text = formatVolumePrimary(result.batchSizeLiters, targetAbv) + " batch"
         solveSampleA.text = formatVolume(result.sampleVolumeA, abvA)
         solveSampleB.text = formatVolume(result.sampleVolumeB, abvB)
         solvePureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
@@ -1115,7 +1166,7 @@ class MainActivity : AppCompatActivity() {
         resultsGroupBottler.visibility = View.VISIBLE
         resultsGroupFlavour.visibility = View.GONE
 
-        val headline = formatVolume(result.stockToChargeLiters, stockAbv) + " of " +
+        val headline = formatVolumePrimary(result.stockToChargeLiters, stockAbv) + " of " +
             formatStrength(stockAbv) + " stock"
         bottlerHeadline.text = headline
 
@@ -1125,7 +1176,6 @@ class MainActivity : AppCompatActivity() {
         bottlerWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
         bottlerContraction.text = formatVolume(result.contractionLiters, 0.0)
 
-        // Available stock check
         val available = readVolume(bottlerAvailableStock)
         resWarning.text = when {
             available == null || available <= 0.0 -> ""
@@ -1187,7 +1237,7 @@ class MainActivity : AppCompatActivity() {
 
         val effectiveTarget = if (result.finalVolumeLiters > 0.0)
             (result.pureAlcoholLiters / result.finalVolumeLiters) * 100.0 else targetAbv
-        flavHeadline.text = formatVolume(result.finalVolumeLiters, effectiveTarget) +
+        flavHeadline.text = formatVolumePrimary(result.finalVolumeLiters, effectiveTarget) +
             " at " + formatStrength(effectiveTarget)
 
         flavBaseSpirit.text = formatVolume(result.baseSpiritLiters, baseAbv)

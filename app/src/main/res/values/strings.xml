@@ -9,16 +9,16 @@
     <string name="tab_bottler">Bottler</string>
     <string name="tab_flavour">Flavour</string>
 
-    <string name="subtab_batch">Batch</string>
-    <string name="subtab_reduce">Reduce</string>
+    <string name="subtab_batch">Formulate</string>
+    <string name="subtab_reduce">Dilute</string>
     <string name="subtab_blend">Blend</string>
 
-    <string name="subtab_combine">Combine</string>
+    <string name="subtab_combine">Compounding</string>
     <string name="subtab_solve">Solve</string>
 
-    <string name="label_finished_volume">Finished volume</string>
-    <string name="label_stock_volume">Stock volume</string>
-    <string name="label_stock_strength">Stock strength</string>
+    <string name="label_finished_volume">Target volume</string>
+    <string name="label_stock_volume">Base volume</string>
+    <string name="label_stock_strength">Base strength</string>
     <string name="label_target_strength">Target strength</string>
 
     <string name="label_component_a_volume">Component A volume</string>
@@ -28,7 +28,7 @@
 
     <string name="label_stronger_strength">Stronger strength</string>
     <string name="label_lighter_strength">Lighter strength</string>
-    <string name="label_batch_size">Batch size</string>
+    <string name="label_batch_size">Total volume</string>
 
     <string name="unit_liters">L</string>
     <string name="unit_gallons">gal</string>
@@ -38,7 +38,7 @@
     <string name="unit_imperial">US</string>
 
     <string name="results_title">Results</string>
-    <string name="result_stock_to_charge">Stock to charge</string>
+    <string name="result_stock_to_charge">Base spirit needed</string>
     <string name="result_water_to_add">Water to add</string>
     <string name="result_final_volume">Final volume</string>
     <string name="result_final_abv">Final strength</string>
@@ -78,7 +78,7 @@
 
     <string name="bottler_result_order_requires">Order requires</string>
     <string name="bottler_result_with_wastage">With wastage</string>
-    <string name="bottler_result_stock_to_charge">Stock to charge</string>
+    <string name="bottler_result_stock_to_charge">Base spirit needed</string>
     <string name="bottler_result_water_to_add">Water to add</string>
     <string name="bottler_result_contraction">Contraction</string>
     <string name="bottler_msg_shortfall">Shortfall: %1$s</string>
@@ -110,4 +110,8 @@
     <string name="unit_mass">MASS</string>
     <string name="unit_kg">kg</string>
     <string name="unit_lb">lb</string>
+
+    <!-- Mode hints (v1.16) -->
+    <string name="hint_mode_formulate">Plan how much base spirit to draw to reach a target volume.</string>
+    <string name="hint_mode_dilute">Dilute a known base volume to reach target strength.</string>
 </resources>
