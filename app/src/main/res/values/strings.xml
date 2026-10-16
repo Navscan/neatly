@@ -126,4 +126,13 @@
     <string name="cd_push_to_enhancing">Push to Enhancing</string>
     <string name="cd_push_to_dilute">Push to Dilute</string>
     <string name="push_arrow">→</string>
+
+    <!-- Bottler reverse mode (v1.18) -->
+    <string name="bottler_mode_cases">Cases</string>
+    <string name="bottler_mode_volume">Volume</string>
+    <string name="bottler_label_finished_volume">Finished volume</string>
+    <string name="bottler_result_whole_cases">Whole cases</string>
+    <string name="bottler_result_bottles">Bottles</string>
+    <string name="bottler_result_residual">Residual</string>
+    <string name="cd_push_to_bottler">Push to Bottler</string>
 </resources>

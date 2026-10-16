@@ -23,6 +23,7 @@ import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.floor
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,6 +62,8 @@ class MainActivity : AppCompatActivity() {
 
     // Bottler inputs
     private lateinit var bottlerCard: MaterialCardView
+    private lateinit var bottlerModeCases: TextView
+    private lateinit var bottlerModeVolume: TextView
     private lateinit var bottlerPresetGlobal: TextView
     private lateinit var bottlerPresetEu: TextView
     private lateinit var bottlerPresetUs: TextView
@@ -70,11 +73,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerBottleSize: EditText
     private lateinit var bottlerUnitBottleSize: TextView
     private lateinit var bottlerPackSize: EditText
+    private lateinit var bottlerCasesGroup: View
     private lateinit var bottlerCases: EditText
+    private lateinit var bottlerVolumeGroup: View
+    private lateinit var bottlerFinishedVolume: EditText
+    private lateinit var bottlerUnitFinishedVolume: TextView
     private lateinit var bottlerTargetAbv: EditText
     private lateinit var bottlerUnitTargetStrength: TextView
     private lateinit var bottlerStockAbv: EditText
     private lateinit var bottlerUnitStockStrength: TextView
+    private lateinit var bottlerAvailableGroup: View
     private lateinit var bottlerAvailableStock: EditText
     private lateinit var bottlerUnitAvailableStock: TextView
     private lateinit var bottlerWastage: EditText
@@ -120,6 +128,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contractionRowDilution: View
     private lateinit var contractionRowCombine: View
     private lateinit var contractionRowBottler: View
+    private lateinit var bottlerCasesResultsGroup: View
+    private lateinit var bottlerVolumeResultsGroup: View
 
     private lateinit var resRow1Label: TextView
     private lateinit var resRow2Label: TextView
@@ -145,6 +155,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerStockCharge: TextView
     private lateinit var bottlerWaterAdd: TextView
     private lateinit var bottlerContraction: TextView
+    private lateinit var bottlerWholeCases: TextView
+    private lateinit var bottlerWholeBottles: TextView
+    private lateinit var bottlerResidual: TextView
 
     private lateinit var flavHeadline: TextView
     private lateinit var flavBaseSpirit: TextView
@@ -159,11 +172,14 @@ class MainActivity : AppCompatActivity() {
 
     // Push-forward chevrons
     private lateinit var pushDiluteFinalToEnhVol: TextView
+    private lateinit var pushDiluteFinalToBottlerVol: TextView
     private lateinit var pushCombineVolToEnhVol: TextView
+    private lateinit var pushCombineVolToBottlerVol: TextView
     private lateinit var pushCombineAbvToEnhStrength: TextView
     private lateinit var pushBottlerWastageToEnhVol: TextView
     private lateinit var pushBottlerStockToDiluteVol: TextView
     private lateinit var pushFlavBaseToDiluteVol: TextView
+    private lateinit var pushFlavHeadlineToBottlerVol: TextView
 
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
@@ -201,10 +217,10 @@ class MainActivity : AppCompatActivity() {
     private var isImperialMode = false
     private var isMassMode = false
     private var bottlerInCl = false
+    private var bottlerVolumeMode = false
     private var enhBaseMode = false
     private var suppressSync = false
 
-    // Last computed results for push-forward.
     private var lastCombinePooledAbv: Double? = null
 
     private val installPermissionLauncher = registerForActivityResult(
@@ -227,6 +243,7 @@ class MainActivity : AppCompatActivity() {
         wireUnitToggles()
         wireTopTabs()
         wireSubTabs()
+        wireBottlerMode()
         wireBottlerPresets()
         wireBottlerUnitToggle()
         wireBottlerAngelsCheckbox()
@@ -239,6 +256,7 @@ class MainActivity : AppCompatActivity() {
         updateUnitLabels()
         applyMassVisibility()
         applyEnhancingMode()
+        applyBottlerMode()
         applyMode()
         applyTopTab()
     }
@@ -283,6 +301,8 @@ class MainActivity : AppCompatActivity() {
 
         // Bottler
         bottlerCard = findViewById(R.id.bottlerCard)
+        bottlerModeCases = findViewById(R.id.bottlerModeCases)
+        bottlerModeVolume = findViewById(R.id.bottlerModeVolume)
         bottlerPresetGlobal = findViewById(R.id.bottlerPresetGlobal)
         bottlerPresetEu = findViewById(R.id.bottlerPresetEu)
         bottlerPresetUs = findViewById(R.id.bottlerPresetUs)
@@ -292,11 +312,16 @@ class MainActivity : AppCompatActivity() {
         bottlerBottleSize = findViewById(R.id.bottlerBottleSize)
         bottlerUnitBottleSize = findViewById(R.id.bottlerUnitBottleSize)
         bottlerPackSize = findViewById(R.id.bottlerPackSize)
+        bottlerCasesGroup = findViewById(R.id.bottlerCasesGroup)
         bottlerCases = findViewById(R.id.bottlerCases)
+        bottlerVolumeGroup = findViewById(R.id.bottlerVolumeGroup)
+        bottlerFinishedVolume = findViewById(R.id.bottlerFinishedVolume)
+        bottlerUnitFinishedVolume = findViewById(R.id.bottlerUnitFinishedVolume)
         bottlerTargetAbv = findViewById(R.id.bottlerTargetAbv)
         bottlerUnitTargetStrength = findViewById(R.id.bottlerUnitTargetStrength)
         bottlerStockAbv = findViewById(R.id.bottlerStockAbv)
         bottlerUnitStockStrength = findViewById(R.id.bottlerUnitStockStrength)
+        bottlerAvailableGroup = findViewById(R.id.bottlerAvailableGroup)
         bottlerAvailableStock = findViewById(R.id.bottlerAvailableStock)
         bottlerUnitAvailableStock = findViewById(R.id.bottlerUnitAvailableStock)
         bottlerWastage = findViewById(R.id.bottlerWastage)
@@ -364,6 +389,8 @@ class MainActivity : AppCompatActivity() {
         contractionRowDilution = findViewById(R.id.contractionRowDilution)
         contractionRowCombine = findViewById(R.id.contractionRowCombine)
         contractionRowBottler = findViewById(R.id.contractionRowBottler)
+        bottlerCasesResultsGroup = findViewById(R.id.bottlerCasesResultsGroup)
+        bottlerVolumeResultsGroup = findViewById(R.id.bottlerVolumeResultsGroup)
 
         resRow1Label = findViewById(R.id.resRow1Label)
         resRow2Label = findViewById(R.id.resRow2Label)
@@ -389,6 +416,9 @@ class MainActivity : AppCompatActivity() {
         bottlerStockCharge = findViewById(R.id.bottlerStockCharge)
         bottlerWaterAdd = findViewById(R.id.bottlerWaterAdd)
         bottlerContraction = findViewById(R.id.bottlerContraction)
+        bottlerWholeCases = findViewById(R.id.bottlerWholeCases)
+        bottlerWholeBottles = findViewById(R.id.bottlerWholeBottles)
+        bottlerResidual = findViewById(R.id.bottlerResidual)
 
         flavHeadline = findViewById(R.id.flavHeadline)
         flavBaseSpirit = findViewById(R.id.flavBaseSpirit)
@@ -402,11 +432,14 @@ class MainActivity : AppCompatActivity() {
         flavPureAlc = findViewById(R.id.flavPureAlc)
 
         pushDiluteFinalToEnhVol = findViewById(R.id.pushDiluteFinalToEnhVol)
+        pushDiluteFinalToBottlerVol = findViewById(R.id.pushDiluteFinalToBottlerVol)
         pushCombineVolToEnhVol = findViewById(R.id.pushCombineVolToEnhVol)
+        pushCombineVolToBottlerVol = findViewById(R.id.pushCombineVolToBottlerVol)
         pushCombineAbvToEnhStrength = findViewById(R.id.pushCombineAbvToEnhStrength)
         pushBottlerWastageToEnhVol = findViewById(R.id.pushBottlerWastageToEnhVol)
         pushBottlerStockToDiluteVol = findViewById(R.id.pushBottlerStockToDiluteVol)
         pushFlavBaseToDiluteVol = findViewById(R.id.pushFlavBaseToDiluteVol)
+        pushFlavHeadlineToBottlerVol = findViewById(R.id.pushFlavHeadlineToBottlerVol)
 
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
@@ -493,6 +526,7 @@ class MainActivity : AppCompatActivity() {
             compAVolume, compAStrength, compBVolume, compBStrength,
             solveAStrength, solveBStrength, solveBatchSize,
             bottlerBottleSize, bottlerPackSize, bottlerCases,
+            bottlerFinishedVolume,
             bottlerTargetAbv, bottlerStockAbv, bottlerAvailableStock,
             bottlerWastage, bottlerYearsBarrel, bottlerAnnualLoss,
             flavourFinishedVolume, flavourTargetAbv, flavourBaseAbv,
@@ -503,7 +537,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Shared strengths: base and target mirror across tabs.
+    // Shared strengths
     // ---------------------------------------------------------------
 
     private fun wireSharedStrengths() {
@@ -592,6 +626,7 @@ class MainActivity : AppCompatActivity() {
         scaleField(compBVolume, factor)
         scaleField(solveBatchSize, factor)
         scaleField(bottlerAvailableStock, factor)
+        scaleField(bottlerFinishedVolume, factor)
         scaleField(flavourFinishedVolume, factor)
         isImperialMode = imperial
         updateToggleVisuals()
@@ -604,7 +639,7 @@ class MainActivity : AppCompatActivity() {
 
         val volumeFields = listOf(
             sourceVolume, compAVolume, compBVolume, solveBatchSize,
-            bottlerAvailableStock, flavourFinishedVolume
+            bottlerAvailableStock, bottlerFinishedVolume, flavourFinishedVolume
         )
         for (field in volumeFields) {
             val raw = field.text?.toString().orEmpty()
@@ -650,6 +685,7 @@ class MainActivity : AppCompatActivity() {
             compBVolume -> readStrength(compBStrength) ?: 40.0
             solveBatchSize -> readStrength(targetAbv) ?: 40.0
             bottlerAvailableStock -> readStrength(bottlerStockAbv) ?: 40.0
+            bottlerFinishedVolume -> readStrength(bottlerTargetAbv) ?: 40.0
             flavourFinishedVolume -> if (enhBaseMode) {
                 readStrength(flavourBaseAbv) ?: 40.0
             } else {
@@ -721,6 +757,7 @@ class MainActivity : AppCompatActivity() {
         bottlerUnitTargetStrength.text = strengthUnit
         bottlerUnitStockStrength.text = strengthUnit
         bottlerUnitAvailableStock.text = volumeOrMassUnit
+        bottlerUnitFinishedVolume.text = volumeOrMassUnit
 
         flavourUnitTargetStrength.text = strengthUnit
         flavourUnitBaseStrength.text = strengthUnit
@@ -811,6 +848,31 @@ class MainActivity : AppCompatActivity() {
         if (mode != Mode.BLEND_SOLVE) {
             targetHint.visibility = View.GONE
         }
+    }
+
+    // ---------------------------------------------------------------
+    // Bottler mode toggle
+    // ---------------------------------------------------------------
+
+    private fun wireBottlerMode() {
+        bottlerModeCases.setOnClickListener { setBottlerMode(volume = false) }
+        bottlerModeVolume.setOnClickListener { setBottlerMode(volume = true) }
+    }
+
+    private fun setBottlerMode(volume: Boolean) {
+        if (volume == bottlerVolumeMode) return
+        bottlerVolumeMode = volume
+        applyBottlerMode()
+        recalculate()
+    }
+
+    private fun applyBottlerMode() {
+        paintToggle(bottlerModeCases, active = !bottlerVolumeMode)
+        paintToggle(bottlerModeVolume, active = bottlerVolumeMode)
+
+        bottlerCasesGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
+        bottlerVolumeGroup.visibility = if (bottlerVolumeMode) View.VISIBLE else View.GONE
+        bottlerAvailableGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
     }
 
     // ---------------------------------------------------------------
@@ -917,6 +979,9 @@ class MainActivity : AppCompatActivity() {
         pushCombineAbvToEnhStrength.setOnClickListener { pushAbvToEnhancingBase() }
         pushBottlerStockToDiluteVol.setOnClickListener { pushToDilute(bottlerStockCharge) }
         pushFlavBaseToDiluteVol.setOnClickListener { pushToDilute(flavBaseSpirit) }
+        pushDiluteFinalToBottlerVol.setOnClickListener { pushToBottler(resFinalVol) }
+        pushCombineVolToBottlerVol.setOnClickListener { pushToBottler(combPooledVol) }
+        pushFlavHeadlineToBottlerVol.setOnClickListener { pushToBottlerFromHeadline(flavHeadline) }
     }
 
     private fun parseLeadingNumber(text: CharSequence): Double? {
@@ -955,6 +1020,30 @@ class MainActivity : AppCompatActivity() {
         sourceVolume.setSelection(sourceVolume.text?.length ?: 0)
         setTopTab(TopTab.CUT)
         setMode(Mode.REDUCE)
+    }
+
+    private fun pushToBottler(source: TextView) {
+        val value = parseLeadingNumber(source.text) ?: return
+        if (value <= 0.0) return
+        if (!bottlerVolumeMode) {
+            bottlerVolumeMode = true
+            applyBottlerMode()
+        }
+        bottlerFinishedVolume.setText(formatNumber(value))
+        bottlerFinishedVolume.setSelection(bottlerFinishedVolume.text?.length ?: 0)
+        setTopTab(TopTab.BOTTLER)
+    }
+
+    private fun pushToBottlerFromHeadline(source: TextView) {
+        val value = parseLeadingNumber(source.text) ?: return
+        if (value <= 0.0) return
+        if (!bottlerVolumeMode) {
+            bottlerVolumeMode = true
+            applyBottlerMode()
+        }
+        bottlerFinishedVolume.setText(formatNumber(value))
+        bottlerFinishedVolume.setSelection(bottlerFinishedVolume.text?.length ?: 0)
+        setTopTab(TopTab.BOTTLER)
     }
 
     // ---------------------------------------------------------------
@@ -1052,7 +1141,9 @@ class MainActivity : AppCompatActivity() {
                 Mode.BLEND_COMBINE -> calculateCombine()
                 Mode.BLEND_SOLVE -> calculateSolve()
             }
-            TopTab.BOTTLER -> calculateBottler()
+            TopTab.BOTTLER -> {
+                if (bottlerVolumeMode) calculateBottlerVolume() else calculateBottler()
+            }
             TopTab.FLAVOUR -> calculateFlavour()
         }
     }
@@ -1251,7 +1342,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ---------------------------------------------------------------
-    // Bottler calculation
+    // Bottler calculation — Cases mode
     // ---------------------------------------------------------------
 
     private fun calculateBottler() {
@@ -1309,6 +1400,8 @@ class MainActivity : AppCompatActivity() {
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.VISIBLE
         resultsGroupFlavour.visibility = View.GONE
+        bottlerCasesResultsGroup.visibility = View.VISIBLE
+        bottlerVolumeResultsGroup.visibility = View.GONE
 
         val headline = formatVolumePrimary(result.stockToChargeLiters, stockAbv) + " of " +
             formatStrength(stockAbv) + " stock"
@@ -1332,6 +1425,104 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.bottler_msg_shortfall, formatVolume(shortfall, stockAbv))
             }
         }
+    }
+
+    // ---------------------------------------------------------------
+    // Bottler calculation — Volume mode (reverse)
+    // ---------------------------------------------------------------
+
+    private fun calculateBottlerVolume() {
+        val bottleRaw = bottlerBottleSize.text?.toString()?.toDoubleOrNull()
+        val packRaw = bottlerPackSize.text?.toString()?.toIntOrNull()
+        val target = readStrength(bottlerTargetAbv)
+        val stock = readStrength(bottlerStockAbv)
+        val wastage = bottlerWastage.text?.toString()?.toDoubleOrNull() ?: 0.0
+        val finishedVolume = readVolume(bottlerFinishedVolume)
+
+        if (bottleRaw == null || packRaw == null || target == null ||
+            stock == null || finishedVolume == null) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        val bottleMl = if (bottlerInCl) bottleRaw * 10.0 else bottleRaw
+        val bottleLiters = bottleMl / 1000.0
+        val caseLiters = bottleLiters * packRaw
+
+        if (bottleLiters <= 0.0 || packRaw <= 0 || caseLiters <= 0.0 ||
+            target <= 0.0 || stock <= target || finishedVolume <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        val wholeCases = floor(finishedVolume / caseLiters).toInt()
+        val wholeCasesVolume = wholeCases * caseLiters
+        val residualLiters = finishedVolume - wholeCasesVolume
+        val wholeBottles = wholeCases * packRaw
+
+        // For the base spirit / water calculation, use the usable volume:
+        // the whole-cases volume. The residual is not fillable into a whole case.
+        // If wholeCases is 0, still show base needed for the residual.
+        val usableVolume = if (wholeCases > 0) wholeCasesVolume else finishedVolume
+
+        val stockToCharge = usableVolume * (target / stock)
+        val pureAlcohol = stockToCharge * (stock / 100.0)
+        val waterPer100 = SpiritsMath.waterPer100L(stock, target)
+        val waterToAdd = (stockToCharge / 100.0) * waterPer100
+
+        // Apply wastage as an informational overlay
+        val wastageMultiplier = 1.0 + (wastage / 100.0)
+        val withWastage = usableVolume * wastageMultiplier
+
+        showBottlerVolumeResults(
+            wholeCases = wholeCases,
+            wholeBottles = wholeBottles,
+            residualLiters = residualLiters,
+            residualBottleCount = if (bottleLiters > 0.0) floor(residualLiters / bottleLiters).toInt() else 0,
+            stockToCharge = stockToCharge,
+            waterToAdd = waterToAdd,
+            pureAlcohol = pureAlcohol,
+            withWastage = withWastage,
+            targetAbv = target,
+            stockAbv = stock,
+            usableVolume = usableVolume
+        )
+    }
+
+    private fun showBottlerVolumeResults(
+        wholeCases: Int,
+        wholeBottles: Int,
+        residualLiters: Double,
+        residualBottleCount: Int,
+        stockToCharge: Double,
+        waterToAdd: Double,
+        pureAlcohol: Double,
+        withWastage: Double,
+        targetAbv: Double,
+        stockAbv: Double,
+        usableVolume: Double
+    ) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.GONE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupSolve.visibility = View.GONE
+        resultsGroupBottler.visibility = View.VISIBLE
+        resultsGroupFlavour.visibility = View.GONE
+        bottlerCasesResultsGroup.visibility = View.GONE
+        bottlerVolumeResultsGroup.visibility = View.VISIBLE
+
+        val headline = formatVolumePrimary(stockToCharge, stockAbv) + " of " +
+            formatStrength(stockAbv) + " stock"
+        bottlerHeadline.text = headline
+
+        bottlerWholeCases.text = wholeCases.toString()
+        bottlerWholeBottles.text = wholeBottles.toString()
+
+        val residualDisplay = formatVolume(residualLiters, targetAbv)
+        val suffix = if (residualBottleCount > 0) " · $residualBottleCount bottles" else ""
+        bottlerResidual.text = "$residualDisplay$suffix"
+
+        resWarning.text = ""
     }
 
     // ---------------------------------------------------------------

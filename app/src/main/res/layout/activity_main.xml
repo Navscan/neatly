@@ -878,6 +878,40 @@
                     android:orientation="horizontal"
                     android:background="@drawable/pill_container"
                     android:padding="3dp"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/bottlerModeCases"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/bottler_mode_cases"
+                        android:textSize="12sp"
+                        android:textColor="@color/on_accent"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03"
+                        android:background="@drawable/pill_active" />
+
+                    <TextView
+                        android:id="@+id/bottlerModeVolume"
+                        android:layout_width="0dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/bottler_mode_volume"
+                        android:textSize="12sp"
+                        android:textColor="@color/ink_muted"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.03" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@drawable/pill_container"
+                    android:padding="3dp"
                     android:layout_marginBottom="22dp">
 
                     <TextView
@@ -1056,6 +1090,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/bottlerCasesGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -1082,6 +1117,60 @@
                         android:inputType="number"
                         android:importantForAutofill="no"
                         android:hint="0" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border_strong" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bottlerVolumeGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="20dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bottler_label_finished_volume"
+                        android:textSize="13sp"
+                        android:textColor="@color/ink_muted"
+                        android:letterSpacing="0.02" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="bottom">
+
+                        <EditText
+                            android:id="@+id/bottlerFinishedVolume"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="28sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display"
+                            android:background="@null"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="6dp"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="no"
+                            android:hint="0" />
+
+                        <TextView
+                            android:id="@+id/bottlerUnitFinishedVolume"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/unit_liters"
+                            android:textSize="13sp"
+                            android:textColor="@color/ink_light"
+                            android:letterSpacing="0.04"
+                            android:paddingBottom="10dp" />
+                    </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
@@ -1194,6 +1283,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/bottlerAvailableGroup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -2350,6 +2440,19 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/cd_push_to_enhancing" />
+
+                        <TextView
+                            android:id="@+id/pushDiluteFinalToBottlerVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2468,6 +2571,19 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:contentDescription="@string/cd_push_to_enhancing" />
+
+                        <TextView
+                            android:id="@+id/pushCombineVolToBottlerVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="6dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
@@ -2689,142 +2805,35 @@
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/bottler_result_order_requires"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/bottlerOrderVolume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/bottler_result_with_wastage"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/bottlerWithWastage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-
-                        <TextView
-                            android:id="@+id/pushBottlerWastageToEnhVol"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/push_arrow"
-                            android:textSize="20sp"
-                            android:textColor="@color/ink_muted"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="4dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="@string/cd_push_to_enhancing" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/bottler_result_stock_to_charge"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/bottlerStockCharge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-
-                        <TextView
-                            android:id="@+id/pushBottlerStockToDiluteVol"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/push_arrow"
-                            android:textSize="20sp"
-                            android:textColor="@color/ink_muted"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="4dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="@string/cd_push_to_dilute" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/bottler_result_water_to_add"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/bottlerWaterAdd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/contractionRowBottler"
+                        android:id="@+id/bottlerCasesResultsGroup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_order_requires"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerOrderVolume"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
 
                         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
@@ -2840,12 +2849,213 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="@string/bottler_result_contraction"
+                                android:text="@string/bottler_result_with_wastage"
                                 android:textSize="15sp"
                                 android:textColor="@color/ink_muted" />
 
                             <TextView
-                                android:id="@+id/bottlerContraction"
+                                android:id="@+id/bottlerWithWastage"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+
+                            <TextView
+                                android:id="@+id/pushBottlerWastageToEnhVol"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/push_arrow"
+                                android:textSize="20sp"
+                                android:textColor="@color/ink_muted"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="4dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:contentDescription="@string/cd_push_to_enhancing" />
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_stock_to_charge"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerStockCharge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+
+                            <TextView
+                                android:id="@+id/pushBottlerStockToDiluteVol"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/push_arrow"
+                                android:textSize="20sp"
+                                android:textColor="@color/ink_muted"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="4dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:contentDescription="@string/cd_push_to_dilute" />
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_water_to_add"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerWaterAdd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/contractionRowBottler"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/bottler_result_contraction"
+                                    android:textSize="15sp"
+                                    android:textColor="@color/ink_muted" />
+
+                                <TextView
+                                    android:id="@+id/bottlerContraction"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="24sp"
+                                    android:textColor="@color/ink"
+                                    android:fontFamily="@font/playfair_display" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/bottlerVolumeResultsGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_whole_cases"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerWholeCases"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_bottles"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerWholeBottles"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
+
+                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_residual"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerResidual"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="24sp"
@@ -2862,14 +3072,35 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/flavHeadline"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display"
-                        android:layout_marginBottom="14dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="14dp">
+
+                        <TextView
+                            android:id="@+id/flavHeadline"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="30sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushFlavHeadlineToBottlerVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_bottler" />
+                    </LinearLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
 
