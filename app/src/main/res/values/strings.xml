@@ -152,4 +152,5 @@
     <string name="result_effective_ratio">Effective ratio</string>
     <string name="hint_order_ratio">Set the stronger-stream share. Volumes are solved.</string>
     <string name="hint_order_cap">Fix one stream at its cap. The other is solved.</string>
+    <string name="msg_order_strengths_swapped">Note: entered strengths were reordered. Higher value treated as stronger.</string>
 </resources>
