@@ -217,20 +217,6 @@ object SpiritsMath {
         val angelsShareStartVolume: Double
     )
 
-    /**
-     * Production planner.
-     *
-     * @param bottleVolumeMl      Bottle size in millilitres (e.g. 750).
-     * @param packSize            Bottles per case (e.g. 12).
-     * @param caseCount           Number of cases in the order.
-     * @param targetAbv           Finished ABV (e.g. 43.0).
-     * @param stockAbv            Available spirit ABV (e.g. 72.0).
-     * @param wastagePercent      0.0 - 10.0. Applied to the order volume.
-     * @param angelsShareEnabled  When true, computes starting barrel
-     *                            volume needed to end up with [withWastageLiters].
-     * @param yearsInBarrel       Only used if [angelsShareEnabled].
-     * @param annualLossPercent   Only used if [angelsShareEnabled].
-     */
     fun calculateBottler(
         bottleVolumeMl: Double,
         packSize: Int,
@@ -291,9 +277,6 @@ object SpiritsMath {
     //
     // Pure alcohol mass balance. No OIML contraction: sugar syrups break
     // the polynomial's assumptions. Volume is treated as additive.
-    //
-    // Dose rates are per litre of FINAL blend volume. Drops are 20 per mL.
-    // Gram doses convert to volume via [AdditiveInput.density].
     // ---------------------------------------------------------------
 
     enum class DoseUnit {
@@ -318,16 +301,6 @@ object SpiritsMath {
         val additiveVolumesLiters: List<Double>
     )
 
-    /**
-     * Additive dosing calculator, finished-volume direction.
-     *
-     * Dose rates are per litre of final blend volume. Drops are 20 per mL.
-     * Gram doses are converted to volume via [AdditiveInput.density].
-     *
-     * @throws IllegalArgumentException when target exceeds base strength,
-     *         when any volume is non-positive, or when additive alcohol
-     *         alone exceeds the target (negative base spirit).
-     */
     fun calculateFlavour(
         finishedVolumeLiters: Double,
         targetAbv: Double,
@@ -372,23 +345,6 @@ object SpiritsMath {
         )
     }
 
-    /**
-     * Additive dosing calculator, base-volume direction.
-     *
-     * The inverse of [calculateFlavour]. Given a base volume and target
-     * strength, computes the final blend volume, each additive's volume,
-     * and water to add. Same mass balance, opposite known.
-     *
-     * Derived from: V_base x S/100 + sum(V_i x a_i/100) = V_final x T/100
-     * and V_i = k_i x V_final, so:
-     *   V_final = V_base x S / (T - sum(k_i x a_i))
-     * where k_i is the dose coefficient in litres-of-additive per
-     * litre-of-final.
-     *
-     * @throws IllegalArgumentException when target exceeds base strength,
-     *         when any volume is non-positive, or when additive alcohol
-     *         alone equals or exceeds the target (division by zero).
-     */
     fun calculateFlavourFromBase(
         baseVolumeLiters: Double,
         targetAbv: Double,
@@ -399,8 +355,6 @@ object SpiritsMath {
         require(targetAbv > 0.0 && baseAbv > 0.0) { "Strength values must be greater than zero." }
         require(targetAbv <= baseAbv) { "Target strength must be at or below base spirit strength." }
 
-        // Dose coefficient per additive: litres of additive per litre of
-        // final blend volume.
         val coefficients = additives.map { a ->
             when (a.unit) {
                 DoseUnit.ML_PER_L -> a.dose / 1000.0
@@ -412,8 +366,6 @@ object SpiritsMath {
             }
         }
 
-        // Total additive alcohol contribution per litre of final blend,
-        // expressed as an ABV percentage.
         val additiveAbvPerLitre = additives.mapIndexed { i, a ->
             coefficients[i] * a.abv
         }.sum()
@@ -439,15 +391,130 @@ object SpiritsMath {
     }
 
     // ---------------------------------------------------------------
+    // Compound From Order (v1.19).
+    //
+    // Two streams of different strength, combined and then diluted with
+    // water to hit an order volume at a target ABV. Two constraint
+    // modes: ratio-driven (fixed split) or cap-driven (one stream
+    // fixed at its available amount, the other solved).
+    // ---------------------------------------------------------------
+
+    data class OrderResult(
+        val orderVolumeLiters: Double,
+        val compoundAbv: Double,
+        val compoundVolumeLiters: Double,
+        val strongerVolumeLiters: Double,
+        val lighterVolumeLiters: Double,
+        val waterToAddLiters: Double,
+        val pureAlcoholLiters: Double,
+        val effectiveRatio: Double
+    )
+
+    /**
+     * Compound planning by ratio.
+     *
+     * @param ratio Fraction of the compound (by volume) taken from the
+     *              stronger stream. 0.0 to 1.0.
+     */
+    fun compoundFromOrderByRatio(
+        finishedVolumeLiters: Double,
+        targetAbv: Double,
+        strongerAbv: Double,
+        lighterAbv: Double,
+        ratio: Double
+    ): OrderResult {
+        require(finishedVolumeLiters > 0.0) { "Order volume must be greater than zero." }
+        require(targetAbv > 0.0) { "Target strength must be greater than zero." }
+        require(strongerAbv > targetAbv) { "Stronger spirit must exceed the target." }
+        require(lighterAbv > targetAbv) { "Lighter spirit must exceed the target." }
+        require(strongerAbv >= lighterAbv) { "Stronger stream must exceed the lighter stream." }
+        require(ratio >= 0.0 && ratio <= 1.0) { "Ratio must be between 0 and 1." }
+
+        val compoundAbv = ratio * strongerAbv + (1.0 - ratio) * lighterAbv
+        val pureAlcohol = finishedVolumeLiters * targetAbv / 100.0
+        val compoundVolume = pureAlcohol * 100.0 / compoundAbv
+        val strongerVolume = ratio * compoundVolume
+        val lighterVolume = (1.0 - ratio) * compoundVolume
+        val waterToAdd = finishedVolumeLiters - compoundVolume
+
+        return OrderResult(
+            orderVolumeLiters = finishedVolumeLiters,
+            compoundAbv = compoundAbv,
+            compoundVolumeLiters = compoundVolume,
+            strongerVolumeLiters = strongerVolume,
+            lighterVolumeLiters = lighterVolume,
+            waterToAddLiters = waterToAdd,
+            pureAlcoholLiters = pureAlcohol,
+            effectiveRatio = ratio
+        )
+    }
+
+    /**
+     * Compound planning by cap. One stream is fixed at its available
+     * amount; the other is solved to hit the order.
+     *
+     * @param capVolumeLiters The fixed draw of the capped stream.
+     * @param capOnStronger   True if the capped stream is the stronger one.
+     */
+    fun compoundFromOrderByCap(
+        finishedVolumeLiters: Double,
+        targetAbv: Double,
+        strongerAbv: Double,
+        lighterAbv: Double,
+        capVolumeLiters: Double,
+        capOnStronger: Boolean
+    ): OrderResult {
+        require(finishedVolumeLiters > 0.0) { "Order volume must be greater than zero." }
+        require(targetAbv > 0.0) { "Target strength must be greater than zero." }
+        require(strongerAbv > targetAbv) { "Stronger spirit must exceed the target." }
+        require(lighterAbv > targetAbv) { "Lighter spirit must exceed the target." }
+        require(strongerAbv >= lighterAbv) { "Stronger stream must exceed the lighter stream." }
+        require(capVolumeLiters > 0.0) { "Cap volume must be greater than zero." }
+
+        val pureAlcohol = finishedVolumeLiters * targetAbv / 100.0
+
+        val strongerVolume: Double
+        val lighterVolume: Double
+        if (capOnStronger) {
+            strongerVolume = capVolumeLiters
+            val alcoholFromStronger = strongerVolume * strongerAbv / 100.0
+            val alcoholFromLighter = pureAlcohol - alcoholFromStronger
+            require(alcoholFromLighter > 0.0) {
+                "Capped stronger volume exceeds the alcohol the order requires."
+            }
+            lighterVolume = alcoholFromLighter * 100.0 / lighterAbv
+        } else {
+            lighterVolume = capVolumeLiters
+            val alcoholFromLighter = lighterVolume * lighterAbv / 100.0
+            val alcoholFromStronger = pureAlcohol - alcoholFromLighter
+            require(alcoholFromStronger > 0.0) {
+                "Capped lighter volume exceeds the alcohol the order requires."
+            }
+            strongerVolume = alcoholFromStronger * 100.0 / strongerAbv
+        }
+
+        val compoundVolume = strongerVolume + lighterVolume
+        require(compoundVolume <= finishedVolumeLiters) {
+            "Compound volume exceeds the order. Reduce the cap."
+        }
+        val waterToAdd = finishedVolumeLiters - compoundVolume
+        val compoundAbv = pureAlcohol * 100.0 / compoundVolume
+        val effectiveRatio = if (compoundVolume > 0.0) strongerVolume / compoundVolume else 0.0
+
+        return OrderResult(
+            orderVolumeLiters = finishedVolumeLiters,
+            compoundAbv = compoundAbv,
+            compoundVolumeLiters = compoundVolume,
+            strongerVolumeLiters = strongerVolume,
+            lighterVolumeLiters = lighterVolume,
+            waterToAddLiters = waterToAdd,
+            pureAlcoholLiters = pureAlcohol,
+            effectiveRatio = effectiveRatio
+        )
+    }
+
+    // ---------------------------------------------------------------
     // Mass-mode conversions (v1.15).
-    //
-    // Ethanol-water density at 20 C, ABV % v/v. These values are
-    // approximate to within ~0.5% of the OIML reference tables.
-    // Adequate for production planning; refine from a standards
-    // source before any use where the difference matters.
-    //
-    // Only valid for post-distillation product (ethanol + water).
-    // Do NOT use for molasses, syrup, wort, or wash.
     // ---------------------------------------------------------------
 
     private val DENSITY_TABLE: Array<Pair<Double, Double>> = arrayOf(
@@ -477,10 +544,6 @@ object SpiritsMath {
     const val DENSITY_WATER = 0.9982
     const val DENSITY_PURE_ETHANOL = 0.7893
 
-    /**
-     * Density of an ethanol-water solution at 20 C, in g/mL, for the
-     * given ABV % v/v. Linear interpolation between tabulated values.
-     */
     fun densityAt(abv: Double): Double {
         val a = abv.coerceIn(0.0, 100.0)
         for (i in 0 until DENSITY_TABLE.size - 1) {
@@ -494,25 +557,11 @@ object SpiritsMath {
         return DENSITY_TABLE.last().second
     }
 
-    /**
-     * Convert kilograms of ethanol-water solution at [abv] % v/v to
-     * litres at 20 C.
-     */
     fun kgToLitres(kg: Double, abv: Double): Double = kg / densityAt(abv)
 
-    /**
-     * Convert litres of ethanol-water solution at [abv] % v/v to
-     * kilograms at 20 C.
-     */
     fun litresToKg(litres: Double, abv: Double): Double = litres * densityAt(abv)
 
-    /**
-     * Convert kilograms to US pounds.
-     */
     fun kgToUsPounds(kg: Double): Double = kg / KG_PER_US_POUND
 
-    /**
-     * Convert US pounds to kilograms.
-     */
     fun usPoundsToKg(lb: Double): Double = lb * KG_PER_US_POUND
 }

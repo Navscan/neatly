@@ -28,7 +28,7 @@ import kotlin.math.floor
 class MainActivity : AppCompatActivity() {
 
     private enum class TopTab { CUT, BOTTLER, FLAVOUR }
-    private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE }
+    private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE, FROM_ORDER }
 
     // Cut inputs
     private lateinit var sourceVolume: EditText
@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groupSingle: View
     private lateinit var groupCombine: View
     private lateinit var groupSolve: View
+    private lateinit var groupFromOrder: View
     private lateinit var groupTarget: View
     private lateinit var blendSubTabs: View
     private lateinit var targetHint: TextView
@@ -59,6 +60,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var subBlend: TextView
     private lateinit var subCombine: TextView
     private lateinit var subSolve: TextView
+    private lateinit var subFromOrder: TextView
+
+    // From Order inputs
+    private lateinit var orderModeRatio: TextView
+    private lateinit var orderModeCap: TextView
+    private lateinit var orderModeHint: TextView
+    private lateinit var orderVolume: EditText
+    private lateinit var unitOrderVolume: TextView
+    private lateinit var orderTargetAbv: EditText
+    private lateinit var unitOrderTargetStrength: TextView
+    private lateinit var orderStrongerAbv: EditText
+    private lateinit var unitOrderStronger: TextView
+    private lateinit var orderLighterAbv: EditText
+    private lateinit var unitOrderLighter: TextView
+    private lateinit var orderRatioGroup: View
+    private lateinit var orderRatio: EditText
+    private lateinit var orderCapGroup: View
+    private lateinit var orderCapStronger: TextView
+    private lateinit var orderCapLighter: TextView
+    private lateinit var orderCapVolume: EditText
+    private lateinit var unitOrderCapVolume: TextView
 
     // Bottler inputs
     private lateinit var bottlerCard: MaterialCardView
@@ -122,6 +144,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultsCard: MaterialCardView
     private lateinit var resultsGroupDilution: View
     private lateinit var resultsGroupCombine: View
+    private lateinit var resultsGroupFromOrder: View
     private lateinit var resultsGroupSolve: View
     private lateinit var resultsGroupBottler: View
     private lateinit var resultsGroupFlavour: View
@@ -143,6 +166,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var combPooledAbv: TextView
     private lateinit var combPureAlc: TextView
     private lateinit var combContraction: TextView
+
+    private lateinit var orderHeadline: TextView
+    private lateinit var orderCompoundVolume: TextView
+    private lateinit var orderStrongerUsed: TextView
+    private lateinit var orderLighterUsed: TextView
+    private lateinit var orderEffectiveRatio: TextView
+    private lateinit var orderWaterAdd: TextView
+    private lateinit var orderPureAlc: TextView
 
     private lateinit var solveHeadline: TextView
     private lateinit var solveSampleA: TextView
@@ -180,6 +211,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pushBottlerStockToDiluteVol: TextView
     private lateinit var pushFlavBaseToDiluteVol: TextView
     private lateinit var pushFlavHeadlineToBottlerVol: TextView
+    private lateinit var pushOrderToBottlerVol: TextView
 
     private lateinit var resWarning: TextView
     private lateinit var footerText: TextView
@@ -219,9 +251,12 @@ class MainActivity : AppCompatActivity() {
     private var bottlerInCl = false
     private var bottlerVolumeMode = false
     private var enhBaseMode = false
+    private var orderRatioMode = true
+    private var orderCapOnStronger = true
     private var suppressSync = false
 
     private var lastCombinePooledAbv: Double? = null
+    private var lastOrderVolume: Double? = null
 
     private val installPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -243,6 +278,7 @@ class MainActivity : AppCompatActivity() {
         wireUnitToggles()
         wireTopTabs()
         wireSubTabs()
+        wireOrderMode()
         wireBottlerMode()
         wireBottlerPresets()
         wireBottlerUnitToggle()
@@ -256,6 +292,7 @@ class MainActivity : AppCompatActivity() {
         updateUnitLabels()
         applyMassVisibility()
         applyEnhancingMode()
+        applyOrderMode()
         applyBottlerMode()
         applyMode()
         applyTopTab()
@@ -285,6 +322,7 @@ class MainActivity : AppCompatActivity() {
         groupSingle = findViewById(R.id.groupSingle)
         groupCombine = findViewById(R.id.groupCombine)
         groupSolve = findViewById(R.id.groupSolve)
+        groupFromOrder = findViewById(R.id.groupFromOrder)
         groupTarget = findViewById(R.id.groupTarget)
         blendSubTabs = findViewById(R.id.blendSubTabs)
         targetHint = findViewById(R.id.targetHint)
@@ -298,6 +336,27 @@ class MainActivity : AppCompatActivity() {
         subBlend = findViewById(R.id.subBlend)
         subCombine = findViewById(R.id.subCombine)
         subSolve = findViewById(R.id.subSolve)
+        subFromOrder = findViewById(R.id.subFromOrder)
+
+        // From Order
+        orderModeRatio = findViewById(R.id.orderModeRatio)
+        orderModeCap = findViewById(R.id.orderModeCap)
+        orderModeHint = findViewById(R.id.orderModeHint)
+        orderVolume = findViewById(R.id.orderVolume)
+        unitOrderVolume = findViewById(R.id.unitOrderVolume)
+        orderTargetAbv = findViewById(R.id.orderTargetAbv)
+        unitOrderTargetStrength = findViewById(R.id.unitOrderTargetStrength)
+        orderStrongerAbv = findViewById(R.id.orderStrongerAbv)
+        unitOrderStronger = findViewById(R.id.unitOrderStronger)
+        orderLighterAbv = findViewById(R.id.orderLighterAbv)
+        unitOrderLighter = findViewById(R.id.unitOrderLighter)
+        orderRatioGroup = findViewById(R.id.orderRatioGroup)
+        orderRatio = findViewById(R.id.orderRatio)
+        orderCapGroup = findViewById(R.id.orderCapGroup)
+        orderCapStronger = findViewById(R.id.orderCapStronger)
+        orderCapLighter = findViewById(R.id.orderCapLighter)
+        orderCapVolume = findViewById(R.id.orderCapVolume)
+        unitOrderCapVolume = findViewById(R.id.unitOrderCapVolume)
 
         // Bottler
         bottlerCard = findViewById(R.id.bottlerCard)
@@ -383,6 +442,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard = findViewById(R.id.resultsCard)
         resultsGroupDilution = findViewById(R.id.resultsGroupDilution)
         resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
+        resultsGroupFromOrder = findViewById(R.id.resultsGroupFromOrder)
         resultsGroupSolve = findViewById(R.id.resultsGroupSolve)
         resultsGroupBottler = findViewById(R.id.resultsGroupBottler)
         resultsGroupFlavour = findViewById(R.id.resultsGroupFlavour)
@@ -404,6 +464,14 @@ class MainActivity : AppCompatActivity() {
         combPooledAbv = findViewById(R.id.combPooledAbv)
         combPureAlc = findViewById(R.id.combPureAlc)
         combContraction = findViewById(R.id.combContraction)
+
+        orderHeadline = findViewById(R.id.orderHeadline)
+        orderCompoundVolume = findViewById(R.id.orderCompoundVolume)
+        orderStrongerUsed = findViewById(R.id.orderStrongerUsed)
+        orderLighterUsed = findViewById(R.id.orderLighterUsed)
+        orderEffectiveRatio = findViewById(R.id.orderEffectiveRatio)
+        orderWaterAdd = findViewById(R.id.orderWaterAdd)
+        orderPureAlc = findViewById(R.id.orderPureAlc)
 
         solveHeadline = findViewById(R.id.solveHeadline)
         solveSampleA = findViewById(R.id.solveSampleA)
@@ -440,6 +508,7 @@ class MainActivity : AppCompatActivity() {
         pushBottlerStockToDiluteVol = findViewById(R.id.pushBottlerStockToDiluteVol)
         pushFlavBaseToDiluteVol = findViewById(R.id.pushFlavBaseToDiluteVol)
         pushFlavHeadlineToBottlerVol = findViewById(R.id.pushFlavHeadlineToBottlerVol)
+        pushOrderToBottlerVol = findViewById(R.id.pushOrderToBottlerVol)
 
         resWarning = findViewById(R.id.resWarning)
         footerText = findViewById(R.id.footerText)
@@ -525,6 +594,8 @@ class MainActivity : AppCompatActivity() {
             sourceVolume, sourceAbv, targetAbv,
             compAVolume, compAStrength, compBVolume, compBStrength,
             solveAStrength, solveBStrength, solveBatchSize,
+            orderVolume, orderTargetAbv, orderStrongerAbv, orderLighterAbv,
+            orderRatio, orderCapVolume,
             bottlerBottleSize, bottlerPackSize, bottlerCases,
             bottlerFinishedVolume,
             bottlerTargetAbv, bottlerStockAbv, bottlerAvailableStock,
@@ -542,7 +613,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun wireSharedStrengths() {
         val baseStrengthFields = listOf(sourceAbv, bottlerStockAbv, flavourBaseAbv)
-        val targetStrengthFields = listOf(targetAbv, bottlerTargetAbv, flavourTargetAbv)
+        val targetStrengthFields = listOf(targetAbv, bottlerTargetAbv, flavourTargetAbv, orderTargetAbv)
         for (f in baseStrengthFields) f.addTextChangedListener(makeSharedWatcher(baseStrengthFields))
         for (f in targetStrengthFields) f.addTextChangedListener(makeSharedWatcher(targetStrengthFields))
     }
@@ -593,6 +664,9 @@ class MainActivity : AppCompatActivity() {
             scaleField(compBStrength, factor)
             scaleField(solveAStrength, factor)
             scaleField(solveBStrength, factor)
+            scaleField(orderTargetAbv, factor)
+            scaleField(orderStrongerAbv, factor)
+            scaleField(orderLighterAbv, factor)
             scaleField(bottlerTargetAbv, factor)
             scaleField(bottlerStockAbv, factor)
             scaleField(flavourTargetAbv, factor)
@@ -625,6 +699,8 @@ class MainActivity : AppCompatActivity() {
         scaleField(compAVolume, factor)
         scaleField(compBVolume, factor)
         scaleField(solveBatchSize, factor)
+        scaleField(orderVolume, factor)
+        scaleField(orderCapVolume, factor)
         scaleField(bottlerAvailableStock, factor)
         scaleField(bottlerFinishedVolume, factor)
         scaleField(flavourFinishedVolume, factor)
@@ -639,6 +715,7 @@ class MainActivity : AppCompatActivity() {
 
         val volumeFields = listOf(
             sourceVolume, compAVolume, compBVolume, solveBatchSize,
+            orderVolume, orderCapVolume,
             bottlerAvailableStock, bottlerFinishedVolume, flavourFinishedVolume
         )
         for (field in volumeFields) {
@@ -684,6 +761,12 @@ class MainActivity : AppCompatActivity() {
             compAVolume -> readStrength(compAStrength) ?: 40.0
             compBVolume -> readStrength(compBStrength) ?: 40.0
             solveBatchSize -> readStrength(targetAbv) ?: 40.0
+            orderVolume -> readStrength(orderTargetAbv) ?: 40.0
+            orderCapVolume -> if (orderCapOnStronger) {
+                readStrength(orderStrongerAbv) ?: 40.0
+            } else {
+                readStrength(orderLighterAbv) ?: 40.0
+            }
             bottlerAvailableStock -> readStrength(bottlerStockAbv) ?: 40.0
             bottlerFinishedVolume -> readStrength(bottlerTargetAbv) ?: 40.0
             flavourFinishedVolume -> if (enhBaseMode) {
@@ -753,6 +836,12 @@ class MainActivity : AppCompatActivity() {
         unitCompBVolume.text = volumeOrMassUnit
         unitSolveBatchSize.text = volumeOrMassUnit
 
+        unitOrderVolume.text = volumeOrMassUnit
+        unitOrderTargetStrength.text = strengthUnit
+        unitOrderStronger.text = strengthUnit
+        unitOrderLighter.text = strengthUnit
+        unitOrderCapVolume.text = volumeOrMassUnit
+
         bottlerUnitBottleSize.text = bottleUnit
         bottlerUnitTargetStrength.text = strengthUnit
         bottlerUnitStockStrength.text = strengthUnit
@@ -800,6 +889,7 @@ class MainActivity : AppCompatActivity() {
         subBlend.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subCombine.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subSolve.setOnClickListener { setMode(Mode.BLEND_SOLVE) }
+        subFromOrder.setOnClickListener { setMode(Mode.FROM_ORDER) }
     }
 
     private fun setMode(newMode: Mode) {
@@ -811,18 +901,24 @@ class MainActivity : AppCompatActivity() {
     private fun applyMode() {
         paintToggle(subBatch, active = mode == Mode.BATCH)
         paintToggle(subReduce, active = mode == Mode.REDUCE)
-        paintToggle(subBlend, active = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE)
+        paintToggle(
+            subBlend,
+            active = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE || mode == Mode.FROM_ORDER
+        )
 
-        val blendActive = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE
+        val blendActive = mode == Mode.BLEND_COMBINE || mode == Mode.BLEND_SOLVE || mode == Mode.FROM_ORDER
         blendSubTabs.visibility = if (blendActive) View.VISIBLE else View.GONE
         paintToggle(subCombine, active = mode == Mode.BLEND_COMBINE)
         paintToggle(subSolve, active = mode == Mode.BLEND_SOLVE)
+        paintToggle(subFromOrder, active = mode == Mode.FROM_ORDER)
 
         groupSingle.visibility = if (mode == Mode.BATCH || mode == Mode.REDUCE) View.VISIBLE else View.GONE
         groupCombine.visibility = if (mode == Mode.BLEND_COMBINE) View.VISIBLE else View.GONE
         groupSolve.visibility = if (mode == Mode.BLEND_SOLVE) View.VISIBLE else View.GONE
+        groupFromOrder.visibility = if (mode == Mode.FROM_ORDER) View.VISIBLE else View.GONE
 
-        groupTarget.visibility = if (mode == Mode.BLEND_COMBINE) View.GONE else View.VISIBLE
+        groupTarget.visibility =
+            if (mode == Mode.BLEND_COMBINE || mode == Mode.FROM_ORDER) View.GONE else View.VISIBLE
 
         pushDiluteFinalToEnhVol.visibility =
             if (mode == Mode.REDUCE) View.VISIBLE else View.GONE
@@ -840,13 +936,55 @@ class MainActivity : AppCompatActivity() {
                 modeHint.text = getString(R.string.hint_mode_dilute)
                 modeHint.visibility = View.VISIBLE
             }
-            Mode.BLEND_COMBINE, Mode.BLEND_SOLVE -> {
+            Mode.BLEND_COMBINE, Mode.BLEND_SOLVE, Mode.FROM_ORDER -> {
                 modeHint.visibility = View.GONE
             }
         }
 
         if (mode != Mode.BLEND_SOLVE) {
             targetHint.visibility = View.GONE
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // From Order mode toggle
+    // ---------------------------------------------------------------
+
+    private fun wireOrderMode() {
+        orderModeRatio.setOnClickListener { setOrderMode(ratio = true) }
+        orderModeCap.setOnClickListener { setOrderMode(ratio = false) }
+        orderCapStronger.setOnClickListener { setOrderCapOn(stronger = true) }
+        orderCapLighter.setOnClickListener { setOrderCapOn(stronger = false) }
+    }
+
+    private fun setOrderMode(ratio: Boolean) {
+        if (ratio == orderRatioMode) return
+        orderRatioMode = ratio
+        applyOrderMode()
+        recalculate()
+    }
+
+    private fun setOrderCapOn(stronger: Boolean) {
+        if (stronger == orderCapOnStronger) return
+        orderCapOnStronger = stronger
+        applyOrderMode()
+        recalculate()
+    }
+
+    private fun applyOrderMode() {
+        paintToggle(orderModeRatio, active = orderRatioMode)
+        paintToggle(orderModeCap, active = !orderRatioMode)
+
+        orderRatioGroup.visibility = if (orderRatioMode) View.VISIBLE else View.GONE
+        orderCapGroup.visibility = if (orderRatioMode) View.GONE else View.VISIBLE
+
+        paintToggle(orderCapStronger, active = orderCapOnStronger)
+        paintToggle(orderCapLighter, active = !orderCapOnStronger)
+
+        if (orderRatioMode) {
+            orderModeHint.text = getString(R.string.hint_order_ratio)
+        } else {
+            orderModeHint.text = getString(R.string.hint_order_cap)
         }
     }
 
@@ -982,6 +1120,7 @@ class MainActivity : AppCompatActivity() {
         pushDiluteFinalToBottlerVol.setOnClickListener { pushToBottler(resFinalVol) }
         pushCombineVolToBottlerVol.setOnClickListener { pushToBottler(combPooledVol) }
         pushFlavHeadlineToBottlerVol.setOnClickListener { pushToBottlerFromHeadline(flavHeadline) }
+        pushOrderToBottlerVol.setOnClickListener { pushOrderVolumeToBottler() }
     }
 
     private fun parseLeadingNumber(text: CharSequence): Double? {
@@ -1036,6 +1175,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun pushToBottlerFromHeadline(source: TextView) {
         val value = parseLeadingNumber(source.text) ?: return
+        if (value <= 0.0) return
+        if (!bottlerVolumeMode) {
+            bottlerVolumeMode = true
+            applyBottlerMode()
+        }
+        bottlerFinishedVolume.setText(formatNumber(value))
+        bottlerFinishedVolume.setSelection(bottlerFinishedVolume.text?.length ?: 0)
+        setTopTab(TopTab.BOTTLER)
+    }
+
+    private fun pushOrderVolumeToBottler() {
+        val value = lastOrderVolume ?: return
         if (value <= 0.0) return
         if (!bottlerVolumeMode) {
             bottlerVolumeMode = true
@@ -1140,6 +1291,7 @@ class MainActivity : AppCompatActivity() {
                 Mode.REDUCE -> calculateReduce()
                 Mode.BLEND_COMBINE -> calculateCombine()
                 Mode.BLEND_SOLVE -> calculateSolve()
+                Mode.FROM_ORDER -> calculateFromOrder()
             }
             TopTab.BOTTLER -> {
                 if (bottlerVolumeMode) calculateBottlerVolume() else calculateBottler()
@@ -1171,6 +1323,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.VISIBLE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
@@ -1207,6 +1360,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.VISIBLE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
@@ -1244,6 +1398,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.VISIBLE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
@@ -1256,6 +1411,80 @@ class MainActivity : AppCompatActivity() {
         combPooledAbv.text = formatStrength(pooledAbv)
         combPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         combContraction.text = formatVolume(result.contractionLiters, 0.0)
+        resWarning.text = ""
+    }
+
+    private fun calculateFromOrder() {
+        val vol = readVolume(orderVolume)
+        val target = readStrength(orderTargetAbv)
+        val a = readStrength(orderStrongerAbv)
+        val b = readStrength(orderLighterAbv)
+
+        if (vol == null || target == null || a == null || b == null ||
+            vol <= 0.0 || target <= 0.0 || a <= 0.0 || b <= 0.0) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        val sAbv = maxOf(a, b)
+        val lAbv = minOf(a, b)
+
+        if (sAbv <= target || lAbv <= target || sAbv == lAbv) {
+            resultsCard.visibility = View.GONE
+            return
+        }
+
+        try {
+            val result = if (orderRatioMode) {
+                val ratioPct = orderRatio.text?.toString()?.toDoubleOrNull() ?: 30.0
+                if (ratioPct <= 0.0 || ratioPct >= 100.0) {
+                    resultsCard.visibility = View.GONE
+                    return
+                }
+                SpiritsMath.compoundFromOrderByRatio(
+                    vol, target, sAbv, lAbv, ratioPct / 100.0
+                )
+            } else {
+                val capVol = readVolume(orderCapVolume)
+                if (capVol == null || capVol <= 0.0) {
+                    resultsCard.visibility = View.GONE
+                    return
+                }
+                SpiritsMath.compoundFromOrderByCap(
+                    vol, target, sAbv, lAbv, capVol, orderCapOnStronger
+                )
+            }
+            showFromOrderResults(result, target, sAbv, lAbv)
+        } catch (_: IllegalArgumentException) {
+            resultsCard.visibility = View.GONE
+        }
+    }
+
+    private fun showFromOrderResults(
+        result: SpiritsMath.OrderResult,
+        targetAbv: Double,
+        strongerAbv: Double,
+        lighterAbv: Double
+    ) {
+        resultsCard.visibility = View.VISIBLE
+        resultsGroupDilution.visibility = View.GONE
+        resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.VISIBLE
+        resultsGroupSolve.visibility = View.GONE
+        resultsGroupBottler.visibility = View.GONE
+        resultsGroupFlavour.visibility = View.GONE
+
+        lastOrderVolume = result.orderVolumeLiters
+
+        orderHeadline.text = formatVolumePrimary(result.orderVolumeLiters, targetAbv) +
+            " at " + formatStrength(targetAbv)
+
+        orderCompoundVolume.text = formatVolume(result.compoundVolumeLiters, result.compoundAbv)
+        orderStrongerUsed.text = formatVolume(result.strongerVolumeLiters, strongerAbv)
+        orderLighterUsed.text = formatVolume(result.lighterVolumeLiters, lighterAbv)
+        orderEffectiveRatio.text = String.format(Locale.US, "%.1f %%", result.effectiveRatio * 100.0)
+        orderWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
+        orderPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resWarning.text = ""
     }
 
@@ -1278,6 +1507,7 @@ class MainActivity : AppCompatActivity() {
             resultsCard.visibility = View.VISIBLE
             resultsGroupDilution.visibility = View.GONE
             resultsGroupCombine.visibility = View.GONE
+            resultsGroupFromOrder.visibility = View.GONE
             resultsGroupSolve.visibility = View.GONE
             resultsGroupBottler.visibility = View.GONE
             resultsGroupFlavour.visibility = View.GONE
@@ -1330,6 +1560,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.VISIBLE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE
@@ -1397,6 +1628,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.VISIBLE
         resultsGroupFlavour.visibility = View.GONE
@@ -1460,9 +1692,6 @@ class MainActivity : AppCompatActivity() {
         val residualLiters = finishedVolume - wholeCasesVolume
         val wholeBottles = wholeCases * packRaw
 
-        // For the base spirit / water calculation, use the usable volume:
-        // the whole-cases volume. The residual is not fillable into a whole case.
-        // If wholeCases is 0, still show base needed for the residual.
         val usableVolume = if (wholeCases > 0) wholeCasesVolume else finishedVolume
 
         val stockToCharge = usableVolume * (target / stock)
@@ -1470,7 +1699,6 @@ class MainActivity : AppCompatActivity() {
         val waterPer100 = SpiritsMath.waterPer100L(stock, target)
         val waterToAdd = (stockToCharge / 100.0) * waterPer100
 
-        // Apply wastage as an informational overlay
         val wastageMultiplier = 1.0 + (wastage / 100.0)
         val withWastage = usableVolume * wastageMultiplier
 
@@ -1505,6 +1733,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.VISIBLE
         resultsGroupFlavour.visibility = View.GONE
@@ -1570,6 +1799,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.VISIBLE
@@ -1605,6 +1835,7 @@ class MainActivity : AppCompatActivity() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
         resultsGroupCombine.visibility = View.GONE
+        resultsGroupFromOrder.visibility = View.GONE
         resultsGroupSolve.visibility = View.GONE
         resultsGroupBottler.visibility = View.GONE
         resultsGroupFlavour.visibility = View.GONE

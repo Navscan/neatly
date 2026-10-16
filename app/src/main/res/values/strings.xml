@@ -15,6 +15,7 @@
 
     <string name="subtab_combine">Compounding</string>
     <string name="subtab_solve">Solve</string>
+    <string name="subtab_from_order">From Order</string>
 
     <string name="label_finished_volume">Target volume</string>
     <string name="label_stock_volume">Base volume</string>
@@ -135,4 +136,20 @@
     <string name="bottler_result_bottles">Bottles</string>
     <string name="bottler_result_residual">Residual</string>
     <string name="cd_push_to_bottler">Push to Bottler</string>
+
+    <!-- Compound From Order (v1.19) -->
+    <string name="order_mode_ratio">Ratio</string>
+    <string name="order_mode_cap">Cap</string>
+    <string name="label_order_volume">Order volume</string>
+    <string name="label_ratio_percent">Ratio (stronger %)</string>
+    <string name="label_cap_volume">Cap volume</string>
+    <string name="label_cap_on">Cap on</string>
+    <string name="order_cap_stronger">Stronger</string>
+    <string name="order_cap_lighter">Lighter</string>
+    <string name="result_compound_volume">Compound volume</string>
+    <string name="result_stronger_used">Stronger used</string>
+    <string name="result_lighter_used">Lighter used</string>
+    <string name="result_effective_ratio">Effective ratio</string>
+    <string name="hint_order_ratio">Set the stronger-stream share. Volumes are solved.</string>
+    <string name="hint_order_cap">Fix one stream at its cap. The other is solved.</string>
 </resources>
