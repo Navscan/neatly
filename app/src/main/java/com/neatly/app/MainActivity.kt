@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private enum class TopTab { CUT, BOTTLER, FLAVOUR }
     private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE, FROM_ORDER }
 
+    // Cut inputs
     private lateinit var sourceVolume: EditText
     private lateinit var sourceAbv: EditText
     private lateinit var targetAbv: EditText
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var subSolve: TextView
     private lateinit var subFromOrder: TextView
 
+    // From Order inputs
     private lateinit var orderModeRatio: TextView
     private lateinit var orderModeCap: TextView
     private lateinit var orderModeHint: TextView
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderCapVolume: EditText
     private lateinit var unitOrderCapVolume: TextView
 
+    // Bottler inputs
     private lateinit var bottlerCard: MaterialCardView
     private lateinit var bottlerModeCases: TextView
     private lateinit var bottlerModeVolume: TextView
@@ -110,6 +113,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerYearsBarrel: EditText
     private lateinit var bottlerAnnualLoss: EditText
 
+    // Enhancing inputs
     private lateinit var flavourCard: MaterialCardView
     private lateinit var enhModeFinished: TextView
     private lateinit var enhModeBase: TextView
@@ -136,6 +140,7 @@ class MainActivity : AppCompatActivity() {
         SpiritsMath.DoseUnit.ML_PER_L
     )
 
+    // Results
     private lateinit var resultsCard: MaterialCardView
     private lateinit var resultsGroupDilution: View
     private lateinit var resultsGroupCombine: View
@@ -196,6 +201,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var flavAdd3Vol: TextView
     private lateinit var flavPureAlc: TextView
 
+    // Push-forward chevrons
     private lateinit var pushDiluteFinalToEnhVol: TextView
     private lateinit var pushDiluteFinalToBottlerVol: TextView
     private lateinit var pushCombineVolToEnhVol: TextView
@@ -212,6 +218,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wordmarkText: TextView
     private lateinit var updateBanner: MaterialCardView
 
+    // Header pills
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
     private lateinit var unitMetric: TextView
@@ -219,6 +226,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitVol: TextView
     private lateinit var unitMass: TextView
 
+    // Cut unit labels (dynamic)
     private lateinit var unitVolume: TextView
     private lateinit var unitSourceStrength: TextView
     private lateinit var unitTargetStrength: TextView
@@ -230,6 +238,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitSolveBStrength: TextView
     private lateinit var unitSolveBatchSize: TextView
 
+    // Top tabs
     private lateinit var tabCut: TextView
     private lateinit var tabBottler: TextView
     private lateinit var tabFlavour: TextView
@@ -297,6 +306,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
+        // Cut
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
@@ -328,6 +338,7 @@ class MainActivity : AppCompatActivity() {
         subSolve = findViewById(R.id.subSolve)
         subFromOrder = findViewById(R.id.subFromOrder)
 
+        // From Order
         orderModeRatio = findViewById(R.id.orderModeRatio)
         orderModeCap = findViewById(R.id.orderModeCap)
         orderModeHint = findViewById(R.id.orderModeHint)
@@ -347,6 +358,7 @@ class MainActivity : AppCompatActivity() {
         orderCapVolume = findViewById(R.id.orderCapVolume)
         unitOrderCapVolume = findViewById(R.id.unitOrderCapVolume)
 
+        // Bottler
         bottlerCard = findViewById(R.id.bottlerCard)
         bottlerModeCases = findViewById(R.id.bottlerModeCases)
         bottlerModeVolume = findViewById(R.id.bottlerModeVolume)
@@ -377,6 +389,7 @@ class MainActivity : AppCompatActivity() {
         bottlerYearsBarrel = findViewById(R.id.bottlerYearsBarrel)
         bottlerAnnualLoss = findViewById(R.id.bottlerAnnualLoss)
 
+        // Enhancing
         flavourCard = findViewById(R.id.flavourCard)
         enhModeFinished = findViewById(R.id.enhModeFinished)
         enhModeBase = findViewById(R.id.enhModeBase)
@@ -425,6 +438,7 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.flavourAdd3UnitDrops)
         )
 
+        // Results
         resultsCard = findViewById(R.id.resultsCard)
         resultsGroupDilution = findViewById(R.id.resultsGroupDilution)
         resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
@@ -591,6 +605,9 @@ class MainActivity : AppCompatActivity() {
         ).forEach { it.addTextChangedListener(watcher) }
     }
 
+    // ---------------------------------------------------------------
+    // Shared strengths
+    // ---------------------------------------------------------------
     private fun wireSharedStrengths() {
         val baseStrengthFields = listOf(sourceAbv, bottlerStockAbv, flavourBaseAbv)
         val targetStrengthFields = listOf(targetAbv, bottlerTargetAbv, flavourTargetAbv, orderTargetAbv)
@@ -620,6 +637,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Header toggles
+    // ---------------------------------------------------------------
     private fun wireUnitToggles() {
         unitAbv.setOnClickListener { setStrengthMode(proof = false) }
         unitProof.setOnClickListener { setStrengthMode(proof = true) }
@@ -829,6 +849,9 @@ class MainActivity : AppCompatActivity() {
         flavourUnitVolume.text = volumeOrMassUnit
     }
 
+    // ---------------------------------------------------------------
+    // Top tab routing
+    // ---------------------------------------------------------------
     private fun wireTopTabs() {
         tabCut.setOnClickListener { setTopTab(TopTab.CUT) }
         tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
@@ -851,6 +874,9 @@ class MainActivity : AppCompatActivity() {
         flavourCard.visibility = if (topTab == TopTab.FLAVOUR) View.VISIBLE else View.GONE
     }
 
+    // ---------------------------------------------------------------
+    // Cut sub-tabs
+    // ---------------------------------------------------------------
     private fun wireSubTabs() {
         subBatch.setOnClickListener { setMode(Mode.BATCH) }
         subReduce.setOnClickListener { setMode(Mode.REDUCE) }
@@ -891,6 +917,9 @@ class MainActivity : AppCompatActivity() {
         pushDiluteFinalToEnhVol.visibility =
             if (mode == Mode.REDUCE) View.VISIBLE else View.GONE
 
+        pushDiluteFinalToBottlerVol.visibility =
+            if (mode == Mode.REDUCE) View.VISIBLE else View.GONE
+
         when (mode) {
             Mode.BATCH -> {
                 labelVolume.text = getString(R.string.label_finished_volume)
@@ -914,6 +943,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // From Order mode toggle
+    // ---------------------------------------------------------------
     private fun wireOrderMode() {
         orderModeRatio.setOnClickListener { setOrderMode(ratio = true) }
         orderModeCap.setOnClickListener { setOrderMode(ratio = false) }
@@ -952,6 +984,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Bottler mode toggle
+    // ---------------------------------------------------------------
     private fun wireBottlerMode() {
         bottlerModeCases.setOnClickListener { setBottlerMode(volume = false) }
         bottlerModeVolume.setOnClickListener { setBottlerMode(volume = true) }
@@ -973,6 +1008,9 @@ class MainActivity : AppCompatActivity() {
         bottlerAvailableGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
     }
 
+    // ---------------------------------------------------------------
+    // Bottler: presets, unit toggle, angels share
+    // ---------------------------------------------------------------
     private fun wireBottlerPresets() {
         bottlerPresetGlobal.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetGlobal) }
         bottlerPresetEu.setOnClickListener { applyBottlerPreset(700.0, "6", bottlerPresetEu) }
@@ -1017,6 +1055,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Enhancing: additive unit pills and mode toggle
+    // ---------------------------------------------------------------
     private fun wireFlavourUnitPills() {
         for (i in 0 until 3) {
             flavourAddUnitMl[i].setOnClickListener { setFlavourUnit(i, SpiritsMath.DoseUnit.ML_PER_L) }
@@ -1058,6 +1099,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Push-forward
+    // ---------------------------------------------------------------
     private fun wirePushButtons() {
         pushDiluteFinalToEnhVol.setOnClickListener { pushToEnhancing(resFinalVol) }
         pushCombineVolToEnhVol.setOnClickListener { pushToEnhancing(combPooledVol) }
@@ -1145,6 +1189,9 @@ class MainActivity : AppCompatActivity() {
         setTopTab(TopTab.BOTTLER)
     }
 
+    // ---------------------------------------------------------------
+    // Reading helpers
+    // ---------------------------------------------------------------
     private fun readVolume(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
@@ -1224,6 +1271,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Calculation dispatcher
+    // ---------------------------------------------------------------
     private fun recalculate() {
         when (topTab) {
             TopTab.CUT -> when (mode) {
@@ -1514,6 +1564,9 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
+    // ---------------------------------------------------------------
+    // Bottler calculation - Cases mode
+    // ---------------------------------------------------------------
     private fun calculateBottler() {
         val bottleRaw = bottlerBottleSize.text?.toString()?.toDoubleOrNull()
         val packRaw = bottlerPackSize.text?.toString()?.toIntOrNull()
@@ -1597,6 +1650,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------
+    // Bottler calculation - Volume mode (reverse)
+    // ---------------------------------------------------------------
     private fun calculateBottlerVolume() {
         val bottleRaw = bottlerBottleSize.text?.toString()?.toDoubleOrNull()
         val packRaw = bottlerPackSize.text?.toString()?.toIntOrNull()
@@ -1688,6 +1744,9 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
+    // ---------------------------------------------------------------
+    // Enhancing calculation
+    // ---------------------------------------------------------------
     private fun calculateFlavour() {
         val firstValue = readVolume(flavourFinishedVolume)
         val target = readStrength(flavourTargetAbv)
@@ -1757,6 +1816,9 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
+    // ---------------------------------------------------------------
+    // Coming soon (reserved, currently unused)
+    // ---------------------------------------------------------------
     private fun showComingSoon() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
@@ -1768,6 +1830,9 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = getString(R.string.msg_coming_soon)
     }
 
+    // ---------------------------------------------------------------
+    // Updater
+    // ---------------------------------------------------------------
     private fun wireUpdateBanner() {
         updateBanner.setOnClickListener {
             if (Updater.canInstall(this)) {
