@@ -15,6 +15,8 @@
         android:paddingTop="28dp"
         android:paddingBottom="40dp">
 
+        <!-- Header: wordmark + header pills -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -188,6 +190,8 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Tagline -->
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -196,6 +200,8 @@
             android:textSize="14sp"
             android:lineSpacingExtra="3dp"
             android:layout_marginBottom="22dp" />
+
+        <!-- Top tabs -->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -243,6 +249,8 @@
                 android:letterSpacing="0.04" />
         </LinearLayout>
 
+        <!-- Cut card -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cutCard"
             android:layout_width="match_parent"
@@ -259,6 +267,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="18dp">
+
+                <!-- Cut sub-tabs -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -305,6 +315,8 @@
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03" />
                 </LinearLayout>
+
+                <!-- Blend sub-tabs (hidden unless Blend selected) -->
 
                 <LinearLayout
                     android:id="@+id/blendSubTabs"
@@ -363,6 +375,8 @@
                     android:letterSpacing="0.02"
                     android:layout_marginBottom="20dp"
                     android:visibility="gone" />
+
+                <!-- Single-input group (Batch / Reduce) -->
 
                 <LinearLayout
                     android:id="@+id/groupSingle"
@@ -476,6 +490,8 @@
                             android:background="@color/border_strong" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- Combine group (two components) -->
 
                 <LinearLayout
                     android:id="@+id/groupCombine"
@@ -692,6 +708,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Solve group (strengths + batch size) -->
+
                 <LinearLayout
                     android:id="@+id/groupSolve"
                     android:layout_width="match_parent"
@@ -855,6 +873,8 @@
                             android:background="@color/border_strong" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- From Order group -->
 
                 <LinearLayout
                     android:id="@+id/groupFromOrder"
@@ -1114,6 +1134,8 @@
                             android:background="@color/border_strong" />
                     </LinearLayout>
 
+                    <!-- Ratio mode input -->
+
                     <LinearLayout
                         android:id="@+id/orderRatioGroup"
                         android:layout_width="match_parent"
@@ -1147,7 +1169,7 @@
                                 android:paddingBottom="6dp"
                                 android:inputType="numberDecimal"
                                 android:importantForAutofill="no"
-                                android:text="30" />
+                                android:hint="0" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -1164,6 +1186,8 @@
                             android:layout_height="1dp"
                             android:background="@color/border_strong" />
                     </LinearLayout>
+
+                    <!-- Cap mode input -->
 
                     <LinearLayout
                         android:id="@+id/orderCapGroup"
@@ -1257,7 +1281,84 @@
                             android:layout_height="1dp"
                             android:background="@color/border_strong" />
                     </LinearLayout>
+
+                    <!-- Compliance: minimum required -->
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="4dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/label_minimum_required"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_muted"
+                                android:letterSpacing="0.02" />
+
+                            <TextView
+                                android:id="@+id/orderComplianceInfo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="(!)"
+                                android:textSize="14sp"
+                                android:textColor="@color/ink_muted"
+                                android:paddingStart="8dp"
+                                android:paddingEnd="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:contentDescription="@string/cd_compliance_info" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="bottom">
+
+                            <EditText
+                                android:id="@+id/orderMinimumRequired"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="28sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display"
+                                android:background="@null"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="6dp"
+                                android:inputType="numberDecimal"
+                                android:importantForAutofill="no"
+                                android:hint="0" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="%"
+                                android:textSize="13sp"
+                                android:textColor="@color/ink_light"
+                                android:letterSpacing="0.04"
+                                android:paddingBottom="10dp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border_strong" />
+                    </LinearLayout>
                 </LinearLayout>
+
+                <!-- Target strength (shared by Batch / Reduce / Solve) -->
 
                 <LinearLayout
                     android:id="@+id/groupTarget"
@@ -1323,6 +1424,8 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Bottler card -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/bottlerCard"
             android:layout_width="match_parent"
@@ -1340,6 +1443,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="18dp">
+
+                <!-- Cases / Volume mode toggle -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1374,6 +1479,8 @@
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03" />
                 </LinearLayout>
+
+                <!-- Region presets -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1432,6 +1539,8 @@
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03" />
                 </LinearLayout>
+
+                <!-- Bottle size + ml/cl toggle -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1524,6 +1633,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Pack size -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1557,6 +1668,8 @@
                         android:layout_height="1dp"
                         android:background="@color/border_strong" />
                 </LinearLayout>
+
+                <!-- Cases (visible in Cases mode) -->
 
                 <LinearLayout
                     android:id="@+id/bottlerCasesGroup"
@@ -1592,6 +1705,8 @@
                         android:layout_height="1dp"
                         android:background="@color/border_strong" />
                 </LinearLayout>
+
+                <!-- Finished volume (visible in Volume mode) -->
 
                 <LinearLayout
                     android:id="@+id/bottlerVolumeGroup"
@@ -1647,6 +1762,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Target strength -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1699,6 +1816,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Stock strength -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1750,6 +1869,8 @@
                         android:layout_height="1dp"
                         android:background="@color/border_strong" />
                 </LinearLayout>
+
+                <!-- Available stock (visible in Cases mode) -->
 
                 <LinearLayout
                     android:id="@+id/bottlerAvailableGroup"
@@ -1804,6 +1925,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Wastage -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1855,6 +1978,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Angels share toggle -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1876,6 +2001,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
+
+                <!-- Angels share inputs (hidden unless checked) -->
 
                 <LinearLayout
                     android:id="@+id/bottlerAngelsGroup"
@@ -1971,6 +2098,8 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Flavour / enhancing card -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/flavourCard"
             android:layout_width="match_parent"
@@ -1988,6 +2117,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="18dp">
+
+                <!-- Finished / Base mode toggle -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -2031,6 +2162,8 @@
                     android:textColor="@color/ink_light"
                     android:letterSpacing="0.02"
                     android:layout_marginBottom="20dp" />
+
+                <!-- First input (label switches per mode) -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -2085,6 +2218,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Target strength -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2137,6 +2272,8 @@
                         android:background="@color/border_strong" />
                 </LinearLayout>
 
+                <!-- Base spirit strength -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2188,6 +2325,8 @@
                         android:layout_height="1dp"
                         android:background="@color/border_strong" />
                 </LinearLayout>
+
+                <!-- Additive 1 -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -2398,6 +2537,8 @@
                     android:background="@color/border_strong"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Additive 2 -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2607,6 +2748,8 @@
                     android:background="@color/border_strong"
                     android:layout_marginBottom="16dp" />
 
+                <!-- Additive 3 -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -2811,6 +2954,8 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Results card -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/resultsCard"
             android:layout_width="match_parent"
@@ -2837,6 +2982,8 @@
                     android:textColor="@color/ink"
                     android:fontFamily="@font/playfair_display"
                     android:layout_marginBottom="14dp" />
+
+                <!-- Dilution results -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupDilution"
@@ -2870,7 +3017,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -2924,7 +3074,10 @@
                             android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -2957,7 +3110,10 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -2986,6 +3142,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Combine results -->
+
                 <LinearLayout
                     android:id="@+id/resultsGroupCombine"
                     android:layout_width="match_parent"
@@ -3002,7 +3160,10 @@
                         android:fontFamily="@font/playfair_display"
                         android:layout_marginBottom="14dp" />
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3055,7 +3216,10 @@
                             android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3095,7 +3259,10 @@
                             android:contentDescription="@string/cd_push_to_enhancing" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3128,7 +3295,10 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3157,6 +3327,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- From Order results -->
+
                 <LinearLayout
                     android:id="@+id/resultsGroupFromOrder"
                     android:layout_width="match_parent"
@@ -3173,7 +3345,10 @@
                         android:fontFamily="@font/playfair_display"
                         android:layout_marginBottom="14dp" />
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3200,7 +3375,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3227,7 +3405,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3254,7 +3435,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3281,7 +3465,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3308,64 +3495,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
-
-                    <LinearLayout
+                    <View
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/label_minimum_required"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <EditText
-                            android:id="@+id/orderMinimumRequired"
-                            android:layout_width="80dp"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display"
-                            android:background="@null"
-                            android:gravity="end"
-                            android:inputType="numberDecimal"
-                            android:importantForAutofill="no"
-                            android:hint="0"
-                            android:paddingTop="0dp"
-                            android:paddingBottom="0dp"
-                            android:paddingStart="0dp"
-                            android:paddingEnd="6dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="%"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_light"
-                            android:letterSpacing="0.04" />
-
-                        <TextView
-                            android:id="@+id/orderComplianceInfo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="(!)"
-                            android:textSize="16sp"
-                            android:textColor="@color/ink_muted"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="2dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="@string/cd_compliance_info" />
-                    </LinearLayout>
-
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3405,7 +3538,10 @@
                             android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3433,6 +3569,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Solve results -->
+
                 <LinearLayout
                     android:id="@+id/resultsGroupSolve"
                     android:layout_width="match_parent"
@@ -3449,7 +3587,10 @@
                         android:fontFamily="@font/playfair_display"
                         android:layout_marginBottom="14dp" />
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3476,7 +3617,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3503,7 +3647,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3531,6 +3678,8 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Bottler results -->
+
                 <LinearLayout
                     android:id="@+id/resultsGroupBottler"
                     android:layout_width="match_parent"
@@ -3547,7 +3696,12 @@
                         android:fontFamily="@font/playfair_display"
                         android:layout_marginBottom="14dp" />
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
+
+                    <!-- Cases mode results -->
 
                     <LinearLayout
                         android:id="@+id/bottlerCasesResultsGroup"
@@ -3580,7 +3734,10 @@
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3620,7 +3777,10 @@
                                 android:contentDescription="@string/cd_push_to_enhancing" />
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3660,7 +3820,10 @@
                                 android:contentDescription="@string/cd_push_to_dilute" />
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3693,7 +3856,10 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -3721,6 +3887,8 @@
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
+
+                    <!-- Volume mode results -->
 
                     <LinearLayout
                         android:id="@+id/bottlerVolumeResultsGroup"
@@ -3754,7 +3922,10 @@
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3781,7 +3952,10 @@
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
 
-                        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -3809,6 +3983,8 @@
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- Flavour results -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupFlavour"
@@ -3847,7 +4023,10 @@
                             android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3887,7 +4066,10 @@
                             android:contentDescription="@string/cd_push_to_dilute" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3914,7 +4096,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3942,7 +4127,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3970,7 +4158,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3998,7 +4189,10 @@
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
 
-                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/border" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -4036,6 +4230,8 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Update banner -->
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/updateBanner"
             android:layout_width="match_parent"
@@ -4063,6 +4259,8 @@
                 android:letterSpacing="0.03" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Footer -->
+
         <TextView
             android:id="@+id/footerText"
             android:layout_width="match_parent"
@@ -4073,6 +4271,5 @@
             android:fontFamily="sans-serif"
             android:letterSpacing="0.08"
             android:gravity="center" />
-
     </LinearLayout>
 </ScrollView>
