@@ -1,5 +1,6 @@
 package com.neatly.app
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -29,6 +30,8 @@ class MainActivity : AppCompatActivity() {
 
     private enum class TopTab { CUT, BOTTLER, FLAVOUR }
     private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE, FROM_ORDER }
+    private enum class Country { GLOBAL, EU_UK, US, RSA }
+    private enum class Product { BRANDY, WHISKY, RUM, VODKA }
 
     // Cut inputs
     private lateinit var sourceVolume: EditText
@@ -171,7 +174,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderCompoundVolume: TextView
     private lateinit var orderStrongerUsed: TextView
     private lateinit var orderLighterUsed: TextView
-    private lateinit var orderEffectiveRatio: TextView
+    private lateinit var orderLowestProof: TextView
+    private lateinit var orderHighestProof: TextView
+    private lateinit var orderMinimumRequired: EditText
+    private lateinit var orderComplianceInfo: TextView
     private lateinit var orderWaterAdd: TextView
     private lateinit var orderPureAlc: TextView
 
@@ -225,6 +231,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var unitImperial: TextView
     private lateinit var unitVol: TextView
     private lateinit var unitMass: TextView
+    private lateinit var productBrandy: TextView
+    private lateinit var productWhisky: TextView
+    private lateinit var productRum: TextView
+    private lateinit var productVodka: TextView
 
     // Cut unit labels (dynamic)
     private lateinit var unitVolume: TextView
@@ -254,6 +264,9 @@ class MainActivity : AppCompatActivity() {
     private var orderRatioMode = true
     private var orderCapOnStronger = true
     private var suppressSync = false
+    private var selectedCountry: Country = Country.GLOBAL
+    private var selectedProduct: Product = Product.BRANDY
+    private var suppressMinimumChange = false
 
     private var lastCombinePooledAbv: Double? = null
     private var lastOrderVolume: Double? = null
@@ -276,6 +289,7 @@ class MainActivity : AppCompatActivity() {
         wireInputs()
         wireSharedStrengths()
         wireUnitToggles()
+        wireProductPills()
         wireTopTabs()
         wireSubTabs()
         wireOrderMode()
@@ -286,6 +300,7 @@ class MainActivity : AppCompatActivity() {
         wireFlavourUnitPills()
         wireEnhancingMode()
         wirePushButtons()
+        wireComplianceInfo()
         wireUpdateBanner()
 
         updateToggleVisuals()
@@ -296,6 +311,7 @@ class MainActivity : AppCompatActivity() {
         applyBottlerMode()
         applyMode()
         applyTopTab()
+        applyComplianceDefault()
     }
 
     override fun onResume() {
@@ -306,7 +322,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
-        // Cut
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
@@ -338,7 +353,6 @@ class MainActivity : AppCompatActivity() {
         subSolve = findViewById(R.id.subSolve)
         subFromOrder = findViewById(R.id.subFromOrder)
 
-        // From Order
         orderModeRatio = findViewById(R.id.orderModeRatio)
         orderModeCap = findViewById(R.id.orderModeCap)
         orderModeHint = findViewById(R.id.orderModeHint)
@@ -358,7 +372,6 @@ class MainActivity : AppCompatActivity() {
         orderCapVolume = findViewById(R.id.orderCapVolume)
         unitOrderCapVolume = findViewById(R.id.unitOrderCapVolume)
 
-        // Bottler
         bottlerCard = findViewById(R.id.bottlerCard)
         bottlerModeCases = findViewById(R.id.bottlerModeCases)
         bottlerModeVolume = findViewById(R.id.bottlerModeVolume)
@@ -389,7 +402,6 @@ class MainActivity : AppCompatActivity() {
         bottlerYearsBarrel = findViewById(R.id.bottlerYearsBarrel)
         bottlerAnnualLoss = findViewById(R.id.bottlerAnnualLoss)
 
-        // Enhancing
         flavourCard = findViewById(R.id.flavourCard)
         enhModeFinished = findViewById(R.id.enhModeFinished)
         enhModeBase = findViewById(R.id.enhModeBase)
@@ -438,7 +450,6 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.flavourAdd3UnitDrops)
         )
 
-        // Results
         resultsCard = findViewById(R.id.resultsCard)
         resultsGroupDilution = findViewById(R.id.resultsGroupDilution)
         resultsGroupCombine = findViewById(R.id.resultsGroupCombine)
@@ -469,7 +480,10 @@ class MainActivity : AppCompatActivity() {
         orderCompoundVolume = findViewById(R.id.orderCompoundVolume)
         orderStrongerUsed = findViewById(R.id.orderStrongerUsed)
         orderLighterUsed = findViewById(R.id.orderLighterUsed)
-        orderEffectiveRatio = findViewById(R.id.orderEffectiveRatio)
+        orderLowestProof = findViewById(R.id.orderLowestProof)
+        orderHighestProof = findViewById(R.id.orderHighestProof)
+        orderMinimumRequired = findViewById(R.id.orderMinimumRequired)
+        orderComplianceInfo = findViewById(R.id.orderComplianceInfo)
         orderWaterAdd = findViewById(R.id.orderWaterAdd)
         orderPureAlc = findViewById(R.id.orderPureAlc)
 
@@ -521,6 +535,10 @@ class MainActivity : AppCompatActivity() {
         unitImperial = findViewById(R.id.unitImperial)
         unitVol = findViewById(R.id.unitVol)
         unitMass = findViewById(R.id.unitMass)
+        productBrandy = findViewById(R.id.productBrandy)
+        productWhisky = findViewById(R.id.productWhisky)
+        productRum = findViewById(R.id.productRum)
+        productVodka = findViewById(R.id.productVodka)
 
         unitVolume = findViewById(R.id.unitVolume)
         unitSourceStrength = findViewById(R.id.unitSourceStrength)
@@ -603,11 +621,17 @@ class MainActivity : AppCompatActivity() {
             flavourAddName[1], flavourAddDose[1], flavourAddAbv[1], flavourAddDensity[1],
             flavourAddName[2], flavourAddDose[2], flavourAddAbv[2], flavourAddDensity[2]
         ).forEach { it.addTextChangedListener(watcher) }
+
+        orderMinimumRequired.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (suppressMinimumChange) return
+                updateComplianceNote()
+            }
+        })
     }
 
-    // ---------------------------------------------------------------
-    // Shared strengths
-    // ---------------------------------------------------------------
     private fun wireSharedStrengths() {
         val baseStrengthFields = listOf(sourceAbv, bottlerStockAbv, flavourBaseAbv)
         val targetStrengthFields = listOf(targetAbv, bottlerTargetAbv, flavourTargetAbv, orderTargetAbv)
@@ -637,9 +661,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Header toggles
-    // ---------------------------------------------------------------
     private fun wireUnitToggles() {
         unitAbv.setOnClickListener { setStrengthMode(proof = false) }
         unitProof.setOnClickListener { setStrengthMode(proof = true) }
@@ -647,6 +668,93 @@ class MainActivity : AppCompatActivity() {
         unitImperial.setOnClickListener { setMeasurementMode(imperial = true) }
         unitVol.setOnClickListener { setMassMode(mass = false) }
         unitMass.setOnClickListener { setMassMode(mass = true) }
+    }
+
+    private fun wireProductPills() {
+        productBrandy.setOnClickListener { setProduct(Product.BRANDY) }
+        productWhisky.setOnClickListener { setProduct(Product.WHISKY) }
+        productRum.setOnClickListener { setProduct(Product.RUM) }
+        productVodka.setOnClickListener { setProduct(Product.VODKA) }
+    }
+
+    private fun setProduct(product: Product) {
+        if (product == selectedProduct) return
+        selectedProduct = product
+        paintToggle(productBrandy, active = product == Product.BRANDY)
+        paintToggle(productWhisky, active = product == Product.WHISKY)
+        paintToggle(productRum, active = product == Product.RUM)
+        paintToggle(productVodka, active = product == Product.VODKA)
+        applyComplianceDefault()
+        recalculate()
+    }
+
+    private fun setCountry(country: Country) {
+        if (country == selectedCountry) return
+        selectedCountry = country
+        applyComplianceDefault()
+        updateComplianceNote()
+    }
+
+    private fun defaultMinimumFor(country: Country, product: Product): Double? {
+        return when (country) {
+            Country.RSA -> when (product) {
+                Product.BRANDY -> 30.0
+                Product.WHISKY -> 25.0
+                else -> null
+            }
+            Country.US -> when (product) {
+                Product.WHISKY -> 20.0
+                else -> null
+            }
+            Country.EU_UK, Country.GLOBAL -> null
+        }
+    }
+
+    private fun applyComplianceDefault() {
+        val default = defaultMinimumFor(selectedCountry, selectedProduct)
+        suppressMinimumChange = true
+        try {
+            if (default != null) {
+                orderMinimumRequired.setText(formatNumber(default))
+            } else {
+                orderMinimumRequired.setText("")
+            }
+            orderMinimumRequired.setSelection(orderMinimumRequired.text?.length ?: 0)
+        } finally {
+            suppressMinimumChange = false
+        }
+        updateComplianceNote()
+    }
+
+    private fun updateComplianceNote() {
+        val lowText = orderLowestProof.text?.toString().orEmpty()
+        val lowValue = parseLeadingNumber(lowText)
+        val minRaw = orderMinimumRequired.text?.toString().orEmpty()
+        val minimum = minRaw.toDoubleOrNull()
+
+        if (minimum == null || minimum <= 0.0 || lowValue == null) {
+            resWarning.text = ""
+            return
+        }
+
+        if (lowValue < minimum) {
+            resWarning.text = getString(
+                R.string.msg_below_minimum,
+                String.format(Locale.US, "%.1f %%", minimum)
+            )
+        } else {
+            resWarning.text = ""
+        }
+    }
+
+    private fun wireComplianceInfo() {
+        orderComplianceInfo.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_compliance_title)
+                .setMessage(R.string.dialog_compliance_body)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+        }
     }
 
     private fun setStrengthMode(proof: Boolean) {
@@ -849,9 +957,6 @@ class MainActivity : AppCompatActivity() {
         flavourUnitVolume.text = volumeOrMassUnit
     }
 
-    // ---------------------------------------------------------------
-    // Top tab routing
-    // ---------------------------------------------------------------
     private fun wireTopTabs() {
         tabCut.setOnClickListener { setTopTab(TopTab.CUT) }
         tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
@@ -874,9 +979,6 @@ class MainActivity : AppCompatActivity() {
         flavourCard.visibility = if (topTab == TopTab.FLAVOUR) View.VISIBLE else View.GONE
     }
 
-    // ---------------------------------------------------------------
-    // Cut sub-tabs
-    // ---------------------------------------------------------------
     private fun wireSubTabs() {
         subBatch.setOnClickListener { setMode(Mode.BATCH) }
         subReduce.setOnClickListener { setMode(Mode.REDUCE) }
@@ -943,9 +1045,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // From Order mode toggle
-    // ---------------------------------------------------------------
     private fun wireOrderMode() {
         orderModeRatio.setOnClickListener { setOrderMode(ratio = true) }
         orderModeCap.setOnClickListener { setOrderMode(ratio = false) }
@@ -984,9 +1083,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Bottler mode toggle
-    // ---------------------------------------------------------------
     private fun wireBottlerMode() {
         bottlerModeCases.setOnClickListener { setBottlerMode(volume = false) }
         bottlerModeVolume.setOnClickListener { setBottlerMode(volume = true) }
@@ -1008,14 +1104,23 @@ class MainActivity : AppCompatActivity() {
         bottlerAvailableGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
     }
 
-    // ---------------------------------------------------------------
-    // Bottler: presets, unit toggle, angels share
-    // ---------------------------------------------------------------
     private fun wireBottlerPresets() {
-        bottlerPresetGlobal.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetGlobal) }
-        bottlerPresetEu.setOnClickListener { applyBottlerPreset(700.0, "6", bottlerPresetEu) }
-        bottlerPresetUs.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetUs) }
-        bottlerPresetRsa.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetRsa) }
+        bottlerPresetGlobal.setOnClickListener {
+            applyBottlerPreset(750.0, "12", bottlerPresetGlobal)
+            setCountry(Country.GLOBAL)
+        }
+        bottlerPresetEu.setOnClickListener {
+            applyBottlerPreset(700.0, "6", bottlerPresetEu)
+            setCountry(Country.EU_UK)
+        }
+        bottlerPresetUs.setOnClickListener {
+            applyBottlerPreset(750.0, "12", bottlerPresetUs)
+            setCountry(Country.US)
+        }
+        bottlerPresetRsa.setOnClickListener {
+            applyBottlerPreset(750.0, "12", bottlerPresetRsa)
+            setCountry(Country.RSA)
+        }
     }
 
     private fun applyBottlerPreset(bottleMl: Double, packSize: String, selected: TextView) {
@@ -1055,9 +1160,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Enhancing: additive unit pills and mode toggle
-    // ---------------------------------------------------------------
     private fun wireFlavourUnitPills() {
         for (i in 0 until 3) {
             flavourAddUnitMl[i].setOnClickListener { setFlavourUnit(i, SpiritsMath.DoseUnit.ML_PER_L) }
@@ -1099,9 +1201,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Push-forward
-    // ---------------------------------------------------------------
     private fun wirePushButtons() {
         pushDiluteFinalToEnhVol.setOnClickListener { pushToEnhancing(resFinalVol) }
         pushCombineVolToEnhVol.setOnClickListener { pushToEnhancing(combPooledVol) }
@@ -1189,9 +1288,6 @@ class MainActivity : AppCompatActivity() {
         setTopTab(TopTab.BOTTLER)
     }
 
-    // ---------------------------------------------------------------
-    // Reading helpers
-    // ---------------------------------------------------------------
     private fun readVolume(field: EditText): Double? {
         val raw = field.text?.toString().orEmpty()
         val value = raw.toDoubleOrNull() ?: return null
@@ -1271,9 +1367,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Calculation dispatcher
-    // ---------------------------------------------------------------
     private fun recalculate() {
         when (topTab) {
             TopTab.CUT -> when (mode) {
@@ -1474,10 +1567,13 @@ class MainActivity : AppCompatActivity() {
         orderCompoundVolume.text = formatVolume(result.compoundVolumeLiters, result.compoundAbv)
         orderStrongerUsed.text = formatVolume(result.strongerVolumeLiters, strongerAbv)
         orderLighterUsed.text = formatVolume(result.lighterVolumeLiters, lighterAbv)
-        orderEffectiveRatio.text = String.format(Locale.US, "%.1f %%", result.effectiveRatio * 100.0)
+        orderLowestProof.text = String.format(Locale.US, "%.1f %%", result.lowestProofRatio * 100.0)
+        orderHighestProof.text = String.format(Locale.US, "%.1f %%", result.highestProofRatio * 100.0)
         orderWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
         orderPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resWarning.text = if (swapped) getString(R.string.msg_order_strengths_swapped) else ""
+
+        updateComplianceNote()
     }
 
     private fun calculateSolve() {
@@ -1564,9 +1660,6 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
-    // ---------------------------------------------------------------
-    // Bottler calculation - Cases mode
-    // ---------------------------------------------------------------
     private fun calculateBottler() {
         val bottleRaw = bottlerBottleSize.text?.toString()?.toDoubleOrNull()
         val packRaw = bottlerPackSize.text?.toString()?.toIntOrNull()
@@ -1650,9 +1743,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Bottler calculation - Volume mode (reverse)
-    // ---------------------------------------------------------------
     private fun calculateBottlerVolume() {
         val bottleRaw = bottlerBottleSize.text?.toString()?.toDoubleOrNull()
         val packRaw = bottlerPackSize.text?.toString()?.toIntOrNull()
@@ -1744,9 +1834,6 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
-    // ---------------------------------------------------------------
-    // Enhancing calculation
-    // ---------------------------------------------------------------
     private fun calculateFlavour() {
         val firstValue = readVolume(flavourFinishedVolume)
         val target = readStrength(flavourTargetAbv)
@@ -1816,9 +1903,6 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = ""
     }
 
-    // ---------------------------------------------------------------
-    // Coming soon (reserved, currently unused)
-    // ---------------------------------------------------------------
     private fun showComingSoon() {
         resultsCard.visibility = View.VISIBLE
         resultsGroupDilution.visibility = View.GONE
@@ -1830,9 +1914,6 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = getString(R.string.msg_coming_soon)
     }
 
-    // ---------------------------------------------------------------
-    // Updater
-    // ---------------------------------------------------------------
     private fun wireUpdateBanner() {
         updateBanner.setOnClickListener {
             if (Updater.canInstall(this)) {

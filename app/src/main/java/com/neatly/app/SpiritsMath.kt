@@ -274,9 +274,6 @@ object SpiritsMath {
 
     // ---------------------------------------------------------------
     // Enhancing: additive dosing for flavoured spirits, liqueurs, aperitifs.
-    //
-    // Pure alcohol mass balance. No OIML contraction: sugar syrups break
-    // the polynomial's assumptions. Volume is treated as additive.
     // ---------------------------------------------------------------
 
     enum class DoseUnit {
@@ -391,12 +388,16 @@ object SpiritsMath {
     }
 
     // ---------------------------------------------------------------
-    // Compound From Order (v1.19).
+    // Compound From Order (v1.19, extended v1.22).
     //
     // Two streams of different strength, combined and then diluted with
     // water to hit an order volume at a target ABV. Two constraint
     // modes: ratio-driven (fixed split) or cap-driven (one stream
     // fixed at its available amount, the other solved).
+    //
+    // The result reports both streams as fractions of the compound
+    // volume, so the caller can check regulatory minimums against
+    // whichever stream carries the base spirit.
     // ---------------------------------------------------------------
 
     data class OrderResult(
@@ -407,15 +408,11 @@ object SpiritsMath {
         val lighterVolumeLiters: Double,
         val waterToAddLiters: Double,
         val pureAlcoholLiters: Double,
-        val effectiveRatio: Double
+        val effectiveRatio: Double,
+        val lowestProofRatio: Double,
+        val highestProofRatio: Double
     )
 
-    /**
-     * Compound planning by ratio.
-     *
-     * @param ratio Fraction of the compound (by volume) taken from the
-     *              stronger stream. 0.0 to 1.0.
-     */
     fun compoundFromOrderByRatio(
         finishedVolumeLiters: Double,
         targetAbv: Double,
@@ -445,17 +442,12 @@ object SpiritsMath {
             lighterVolumeLiters = lighterVolume,
             waterToAddLiters = waterToAdd,
             pureAlcoholLiters = pureAlcohol,
-            effectiveRatio = ratio
+            effectiveRatio = ratio,
+            lowestProofRatio = 1.0 - ratio,
+            highestProofRatio = ratio
         )
     }
 
-    /**
-     * Compound planning by cap. One stream is fixed at its available
-     * amount; the other is solved to hit the order.
-     *
-     * @param capVolumeLiters The fixed draw of the capped stream.
-     * @param capOnStronger   True if the capped stream is the stronger one.
-     */
     fun compoundFromOrderByCap(
         finishedVolumeLiters: Double,
         targetAbv: Double,
@@ -499,7 +491,8 @@ object SpiritsMath {
         }
         val waterToAdd = finishedVolumeLiters - compoundVolume
         val compoundAbv = pureAlcohol * 100.0 / compoundVolume
-        val effectiveRatio = if (compoundVolume > 0.0) strongerVolume / compoundVolume else 0.0
+        val effRatio = if (compoundVolume > 0.0) strongerVolume / compoundVolume else 0.0
+        val lowRatio = if (compoundVolume > 0.0) lighterVolume / compoundVolume else 0.0
 
         return OrderResult(
             orderVolumeLiters = finishedVolumeLiters,
@@ -509,7 +502,9 @@ object SpiritsMath {
             lighterVolumeLiters = lighterVolume,
             waterToAddLiters = waterToAdd,
             pureAlcoholLiters = pureAlcohol,
-            effectiveRatio = effectiveRatio
+            effectiveRatio = effRatio,
+            lowestProofRatio = lowRatio,
+            highestProofRatio = effRatio
         )
     }
 

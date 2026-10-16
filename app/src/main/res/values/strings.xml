@@ -153,4 +153,19 @@
     <string name="hint_order_ratio">Set the stronger-stream share. Volumes are solved.</string>
     <string name="hint_order_cap">Fix one stream at its cap. The other is solved.</string>
     <string name="msg_order_strengths_swapped">Note: entered strengths were reordered. Higher value treated as stronger.</string>
+
+    <!-- Compound compliance (v1.22) -->
+    <string name="product_brandy">BRANDY</string>
+    <string name="product_whisky">WHISKY</string>
+    <string name="product_rum">RUM</string>
+    <string name="product_vodka">VODKA</string>
+
+    <string name="result_lowest_proof">Lowest proof</string>
+    <string name="result_highest_proof">Highest proof</string>
+    <string name="label_minimum_required">Minimum required</string>
+
+    <string name="cd_compliance_info">Compliance information</string>
+    <string name="dialog_compliance_title">Base spirit minimum</string>
+    <string name="dialog_compliance_body">Some jurisdictions require a minimum percentage of base spirit in the bottle. The lowest proof row shows that percentage. Adjust the Minimum required field to match your market. The app compares and notes; it does not enforce.</string>
+    <string name="msg_below_minimum">Below %1$s minimum.</string>
 </resources>
