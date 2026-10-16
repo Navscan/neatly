@@ -168,4 +168,7 @@
     <string name="dialog_compliance_title">Base spirit minimum</string>
     <string name="dialog_compliance_body">Some jurisdictions require a minimum percentage of base spirit in the bottle. The lowest proof row shows that percentage. Adjust the Minimum required field to match your market. The app compares and notes; it does not enforce.</string>
     <string name="msg_below_minimum">Below %1$s minimum.</string>
+
+    <!-- Bottler volume mode additions (v1.22.2) -->
+    <string name="bottler_result_total_bottled">Total bottled</string>
 </resources>

@@ -1134,8 +1134,6 @@
                             android:background="@color/border_strong" />
                     </LinearLayout>
 
-                    <!-- Ratio mode input -->
-
                     <LinearLayout
                         android:id="@+id/orderRatioGroup"
                         android:layout_width="match_parent"
@@ -1186,8 +1184,6 @@
                             android:layout_height="1dp"
                             android:background="@color/border_strong" />
                     </LinearLayout>
-
-                    <!-- Cap mode input -->
 
                     <LinearLayout
                         android:id="@+id/orderCapGroup"
@@ -1281,8 +1277,6 @@
                             android:layout_height="1dp"
                             android:background="@color/border_strong" />
                     </LinearLayout>
-
-                    <!-- Compliance: minimum required -->
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3142,7 +3136,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Combine results -->
+                <!-- Combine results (headline removed) -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupCombine"
@@ -3150,20 +3144,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/combHeadline"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display"
-                        android:layout_marginBottom="14dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3335,20 +3315,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/orderHeadline"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display"
-                        android:layout_marginBottom="14dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3567,9 +3533,39 @@
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_total"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/orderFinalTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Solve results -->
+                <!-- Solve results (headline removed) -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupSolve"
@@ -3577,20 +3573,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/solveHeadline"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display"
-                        android:layout_marginBottom="14dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -3676,9 +3658,39 @@
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_total"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/solveFinalTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Bottler results -->
+                <!-- Bottler results (headline removed) -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupBottler"
@@ -3686,20 +3698,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/bottlerHeadline"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="30sp"
-                        android:textColor="@color/ink"
-                        android:fontFamily="@font/playfair_display"
-                        android:layout_marginBottom="14dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
 
                     <!-- Cases mode results -->
 
@@ -3981,10 +3979,40 @@
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/border" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingTop="14dp"
+                            android:paddingBottom="14dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/bottler_result_total_bottled"
+                                android:textSize="15sp"
+                                android:textColor="@color/ink_muted" />
+
+                            <TextView
+                                android:id="@+id/bottlerTotalBottled"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="24sp"
+                                android:textColor="@color/ink"
+                                android:fontFamily="@font/playfair_display" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Flavour results -->
+                <!-- Flavour results (headline removed) -->
 
                 <LinearLayout
                     android:id="@+id/resultsGroupFlavour"
@@ -3992,41 +4020,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
-
-                        <TextView
-                            android:id="@+id/flavHeadline"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="30sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-
-                        <TextView
-                            android:id="@+id/pushFlavHeadlineToBottlerVol"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/push_arrow"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink_muted"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="4dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="@string/cd_push_to_bottler" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -4217,6 +4210,49 @@
                             android:textSize="24sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/border" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingTop="14dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/result_total"
+                            android:textSize="15sp"
+                            android:textColor="@color/ink_muted" />
+
+                        <TextView
+                            android:id="@+id/flavFinalTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:textColor="@color/ink"
+                            android:fontFamily="@font/playfair_display" />
+
+                        <TextView
+                            android:id="@+id/pushFlavHeadlineToBottlerVol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/push_arrow"
+                            android:textSize="20sp"
+                            android:textColor="@color/ink_muted"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="@string/cd_push_to_bottler" />
                     </LinearLayout>
                 </LinearLayout>
 
