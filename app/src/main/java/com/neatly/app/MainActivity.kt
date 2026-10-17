@@ -2123,19 +2123,50 @@ class MainActivity : AppCompatActivity() {
         updateExportVisibility()
     }
 
+    private val defaultCutData = mapOf(
+        "Cut_Mode" to "None",
+        "Cut_Target_Vol" to "0.000 L",
+        "Cut_Base_Vol" to "0.000 L",
+        "Cut_Base_Strength" to "0.00 % ABV",
+        "Cut_Target_Strength" to "0.00 % ABV",
+        "Cut_Base_Spirit" to "0.000 L",
+        "Cut_Water" to "0.000 L",
+        "Cut_Pure_Alcohol" to "0.000 L",
+        "Cut_Contraction" to "0.000 L"
+    )
+
+    private val defaultBottlerData = mapOf(
+        "Bottler_Mode" to "None",
+        "Bottler_Order_Vol" to "0.000 L",
+        "Bottler_Base_Spirit" to "0.000 L",
+        "Bottler_Water" to "0.000 L",
+        "Bottler_Contraction" to "0.000 L"
+    )
+
+    private val defaultEnhancingData = mapOf(
+        "Enh_Mode" to "None",
+        "Enh_Base_Spirit" to "0.000 L",
+        "Enh_Water" to "0.000 L",
+        "Enh_Add1" to "0.000 L",
+        "Enh_Add2" to "0.000 L",
+        "Enh_Add3" to "0.000 L",
+        "Enh_Pure_Alcohol" to "0.000 L",
+        "Enh_Total_Volume" to "0.000 L"
+    )
+
     private fun wireExportButtons() {
         btnExportPdf.setOnClickListener {
             val data = mutableMapOf<String, Map<String, String>>()
-            cutExportData?.let { data["Cut"] = it }
-            bottlerExportData?.let { data["Bottler"] = it }
-            enhancingExportData?.let { data["Enhancing"] = it }
+            data["Cut"] = cutExportData ?: defaultCutData
+            data["Bottler"] = bottlerExportData ?: defaultBottlerData
+            data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
             ExportManager.exportPdf(this, data)
         }
         btnExportTsv.setOnClickListener {
             val data = mutableMapOf<String, Map<String, String>>()
-            cutExportData?.let { data["Cut"] = it }
-            bottlerExportData?.let { data["Bottler"] = it }
-            enhancingExportData?.let { data["Enhancing"] = it }
+            data["Cut"] = cutExportData ?: defaultCutData
+            data["Bottler"] = bottlerExportData ?: defaultBottlerData
+            data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
             ExportManager.exportTsv(this, data)
         }
     }
