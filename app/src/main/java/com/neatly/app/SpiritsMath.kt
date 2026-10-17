@@ -275,7 +275,7 @@ object SpiritsMath {
     // ---------------------------------------------------------------
     // Enhancing: additive dosing for flavoured spirits, liqueurs, aperitifs.
     // ---------------------------------------------------------------
-
+    
     enum class DoseUnit {
         ML_PER_L,
         G_PER_L,
@@ -295,7 +295,8 @@ object SpiritsMath {
         val waterToAddLiters: Double,
         val finalVolumeLiters: Double,
         val pureAlcoholLiters: Double,
-        val additiveVolumesLiters: List<Double>
+        val additiveVolumesLiters: List<Double>,
+        val additiveMassesKg: List<Double>
     )
 
     fun calculateFlavour(
@@ -319,6 +320,14 @@ object SpiritsMath {
             }
         }
 
+        val additiveMassesKg = additives.mapIndexed { i, a ->
+            when (a.unit) {
+                DoseUnit.ML_PER_L -> additiveVolumes[i] * a.density
+                DoseUnit.G_PER_L -> a.dose * finishedVolumeLiters / 1000.0
+                DoseUnit.DROPS_PER_L -> additiveVolumes[i] * a.density
+            }
+        }
+
         val totalAdditiveVolume = additiveVolumes.sum()
         val totalAdditivePure = additives.mapIndexed { i, a ->
             additiveVolumes[i] * a.abv / 100.0
@@ -338,7 +347,8 @@ object SpiritsMath {
             waterToAddLiters = waterToAdd,
             finalVolumeLiters = finishedVolumeLiters,
             pureAlcoholLiters = targetPure,
-            additiveVolumesLiters = additiveVolumes
+            additiveVolumesLiters = additiveVolumes,
+            additiveMassesKg = additiveMassesKg
         )
     }
 
@@ -375,6 +385,15 @@ object SpiritsMath {
         val finalVolume = baseVolumeLiters * baseAbv / effectiveTarget
         val additiveVolumes = coefficients.map { it * finalVolume }
         val totalAdditiveVolume = additiveVolumes.sum()
+
+        val additiveMassesKg = additives.mapIndexed { i, a ->
+            when (a.unit) {
+                DoseUnit.ML_PER_L -> additiveVolumes[i] * a.density
+                DoseUnit.G_PER_L -> a.dose * finalVolume / 1000.0
+                DoseUnit.DROPS_PER_L -> additiveVolumes[i] * a.density
+            }
+        }
+
         val waterToAdd = finalVolume - baseVolumeLiters - totalAdditiveVolume
         val pureAlcohol = finalVolume * targetAbv / 100.0
 
@@ -383,7 +402,8 @@ object SpiritsMath {
             waterToAddLiters = waterToAdd,
             finalVolumeLiters = finalVolume,
             pureAlcoholLiters = pureAlcohol,
-            additiveVolumesLiters = additiveVolumes
+            additiveVolumesLiters = additiveVolumes,
+            additiveMassesKg = additiveMassesKg
         )
     }
 

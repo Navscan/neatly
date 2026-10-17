@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderModeRatio: TextView
     private lateinit var orderModeCap: TextView
     private lateinit var orderModeHint: TextView
+    private lateinit var labelOrderVolume: TextView
     private lateinit var orderVolume: EditText
     private lateinit var unitOrderVolume: TextView
     private lateinit var orderTargetAbv: EditText
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderCapGroup: View
     private lateinit var orderCapStronger: TextView
     private lateinit var orderCapLighter: TextView
+    private lateinit var labelCapVolume: TextView
     private lateinit var orderCapVolume: EditText
     private lateinit var unitOrderCapVolume: TextView
 
@@ -101,6 +103,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottlerCasesGroup: View
     private lateinit var bottlerCases: EditText
     private lateinit var bottlerVolumeGroup: View
+    private lateinit var labelBottlerFinishedVolume: TextView
     private lateinit var bottlerFinishedVolume: EditText
     private lateinit var bottlerUnitFinishedVolume: TextView
     private lateinit var bottlerTargetAbv: EditText
@@ -156,6 +159,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contractionRowBottler: View
     private lateinit var bottlerCasesResultsGroup: View
     private lateinit var bottlerVolumeResultsGroup: View
+    private lateinit var bottlerAngelsShareRow: View
+    private lateinit var bottlerAngelsShare: TextView
 
     private lateinit var resRow1Label: TextView
     private lateinit var resRow2Label: TextView
@@ -180,6 +185,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var orderPureAlc: TextView
     private lateinit var orderFinalTotal: TextView
 
+    private lateinit var labelSolveBatchSize: TextView
     private lateinit var solveSampleA: TextView
     private lateinit var solveSampleB: TextView
     private lateinit var solvePureAlc: TextView
@@ -311,6 +317,7 @@ class MainActivity : AppCompatActivity() {
         applyMode()
         applyTopTab()
         applyComplianceDefault()
+        updateDynamicLabels()
     }
 
     override fun onResume() {
@@ -355,6 +362,7 @@ class MainActivity : AppCompatActivity() {
         orderModeRatio = findViewById(R.id.orderModeRatio)
         orderModeCap = findViewById(R.id.orderModeCap)
         orderModeHint = findViewById(R.id.orderModeHint)
+        labelOrderVolume = findViewById(R.id.labelOrderVolume)
         orderVolume = findViewById(R.id.orderVolume)
         unitOrderVolume = findViewById(R.id.unitOrderVolume)
         orderTargetAbv = findViewById(R.id.orderTargetAbv)
@@ -368,6 +376,7 @@ class MainActivity : AppCompatActivity() {
         orderCapGroup = findViewById(R.id.orderCapGroup)
         orderCapStronger = findViewById(R.id.orderCapStronger)
         orderCapLighter = findViewById(R.id.orderCapLighter)
+        labelCapVolume = findViewById(R.id.labelCapVolume)
         orderCapVolume = findViewById(R.id.orderCapVolume)
         unitOrderCapVolume = findViewById(R.id.unitOrderCapVolume)
 
@@ -386,6 +395,7 @@ class MainActivity : AppCompatActivity() {
         bottlerCasesGroup = findViewById(R.id.bottlerCasesGroup)
         bottlerCases = findViewById(R.id.bottlerCases)
         bottlerVolumeGroup = findViewById(R.id.bottlerVolumeGroup)
+        labelBottlerFinishedVolume = findViewById(R.id.labelBottlerFinishedVolume)
         bottlerFinishedVolume = findViewById(R.id.bottlerFinishedVolume)
         bottlerUnitFinishedVolume = findViewById(R.id.bottlerUnitFinishedVolume)
         bottlerTargetAbv = findViewById(R.id.bottlerTargetAbv)
@@ -461,6 +471,8 @@ class MainActivity : AppCompatActivity() {
         contractionRowBottler = findViewById(R.id.contractionRowBottler)
         bottlerCasesResultsGroup = findViewById(R.id.bottlerCasesResultsGroup)
         bottlerVolumeResultsGroup = findViewById(R.id.bottlerVolumeResultsGroup)
+        bottlerAngelsShareRow = findViewById(R.id.bottlerAngelsShareRow)
+        bottlerAngelsShare = findViewById(R.id.bottlerAngelsShare)
 
         resRow1Label = findViewById(R.id.resRow1Label)
         resRow2Label = findViewById(R.id.resRow2Label)
@@ -485,6 +497,7 @@ class MainActivity : AppCompatActivity() {
         orderPureAlc = findViewById(R.id.orderPureAlc)
         orderFinalTotal = findViewById(R.id.orderFinalTotal)
 
+        labelSolveBatchSize = findViewById(R.id.labelSolveBatchSize)
         solveSampleA = findViewById(R.id.solveSampleA)
         solveSampleB = findViewById(R.id.solveSampleB)
         solvePureAlc = findViewById(R.id.solvePureAlc)
@@ -843,6 +856,7 @@ class MainActivity : AppCompatActivity() {
         updateToggleVisuals()
         updateUnitLabels()
         applyMassVisibility()
+        updateDynamicLabels()
         recalculate()
     }
 
@@ -955,6 +969,31 @@ class MainActivity : AppCompatActivity() {
         flavourUnitVolume.text = volumeOrMassUnit
     }
 
+    private fun updateDynamicLabels() {
+        // Cut
+        when (mode) {
+            Mode.BATCH -> labelVolume.text = getString(if (isMassMode) R.string.label_finished_volume_mass else R.string.label_finished_volume)
+            Mode.REDUCE -> labelVolume.text = getString(if (isMassMode) R.string.label_stock_volume_mass else R.string.label_stock_volume)
+            else -> {}
+        }
+        labelSolveBatchSize.text = getString(if (isMassMode) R.string.label_batch_size_mass else R.string.label_batch_size)
+        labelOrderVolume.text = getString(if (isMassMode) R.string.label_order_mass else R.string.label_order_volume)
+        labelCapVolume.text = getString(if (isMassMode) R.string.label_cap_mass else R.string.label_cap_volume)
+
+        // Enhancing
+        enhModeFinished.text = getString(if (isMassMode) R.string.enh_mode_finished_mass else R.string.enh_mode_finished)
+        enhModeBase.text = getString(if (isMassMode) R.string.enh_mode_base_mass else R.string.enh_mode_base)
+        if (enhBaseMode) {
+            enhFirstLabel.text = getString(if (isMassMode) R.string.label_base_volume_enh_mass else R.string.label_base_volume_enh)
+        } else {
+            enhFirstLabel.text = getString(if (isMassMode) R.string.label_finished_volume_mass else R.string.label_finished_volume)
+        }
+
+        // Bottler
+        labelBottlerFinishedVolume.text = getString(if (isMassMode) R.string.bottler_label_finished_mass else R.string.bottler_label_finished_volume)
+        bottlerModeVolume.text = getString(if (isMassMode) R.string.bottler_mode_mass else R.string.bottler_mode_volume)
+    }
+
     private fun wireTopTabs() {
         tabCut.setOnClickListener { setTopTab(TopTab.CUT) }
         tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
@@ -1022,13 +1061,11 @@ class MainActivity : AppCompatActivity() {
 
         when (mode) {
             Mode.BATCH -> {
-                labelVolume.text = getString(R.string.label_finished_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
                 modeHint.text = getString(R.string.hint_mode_formulate)
                 modeHint.visibility = View.VISIBLE
             }
             Mode.REDUCE -> {
-                labelVolume.text = getString(R.string.label_stock_volume)
                 labelSourceStrength.text = getString(R.string.label_stock_strength)
                 modeHint.text = getString(R.string.hint_mode_dilute)
                 modeHint.visibility = View.VISIBLE
@@ -1041,6 +1078,7 @@ class MainActivity : AppCompatActivity() {
         if (mode != Mode.BLEND_SOLVE) {
             targetHint.visibility = View.GONE
         }
+        updateDynamicLabels()
     }
 
     private fun wireOrderMode() {
@@ -1100,6 +1138,7 @@ class MainActivity : AppCompatActivity() {
         bottlerCasesGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
         bottlerVolumeGroup.visibility = if (bottlerVolumeMode) View.VISIBLE else View.GONE
         bottlerAvailableGroup.visibility = if (bottlerVolumeMode) View.GONE else View.VISIBLE
+        updateDynamicLabels()
     }
 
     private fun wireBottlerPresets() {
@@ -1191,12 +1230,11 @@ class MainActivity : AppCompatActivity() {
         paintToggle(enhModeFinished, active = !enhBaseMode)
         paintToggle(enhModeBase, active = enhBaseMode)
         if (enhBaseMode) {
-            enhFirstLabel.text = getString(R.string.label_base_volume_enh)
             enhModeHint.text = getString(R.string.hint_enh_base)
         } else {
-            enhFirstLabel.text = getString(R.string.enh_mode_finished)
             enhModeHint.text = getString(R.string.hint_enh_finished)
         }
+        updateDynamicLabels()
     }
 
     private fun wirePushButtons() {
@@ -1342,6 +1380,37 @@ class MainActivity : AppCompatActivity() {
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
+        return span
+    }
+
+    private fun formatAdditiveVolume(liters: Double, kg: Double): CharSequence {
+        val primary: String
+        val secondary: String
+
+        if (isMassMode) {
+            primary = if (isImperialMode) String.format(Locale.US, "%.3f lb", SpiritsMath.kgToUsPounds(kg))
+                      else String.format(Locale.US, "%.3f kg", kg)
+            secondary = if (isImperialMode) String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+                        else String.format(Locale.US, "%.3f L", liters)
+        } else {
+            primary = if (isImperialMode) String.format(Locale.US, "%.3f gal", SpiritsMath.litersToUsGallons(liters))
+                      else String.format(Locale.US, "%.3f L", liters)
+            secondary = if (isImperialMode) String.format(Locale.US, "%.3f lb", SpiritsMath.kgToUsPounds(kg))
+                        else String.format(Locale.US, "%.3f kg", kg)
+        }
+
+        val full = "$primary ($secondary)"
+        val span = SpannableString(full)
+        span.setSpan(
+            RelativeSizeSpan(0.65f),
+            primary.length, full.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        span.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.ink_light)),
+            primary.length, full.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         return span
     }
 
@@ -1723,6 +1792,13 @@ class MainActivity : AppCompatActivity() {
         bottlerWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
         bottlerContraction.text = formatContraction(result.contractionLiters)
 
+        if (bottlerAngelsCheckbox.isChecked) {
+            bottlerAngelsShareRow.visibility = View.VISIBLE
+            bottlerAngelsShare.text = formatVolume(result.angelsShareStartVolume, stockAbv)
+        } else {
+            bottlerAngelsShareRow.visibility = View.GONE
+        }
+
         val available = readVolume(bottlerAvailableStock)
         resWarning.text = when {
             available == null || available <= 0.0 -> ""
@@ -1873,18 +1949,19 @@ class MainActivity : AppCompatActivity() {
 
         flavBaseSpirit.text = formatVolume(result.baseSpiritLiters, baseAbv)
         flavWaterAdd.text = formatVolume(result.waterToAddLiters, 0.0)
-        flavAdd1Vol.text = formatVolume(
-            result.additiveVolumesLiters.getOrElse(0) { 0.0 },
-            readStrength(flavourAddAbv[0]) ?: 0.0
-        )
-        flavAdd2Vol.text = formatVolume(
-            result.additiveVolumesLiters.getOrElse(1) { 0.0 },
-            readStrength(flavourAddAbv[1]) ?: 0.0
-        )
-        flavAdd3Vol.text = formatVolume(
-            result.additiveVolumesLiters.getOrElse(2) { 0.0 },
-            readStrength(flavourAddAbv[2]) ?: 0.0
-        )
+        
+        val add1Vol = result.additiveVolumesLiters.getOrElse(0) { 0.0 }
+        val add1Mass = result.additiveMassesKg.getOrElse(0) { 0.0 }
+        flavAdd1Vol.text = formatAdditiveVolume(add1Vol, add1Mass)
+        
+        val add2Vol = result.additiveVolumesLiters.getOrElse(1) { 0.0 }
+        val add2Mass = result.additiveMassesKg.getOrElse(1) { 0.0 }
+        flavAdd2Vol.text = formatAdditiveVolume(add2Vol, add2Mass)
+        
+        val add3Vol = result.additiveVolumesLiters.getOrElse(2) { 0.0 }
+        val add3Mass = result.additiveMassesKg.getOrElse(2) { 0.0 }
+        flavAdd3Vol.text = formatAdditiveVolume(add3Vol, add3Mass)
+
         flavPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         flavFinalTotal.text = formatVolume(result.finalVolumeLiters, effectiveTarget)
         resWarning.text = ""

@@ -828,6 +828,7 @@
                         android:layout_marginBottom="20dp">
 
                         <TextView
+                            android:id="@+id/labelSolveBatchSize"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_batch_size"
@@ -933,6 +934,7 @@
                         android:layout_marginBottom="20dp">
 
                         <TextView
+                            android:id="@+id/labelOrderVolume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_order_volume"
@@ -1200,6 +1202,7 @@
                             android:layout_marginBottom="4dp">
 
                             <TextView
+                                android:id="@+id/labelCapVolume"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -1711,6 +1714,7 @@
                     android:visibility="gone">
 
                     <TextView
+                        android:id="@+id/labelBottlerFinishedVolume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bottler_label_finished_volume"
@@ -3877,6 +3881,44 @@
 
                                 <TextView
                                     android:id="@+id/bottlerContraction"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="24sp"
+                                    android:textColor="@color/ink"
+                                    android:fontFamily="@font/playfair_display" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/bottlerAngelsShareRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/border" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:paddingTop="14dp"
+                                android:paddingBottom="14dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/bottler_result_angels_share"
+                                    android:textSize="15sp"
+                                    android:textColor="@color/ink_muted" />
+
+                                <TextView
+                                    android:id="@+id/bottlerAngelsShare"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="24sp"

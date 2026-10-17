@@ -82,6 +82,7 @@
     <string name="bottler_result_stock_to_charge">Base spirit needed</string>
     <string name="bottler_result_water_to_add">Water to add</string>
     <string name="bottler_result_contraction">Contraction</string>
+
     <string name="bottler_msg_shortfall">Shortfall: %1$s</string>
     <string name="bottler_msg_surplus">Surplus: %1$s</string>
     <string name="bottler_msg_sufficient">Sufficient stock available.</string>
@@ -171,4 +172,19 @@
 
     <!-- Bottler volume mode additions (v1.22.2) -->
     <string name="bottler_result_total_bottled">Total bottled</string>
+
+    <!-- v1.23 Dynamic Labels for MASS mode -->
+    <string name="label_finished_volume_mass">Target mass</string>
+    <string name="label_batch_size_mass">Total mass</string>
+    <string name="label_order_mass">Order mass</string>
+    <string name="label_cap_mass">Cap mass</string>
+    <string name="label_stock_volume_mass">Base mass</string>
+    <string name="label_base_volume_enh_mass">Base mass</string>
+    <string name="enh_mode_finished_mass">Finished mass</string>
+    <string name="enh_mode_base_mass">Base mass</string>
+    <string name="bottler_label_finished_mass">Finished mass</string>
+    <string name="bottler_mode_mass">Mass</string>
+
+    <!-- v1.23 Barrel Aging Result -->
+    <string name="bottler_result_angels_share">Barrel start volume</string>
 </resources>
