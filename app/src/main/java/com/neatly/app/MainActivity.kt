@@ -229,6 +229,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wordmarkText: TextView
     private lateinit var updateBanner: MaterialCardView
 
+    // Export UI
+    private lateinit var exportContainer: View
+    private lateinit var btnExportPdf: View
+    private lateinit var btnExportTsv: View
+
+    // Export Data Caches
+    private var cutExportData: Map<String, String>? = null
+    private var bottlerExportData: Map<String, String>? = null
+    private var enhancingExportData: Map<String, String>? = null
+
     // Header pills
     private lateinit var unitAbv: TextView
     private lateinit var unitProof: TextView
@@ -307,6 +317,7 @@ class MainActivity : AppCompatActivity() {
         wirePushButtons()
         wireComplianceInfo()
         wireUpdateBanner()
+        wireExportButtons()
 
         updateToggleVisuals()
         updateUnitLabels()
@@ -539,6 +550,10 @@ class MainActivity : AppCompatActivity() {
         footerText = findViewById(R.id.footerText)
         wordmarkText = findViewById(R.id.wordmarkText)
         updateBanner = findViewById(R.id.updateBanner)
+
+        exportContainer = findViewById(R.id.exportContainer)
+        btnExportPdf = findViewById(R.id.btnExportPdf)
+        btnExportTsv = findViewById(R.id.btnExportTsv)
 
         unitAbv = findViewById(R.id.unitAbv)
         unitProof = findViewById(R.id.unitProof)
@@ -1462,6 +1477,8 @@ class MainActivity : AppCompatActivity() {
         if (finishedVolume == null || stock == null || target == null ||
             target >= stock || target <= 0.0 || stock <= 0.0 || finishedVolume <= 0.0) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1470,6 +1487,8 @@ class MainActivity : AppCompatActivity() {
             showBatchResults(result, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1489,6 +1508,18 @@ class MainActivity : AppCompatActivity() {
         resPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resContraction.text = formatContraction(result.contractionLiters)
         resWarning.text = ""
+
+        cutExportData = mapOf(
+            "Cut_Mode" to "Formulate",
+            "Cut_Target_Vol" to formatVolume(result.finalVolumeLiters, readStrength(targetAbv) ?: stockAbv).toString(),
+            "Cut_Base_Strength" to formatStrength(stockAbv),
+            "Cut_Target_Strength" to formatStrength(readStrength(targetAbv) ?: 0.0),
+            "Cut_Base_Spirit" to formatVolume(result.stockToChargeLiters, stockAbv).toString(),
+            "Cut_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
+            "Cut_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString(),
+            "Cut_Contraction" to formatContraction(result.contractionLiters)
+        )
+        updateExportVisibility()
     }
 
     private fun calculateReduce() {
@@ -1499,6 +1530,8 @@ class MainActivity : AppCompatActivity() {
         if (volume == null || source == null || target == null ||
             target >= source || target <= 0.0 || source <= 0.0 || volume <= 0.0) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1507,6 +1540,8 @@ class MainActivity : AppCompatActivity() {
             showReduceResults(result, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1526,6 +1561,20 @@ class MainActivity : AppCompatActivity() {
         resPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         resContraction.text = formatContraction(result.contractionLiters)
         resWarning.text = ""
+
+        val source = readStrength(sourceAbv) ?: 0.0
+        val volume = readVolume(sourceVolume) ?: 0.0
+        cutExportData = mapOf(
+            "Cut_Mode" to "Dilute",
+            "Cut_Base_Vol" to formatVolume(volume, source).toString(),
+            "Cut_Base_Strength" to formatStrength(source),
+            "Cut_Target_Strength" to formatStrength(targetAbv),
+            "Cut_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
+            "Cut_Final_Volume" to formatVolume(result.finalVolumeLiters, targetAbv).toString(),
+            "Cut_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString(),
+            "Cut_Contraction" to formatContraction(result.contractionLiters)
+        )
+        updateExportVisibility()
     }
 
     private fun calculateCombine() {
@@ -1537,6 +1586,8 @@ class MainActivity : AppCompatActivity() {
         if (volA == null || abvA == null || volB == null || abvB == null ||
             volA <= 0.0 || volB <= 0.0 || abvA <= 0.0 || abvB <= 0.0) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1545,6 +1596,8 @@ class MainActivity : AppCompatActivity() {
             showCombineResults(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1564,6 +1617,19 @@ class MainActivity : AppCompatActivity() {
         combPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         combContraction.text = formatContraction(result.contractionLiters)
         resWarning.text = ""
+
+        cutExportData = mapOf(
+            "Cut_Mode" to "Compounding",
+            "Cut_A_Vol" to formatVolume(readVolume(compAVolume) ?: 0.0, readStrength(compAStrength) ?: 0.0).toString(),
+            "Cut_A_Strength" to formatStrength(readStrength(compAStrength) ?: 0.0),
+            "Cut_B_Vol" to formatVolume(readVolume(compBVolume) ?: 0.0, readStrength(compBStrength) ?: 0.0).toString(),
+            "Cut_B_Strength" to formatStrength(readStrength(compBStrength) ?: 0.0),
+            "Cut_Final_Volume" to formatVolume(result.pooledVolumeLiters, result.pooledAbv).toString(),
+            "Cut_Final_Strength" to formatStrength(result.pooledAbv),
+            "Cut_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString(),
+            "Cut_Contraction" to formatContraction(result.contractionLiters)
+        )
+        updateExportVisibility()
     }
 
     private fun calculateFromOrder() {
@@ -1575,6 +1641,8 @@ class MainActivity : AppCompatActivity() {
         if (vol == null || target == null || a == null || b == null ||
             vol <= 0.0 || target <= 0.0 || a <= 0.0 || b <= 0.0) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1584,6 +1652,8 @@ class MainActivity : AppCompatActivity() {
 
         if (sAbv <= target || lAbv <= target || sAbv == lAbv) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1592,6 +1662,8 @@ class MainActivity : AppCompatActivity() {
                 val ratioPct = orderRatio.text?.toString()?.toDoubleOrNull() ?: 30.0
                 if (ratioPct <= 0.0 || ratioPct >= 100.0) {
                     resultsCard.visibility = View.GONE
+                    cutExportData = null
+                    updateExportVisibility()
                     return
                 }
                 SpiritsMath.compoundFromOrderByRatio(
@@ -1601,6 +1673,8 @@ class MainActivity : AppCompatActivity() {
                 val capVol = readVolume(orderCapVolume)
                 if (capVol == null || capVol <= 0.0) {
                     resultsCard.visibility = View.GONE
+                    cutExportData = null
+                    updateExportVisibility()
                     return
                 }
                 SpiritsMath.compoundFromOrderByCap(
@@ -1610,6 +1684,8 @@ class MainActivity : AppCompatActivity() {
             showFromOrderResults(result, target, sAbv, lAbv, swapped)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1641,6 +1717,20 @@ class MainActivity : AppCompatActivity() {
         resWarning.text = if (swapped) getString(R.string.msg_order_strengths_swapped) else ""
 
         updateComplianceNote()
+
+        cutExportData = mapOf(
+            "Cut_Mode" to if (orderRatioMode) "From Order (Ratio)" else "From Order (Cap)",
+            "Cut_Order_Vol" to formatVolume(result.orderVolumeLiters, targetAbv).toString(),
+            "Cut_Target_Strength" to formatStrength(targetAbv),
+            "Cut_Stronger_Strength" to formatStrength(strongerAbv),
+            "Cut_Lighter_Strength" to formatStrength(lighterAbv),
+            "Cut_Compound_Vol" to formatVolume(result.compoundVolumeLiters, result.compoundAbv).toString(),
+            "Cut_Stronger_Used" to formatVolume(result.strongerVolumeLiters, strongerAbv).toString(),
+            "Cut_Lighter_Used" to formatVolume(result.lighterVolumeLiters, lighterAbv).toString(),
+            "Cut_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
+            "Cut_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString()
+        )
+        updateExportVisibility()
     }
 
     private fun calculateSolve() {
@@ -1653,6 +1743,8 @@ class MainActivity : AppCompatActivity() {
 
         if (abvA == null || abvB == null || target == null || batchSize == null) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1667,11 +1759,15 @@ class MainActivity : AppCompatActivity() {
             resultsGroupBottler.visibility = View.GONE
             resultsGroupFlavour.visibility = View.GONE
             resWarning.text = getString(R.string.msg_solve_out_of_range)
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
         if (batchSize <= 0.0) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1680,6 +1776,8 @@ class MainActivity : AppCompatActivity() {
             showSolveResults(result, abvA, abvB, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            cutExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1725,6 +1823,18 @@ class MainActivity : AppCompatActivity() {
         solvePureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         solveFinalTotal.text = formatVolume(result.batchSizeLiters, targetAbv)
         resWarning.text = ""
+
+        cutExportData = mapOf(
+            "Cut_Mode" to "Solve",
+            "Cut_A_Strength" to formatStrength(abvA),
+            "Cut_B_Strength" to formatStrength(abvB),
+            "Cut_Target_Strength" to formatStrength(targetAbv),
+            "Cut_Total_Vol" to formatVolume(result.batchSizeLiters, targetAbv).toString(),
+            "Cut_Comp_A" to formatVolume(result.sampleVolumeA, abvA).toString(),
+            "Cut_Comp_B" to formatVolume(result.sampleVolumeB, abvB).toString(),
+            "Cut_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString()
+        )
+        updateExportVisibility()
     }
 
     private fun calculateBottler() {
@@ -1738,6 +1848,8 @@ class MainActivity : AppCompatActivity() {
         if (bottleRaw == null || packRaw == null || casesRaw == null ||
             target == null || stock == null) {
             resultsCard.visibility = View.GONE
+            bottlerExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1746,6 +1858,8 @@ class MainActivity : AppCompatActivity() {
         if (bottleMl <= 0.0 || packRaw <= 0 || casesRaw <= 0 ||
             target <= 0.0 || stock <= target) {
             resultsCard.visibility = View.GONE
+            bottlerExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1768,6 +1882,8 @@ class MainActivity : AppCompatActivity() {
             showBottlerResults(result, target, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            bottlerExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1811,6 +1927,17 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.bottler_msg_shortfall, formatVolume(shortfall, stockAbv))
             }
         }
+
+        bottlerExportData = mapOf(
+            "Bottler_Mode" to "Cases",
+            "Bottler_Order_Vol" to formatVolume(result.orderVolumeLiters, targetAbv).toString(),
+            "Bottler_With_Wastage" to formatVolume(result.withWastageLiters, targetAbv).toString(),
+            "Bottler_Base_Spirit" to formatVolume(result.stockToChargeLiters, stockAbv).toString(),
+            "Bottler_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
+            "Bottler_Contraction" to formatContraction(result.contractionLiters),
+            "Bottler_Start_Vol" to if (bottlerAngelsCheckbox.isChecked) formatVolume(result.angelsShareStartVolume, stockAbv).toString() else "0.000"
+        )
+        updateExportVisibility()
     }
 
     private fun calculateBottlerVolume() {
@@ -1824,6 +1951,8 @@ class MainActivity : AppCompatActivity() {
         if (bottleRaw == null || packRaw == null || target == null ||
             stock == null || finishedVolume == null) {
             resultsCard.visibility = View.GONE
+            bottlerExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1834,6 +1963,8 @@ class MainActivity : AppCompatActivity() {
         if (bottleLiters <= 0.0 || packRaw <= 0 || caseLiters <= 0.0 ||
             target <= 0.0 || stock <= target || finishedVolume <= 0.0) {
             resultsCard.visibility = View.GONE
+            bottlerExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1896,6 +2027,15 @@ class MainActivity : AppCompatActivity() {
         bottlerTotalBottled.text = formatVolume(wholeCasesVolume, targetAbv)
 
         resWarning.text = ""
+
+        bottlerExportData = mapOf(
+            "Bottler_Mode" to "Volume",
+            "Bottler_Whole_Cases" to wholeCases.toString(),
+            "Bottler_Bottles" to wholeBottles.toString(),
+            "Bottler_Residual" to formatVolume(residualLiters, targetAbv).toString(),
+            "Bottler_Total_Bottled" to formatVolume(wholeCasesVolume, targetAbv).toString()
+        )
+        updateExportVisibility()
     }
 
     private fun calculateFlavour() {
@@ -1906,6 +2046,8 @@ class MainActivity : AppCompatActivity() {
         if (firstValue == null || target == null || base == null ||
             firstValue <= 0.0 || target <= 0.0 || base <= 0.0) {
             resultsCard.visibility = View.GONE
+            enhancingExportData = null
+            updateExportVisibility()
             return
         }
 
@@ -1928,6 +2070,8 @@ class MainActivity : AppCompatActivity() {
             showFlavourResults(result, target, base)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
+            enhancingExportData = null
+            updateExportVisibility()
         }
     }
 
@@ -1965,6 +2109,40 @@ class MainActivity : AppCompatActivity() {
         flavPureAlc.text = formatVolume(result.pureAlcoholLiters, 100.0)
         flavFinalTotal.text = formatVolume(result.finalVolumeLiters, effectiveTarget)
         resWarning.text = ""
+
+        enhancingExportData = mapOf(
+            "Enh_Mode" to if (enhBaseMode) "Base Volume" else "Finished Volume",
+            "Enh_Base_Spirit" to formatVolume(result.baseSpiritLiters, baseAbv).toString(),
+            "Enh_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
+            "Enh_Add1" to formatVolume(result.additiveVolumesLiters.getOrElse(0) { 0.0 }, 0.0).toString(),
+            "Enh_Add2" to formatVolume(result.additiveVolumesLiters.getOrElse(1) { 0.0 }, 0.0).toString(),
+            "Enh_Add3" to formatVolume(result.additiveVolumesLiters.getOrElse(2) { 0.0 }, 0.0).toString(),
+            "Enh_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString(),
+            "Enh_Total_Volume" to formatVolume(result.finalVolumeLiters, effectiveTarget).toString()
+        )
+        updateExportVisibility()
+    }
+
+    private fun wireExportButtons() {
+        btnExportPdf.setOnClickListener {
+            val data = mutableMapOf<String, Map<String, String>>()
+            cutExportData?.let { data["Cut"] = it }
+            bottlerExportData?.let { data["Bottler"] = it }
+            enhancingExportData?.let { data["Enhancing"] = it }
+            ExportManager.exportPdf(this, data)
+        }
+        btnExportTsv.setOnClickListener {
+            val data = mutableMapOf<String, Map<String, String>>()
+            cutExportData?.let { data["Cut"] = it }
+            bottlerExportData?.let { data["Bottler"] = it }
+            enhancingExportData?.let { data["Enhancing"] = it }
+            ExportManager.exportTsv(this, data)
+        }
+    }
+
+    private fun updateExportVisibility() {
+        val hasData = cutExportData != null || bottlerExportData != null || enhancingExportData != null
+        exportContainer.visibility = if (hasData) View.VISIBLE else View.GONE
     }
 
     private fun showComingSoon() {

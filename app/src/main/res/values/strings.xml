@@ -187,4 +187,9 @@
 
     <!-- v1.23 Barrel Aging Result -->
     <string name="bottler_result_angels_share">Barrel start volume</string>
+
+    <!-- v1.24 Export Strings -->
+    <string name="btn_export_pdf">PDF Document</string>
+    <string name="btn_export_tsv">Excel (.tsv)</string>
+    <string name="export_dialog_title">Export Batch Record</string>
 </resources>
