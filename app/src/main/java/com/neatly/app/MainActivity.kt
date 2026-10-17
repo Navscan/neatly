@@ -1477,7 +1477,6 @@ class MainActivity : AppCompatActivity() {
         if (finishedVolume == null || stock == null || target == null ||
             target >= stock || target <= 0.0 || stock <= 0.0 || finishedVolume <= 0.0) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1487,7 +1486,6 @@ class MainActivity : AppCompatActivity() {
             showBatchResults(result, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
         }
     }
@@ -1530,7 +1528,6 @@ class MainActivity : AppCompatActivity() {
         if (volume == null || source == null || target == null ||
             target >= source || target <= 0.0 || source <= 0.0 || volume <= 0.0) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1540,7 +1537,6 @@ class MainActivity : AppCompatActivity() {
             showReduceResults(result, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
         }
     }
@@ -1586,7 +1582,6 @@ class MainActivity : AppCompatActivity() {
         if (volA == null || abvA == null || volB == null || abvB == null ||
             volA <= 0.0 || volB <= 0.0 || abvA <= 0.0 || abvB <= 0.0) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1596,7 +1591,6 @@ class MainActivity : AppCompatActivity() {
             showCombineResults(result)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
         }
     }
@@ -1641,7 +1635,6 @@ class MainActivity : AppCompatActivity() {
         if (vol == null || target == null || a == null || b == null ||
             vol <= 0.0 || target <= 0.0 || a <= 0.0 || b <= 0.0) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1652,7 +1645,6 @@ class MainActivity : AppCompatActivity() {
 
         if (sAbv <= target || lAbv <= target || sAbv == lAbv) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1662,7 +1654,6 @@ class MainActivity : AppCompatActivity() {
                 val ratioPct = orderRatio.text?.toString()?.toDoubleOrNull() ?: 30.0
                 if (ratioPct <= 0.0 || ratioPct >= 100.0) {
                     resultsCard.visibility = View.GONE
-                    cutExportData = null
                     updateExportVisibility()
                     return
                 }
@@ -1673,7 +1664,6 @@ class MainActivity : AppCompatActivity() {
                 val capVol = readVolume(orderCapVolume)
                 if (capVol == null || capVol <= 0.0) {
                     resultsCard.visibility = View.GONE
-                    cutExportData = null
                     updateExportVisibility()
                     return
                 }
@@ -1684,7 +1674,6 @@ class MainActivity : AppCompatActivity() {
             showFromOrderResults(result, target, sAbv, lAbv, swapped)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
         }
     }
@@ -1743,7 +1732,6 @@ class MainActivity : AppCompatActivity() {
 
         if (abvA == null || abvB == null || target == null || batchSize == null) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1759,14 +1747,12 @@ class MainActivity : AppCompatActivity() {
             resultsGroupBottler.visibility = View.GONE
             resultsGroupFlavour.visibility = View.GONE
             resWarning.text = getString(R.string.msg_solve_out_of_range)
-            cutExportData = null
             updateExportVisibility()
             return
         }
 
         if (batchSize <= 0.0) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
             return
         }
@@ -1776,7 +1762,6 @@ class MainActivity : AppCompatActivity() {
             showSolveResults(result, abvA, abvB, target)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            cutExportData = null
             updateExportVisibility()
         }
     }
@@ -1848,7 +1833,6 @@ class MainActivity : AppCompatActivity() {
         if (bottleRaw == null || packRaw == null || casesRaw == null ||
             target == null || stock == null) {
             resultsCard.visibility = View.GONE
-            bottlerExportData = null
             updateExportVisibility()
             return
         }
@@ -1858,7 +1842,6 @@ class MainActivity : AppCompatActivity() {
         if (bottleMl <= 0.0 || packRaw <= 0 || casesRaw <= 0 ||
             target <= 0.0 || stock <= target) {
             resultsCard.visibility = View.GONE
-            bottlerExportData = null
             updateExportVisibility()
             return
         }
@@ -1882,7 +1865,6 @@ class MainActivity : AppCompatActivity() {
             showBottlerResults(result, target, stock)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            bottlerExportData = null
             updateExportVisibility()
         }
     }
@@ -1951,7 +1933,6 @@ class MainActivity : AppCompatActivity() {
         if (bottleRaw == null || packRaw == null || target == null ||
             stock == null || finishedVolume == null) {
             resultsCard.visibility = View.GONE
-            bottlerExportData = null
             updateExportVisibility()
             return
         }
@@ -1963,7 +1944,6 @@ class MainActivity : AppCompatActivity() {
         if (bottleLiters <= 0.0 || packRaw <= 0 || caseLiters <= 0.0 ||
             target <= 0.0 || stock <= target || finishedVolume <= 0.0) {
             resultsCard.visibility = View.GONE
-            bottlerExportData = null
             updateExportVisibility()
             return
         }
@@ -2046,7 +2026,6 @@ class MainActivity : AppCompatActivity() {
         if (firstValue == null || target == null || base == null ||
             firstValue <= 0.0 || target <= 0.0 || base <= 0.0) {
             resultsCard.visibility = View.GONE
-            enhancingExportData = null
             updateExportVisibility()
             return
         }
@@ -2070,7 +2049,6 @@ class MainActivity : AppCompatActivity() {
             showFlavourResults(result, target, base)
         } catch (_: IllegalArgumentException) {
             resultsCard.visibility = View.GONE
-            enhancingExportData = null
             updateExportVisibility()
         }
     }
