@@ -11,8 +11,8 @@ android {
         applicationId = "com.neatly.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 26
-        versionName = "1.24"
+        versionCode = 27
+        versionName = "1.25"
     }
 
     signingConfigs {
