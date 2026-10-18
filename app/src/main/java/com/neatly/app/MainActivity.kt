@@ -2053,6 +2053,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getAdditiveName(index: Int): String {
+        val name = flavourAddName[index].text?.toString()?.trim() ?: ""
+        return if (name.isBlank()) "Additive ${index + 1}" else name.replace(" ", "_")
+    }
+
     private fun showFlavourResults(
         result: SpiritsMath.FlavourResult,
         targetAbv: Double,
@@ -2092,9 +2097,9 @@ class MainActivity : AppCompatActivity() {
             "Enh_Mode" to if (enhBaseMode) "Base Volume" else "Finished Volume",
             "Enh_Base_Spirit" to formatVolume(result.baseSpiritLiters, baseAbv).toString(),
             "Enh_Water" to formatVolume(result.waterToAddLiters, 0.0).toString(),
-            "Enh_Add1" to formatVolume(result.additiveVolumesLiters.getOrElse(0) { 0.0 }, 0.0).toString(),
-            "Enh_Add2" to formatVolume(result.additiveVolumesLiters.getOrElse(1) { 0.0 }, 0.0).toString(),
-            "Enh_Add3" to formatVolume(result.additiveVolumesLiters.getOrElse(2) { 0.0 }, 0.0).toString(),
+            "Enh_${getAdditiveName(0)}" to formatVolume(result.additiveVolumesLiters.getOrElse(0) { 0.0 }, 0.0).toString(),
+            "Enh_${getAdditiveName(1)}" to formatVolume(result.additiveVolumesLiters.getOrElse(1) { 0.0 }, 0.0).toString(),
+            "Enh_${getAdditiveName(2)}" to formatVolume(result.additiveVolumesLiters.getOrElse(2) { 0.0 }, 0.0).toString(),
             "Enh_Pure_Alcohol" to formatVolume(result.pureAlcoholLiters, 100.0).toString(),
             "Enh_Total_Volume" to formatVolume(result.finalVolumeLiters, effectiveTarget).toString()
         )
@@ -2125,9 +2130,9 @@ class MainActivity : AppCompatActivity() {
         "Enh_Mode" to "None",
         "Enh_Base_Spirit" to "0.000 L",
         "Enh_Water" to "0.000 L",
-        "Enh_Add1" to "0.000 L",
-        "Enh_Add2" to "0.000 L",
-        "Enh_Add3" to "0.000 L",
+        "Enh_Additive_1" to "0.000 L",
+        "Enh_Additive_2" to "0.000 L",
+        "Enh_Additive_3" to "0.000 L",
         "Enh_Pure_Alcohol" to "0.000 L",
         "Enh_Total_Volume" to "0.000 L"
     )
