@@ -1,6 +1,7 @@
 package com.neatly.app
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -230,6 +232,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tabBottler: TextView
     private lateinit var tabFlavour: TextView
 
+    // Age Gate
+    private lateinit var ageGateOverlay: View
+    private lateinit var ageGateCheckbox: CheckBox
+    private lateinit var ageGateEnterButton: TextView
+    private lateinit var ageGateExitButton: TextView
+
     private var topTab = TopTab.CUT
     private var mode = Mode.BATCH
     private var isProofMode = false
@@ -273,6 +281,7 @@ class MainActivity : AppCompatActivity() {
         wirePushButtons()
         wireUpdateBanner()
         wireExportButtons()
+        checkAgeGate()
 
         updateToggleVisuals()
         updateUnitLabels()
@@ -288,6 +297,28 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (updateBanner.visibility != View.VISIBLE) {
             checkForUpdate()
+        }
+    }
+
+    private fun checkAgeGate() {
+        val prefs = getSharedPreferences("neatly_prefs", Context.MODE_PRIVATE)
+        val isVerified = prefs.getBoolean("isAgeVerified", false)
+
+        if (isVerified) {
+            ageGateOverlay.visibility = View.GONE
+        } else {
+            ageGateOverlay.visibility = View.VISIBLE
+            ageGateEnterButton.setOnClickListener {
+                if (ageGateCheckbox.isChecked) {
+                    prefs.edit().putBoolean("isAgeVerified", true).apply()
+                    ageGateOverlay.visibility = View.GONE
+                } else {
+                    Toast.makeText(this, R.string.age_gate_warning, Toast.LENGTH_SHORT).show()
+                }
+            }
+            ageGateExitButton.setOnClickListener {
+                finishAffinity()
+            }
         }
     }
 
@@ -497,6 +528,11 @@ class MainActivity : AppCompatActivity() {
         tabCut = findViewById(R.id.tabCut)
         tabBottler = findViewById(R.id.tabBottler)
         tabFlavour = findViewById(R.id.tabFlavour)
+
+        ageGateOverlay = findViewById(R.id.ageGateOverlay)
+        ageGateCheckbox = findViewById(R.id.ageGateCheckbox)
+        ageGateEnterButton = findViewById(R.id.ageGateEnterButton)
+        ageGateExitButton = findViewById(R.id.ageGateExitButton)
     }
 
     private fun buildWordmark() {
