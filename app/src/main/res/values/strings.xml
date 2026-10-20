@@ -152,4 +152,11 @@
     <string name="btn_export_pdf">PDF Document</string>
     <string name="btn_export_tsv">Excel (.tsv)</string>
     <string name="export_dialog_title">Export Batch Record</string>
+
+    <!-- Age Gate Strings -->
+    <string name="age_gate_message">Please confirm you are of legal drinking age in your jurisdiction to use this tool.</string>
+    <string name="age_gate_checkbox">I am of legal drinking age.</string>
+    <string name="age_gate_enter">ENTER NEATLY</string>
+    <string name="age_gate_exit">Exit</string>
+    <string name="age_gate_warning">You must confirm you are of legal drinking age.</string>
 </resources>
