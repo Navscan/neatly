@@ -15,7 +15,6 @@
 
     <string name="subtab_combine">Compounding</string>
     <string name="subtab_solve">Solve</string>
-    <string name="subtab_from_order">From Order</string>
 
     <string name="label_finished_volume">Target volume</string>
     <string name="label_stock_volume">Base volume</string>
@@ -87,7 +86,6 @@
     <string name="bottler_msg_surplus">Surplus: %1$s</string>
     <string name="bottler_msg_sufficient">Sufficient stock available.</string>
 
-    <!-- Enhancing tab -->
     <string name="flavour_additive_1">Additive 1</string>
     <string name="flavour_additive_2">Additive 2</string>
     <string name="flavour_additive_3">Additive 3</string>
@@ -107,29 +105,24 @@
     <string name="msg_flavour_incomplete">Enter finished volume, target, and base strength.</string>
     <string name="msg_flavour_target_exceeds_base">Target strength must be at or below base spirit strength.</string>
 
-    <!-- Mass mode (v1.15) -->
     <string name="unit_vol">VOL</string>
     <string name="unit_mass">MASS</string>
     <string name="unit_kg">kg</string>
     <string name="unit_lb">lb</string>
 
-    <!-- Mode hints (v1.16) -->
     <string name="hint_mode_formulate">Plan how much base spirit to draw to reach a target volume.</string>
     <string name="hint_mode_dilute">Dilute a known base volume to reach target strength.</string>
 
-    <!-- Enhancing mode toggle (v1.17) -->
     <string name="enh_mode_finished">Finished volume</string>
     <string name="enh_mode_base">Base volume</string>
     <string name="label_base_volume_enh">Base volume</string>
     <string name="hint_enh_finished">Specify finished volume. Base spirit is solved.</string>
     <string name="hint_enh_base">Specify base volume. Finished volume is solved.</string>
 
-    <!-- Push-forward chevrons (v1.17) -->
     <string name="cd_push_to_enhancing">Push to Enhancing</string>
     <string name="cd_push_to_dilute">Push to Dilute</string>
     <string name="push_arrow">→</string>
 
-    <!-- Bottler reverse mode (v1.18) -->
     <string name="bottler_mode_cases">Cases</string>
     <string name="bottler_mode_volume">Volume</string>
     <string name="bottler_label_finished_volume">Finished volume</string>
@@ -138,46 +131,15 @@
     <string name="bottler_result_residual">Residual</string>
     <string name="cd_push_to_bottler">Push to Bottler</string>
 
-    <!-- Compound From Order (v1.19) -->
-    <string name="order_mode_ratio">Ratio</string>
-    <string name="order_mode_cap">Cap</string>
-    <string name="label_order_volume">Order volume</string>
-    <string name="label_ratio_percent">Ratio (stronger %)</string>
-    <string name="label_cap_volume">Cap volume</string>
-    <string name="label_cap_on">Cap on</string>
-    <string name="order_cap_stronger">Stronger</string>
-    <string name="order_cap_lighter">Lighter</string>
-    <string name="result_compound_volume">Compound volume</string>
-    <string name="result_stronger_used">Stronger used</string>
-    <string name="result_lighter_used">Lighter used</string>
-    <string name="result_effective_ratio">Effective ratio</string>
-    <string name="hint_order_ratio">Set the stronger-stream share. Volumes are solved.</string>
-    <string name="hint_order_cap">Fix one stream at its cap. The other is solved.</string>
-    <string name="msg_order_strengths_swapped">Note: entered strengths were reordered. Higher value treated as stronger.</string>
-
-    <!-- Compound compliance (v1.22) -->
     <string name="product_brandy">BRANDY</string>
     <string name="product_whisky">WHISKY</string>
     <string name="product_rum">RUM</string>
     <string name="product_vodka">VODKA</string>
 
-    <string name="result_lowest_proof">Lowest proof</string>
-    <string name="result_highest_proof">Highest proof</string>
-    <string name="label_minimum_required">Minimum required</string>
-
-    <string name="cd_compliance_info">Compliance information</string>
-    <string name="dialog_compliance_title">Base spirit minimum</string>
-    <string name="dialog_compliance_body">Some jurisdictions require a minimum percentage of base spirit in the bottle. The lowest proof row shows that percentage. Adjust the Minimum required field to match your market. The app compares and notes; it does not enforce.</string>
-    <string name="msg_below_minimum">Below %1$s minimum.</string>
-
-    <!-- Bottler volume mode additions (v1.22.2) -->
     <string name="bottler_result_total_bottled">Total bottled</string>
 
-    <!-- v1.23 Dynamic Labels for MASS mode -->
     <string name="label_finished_volume_mass">Target mass</string>
     <string name="label_batch_size_mass">Total mass</string>
-    <string name="label_order_mass">Order mass</string>
-    <string name="label_cap_mass">Cap mass</string>
     <string name="label_stock_volume_mass">Base mass</string>
     <string name="label_base_volume_enh_mass">Base mass</string>
     <string name="enh_mode_finished_mass">Finished mass</string>
@@ -185,10 +147,8 @@
     <string name="bottler_label_finished_mass">Finished mass</string>
     <string name="bottler_mode_mass">Mass</string>
 
-    <!-- v1.23 Barrel Aging Result -->
     <string name="bottler_result_angels_share">Barrel start volume</string>
 
-    <!-- v1.24 Export Strings -->
     <string name="btn_export_pdf">PDF Document</string>
     <string name="btn_export_tsv">Excel (.tsv)</string>
     <string name="export_dialog_title">Export Batch Record</string>

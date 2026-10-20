@@ -352,18 +352,6 @@
                         android:textColor="@color/ink_muted"
                         android:fontFamily="sans-serif-medium"
                         android:letterSpacing="0.03" />
-
-                    <TextView
-                        android:id="@+id/subFromOrder"
-                        android:layout_width="0dp"
-                        android:layout_height="30dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="@string/subtab_from_order"
-                        android:textSize="11sp"
-                        android:textColor="@color/ink_muted"
-                        android:fontFamily="sans-serif-medium"
-                        android:letterSpacing="0.03" />
                 </LinearLayout>
 
                 <TextView
@@ -862,486 +850,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/unit_liters"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- From Order group -->
-
-                <LinearLayout
-                    android:id="@+id/groupFromOrder"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:background="@drawable/pill_container"
-                        android:padding="3dp"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:id="@+id/orderModeRatio"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="@string/order_mode_ratio"
-                            android:textSize="11sp"
-                            android:textColor="@color/on_accent"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.03"
-                            android:background="@drawable/pill_active" />
-
-                        <TextView
-                            android:id="@+id/orderModeCap"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:text="@string/order_mode_cap"
-                            android:textSize="11sp"
-                            android:textColor="@color/ink_muted"
-                            android:fontFamily="sans-serif-medium"
-                            android:letterSpacing="0.03" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/orderModeHint"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="12sp"
-                        android:textColor="@color/ink_light"
-                        android:letterSpacing="0.02"
-                        android:layout_marginBottom="20dp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:id="@+id/labelOrderVolume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_order_volume"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_muted"
-                            android:letterSpacing="0.02" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderVolume"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:id="@+id/unitOrderVolume"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/unit_liters"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_target_strength"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_muted"
-                            android:letterSpacing="0.02" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderTargetAbv"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:id="@+id/unitOrderTargetStrength"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/unit_abv"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_stronger_strength"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_muted"
-                            android:letterSpacing="0.02" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderStrongerAbv"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:id="@+id/unitOrderStronger"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/unit_abv"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginBottom="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_lighter_strength"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_muted"
-                            android:letterSpacing="0.02" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderLighterAbv"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:id="@+id/unitOrderLighter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/unit_abv"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/orderRatioGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_ratio_percent"
-                            android:textSize="13sp"
-                            android:textColor="@color/ink_muted"
-                            android:letterSpacing="0.02" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderRatio"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="%"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/orderCapGroup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="4dp">
-
-                            <TextView
-                                android:id="@+id/labelCapVolume"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/label_cap_volume"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_muted"
-                                android:letterSpacing="0.02" />
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:background="@drawable/pill_container"
-                                android:padding="2dp">
-
-                                <TextView
-                                    android:id="@+id/orderCapStronger"
-                                    android:layout_width="80dp"
-                                    android:layout_height="24dp"
-                                    android:gravity="center"
-                                    android:text="@string/order_cap_stronger"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/on_accent"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:letterSpacing="0.03"
-                                    android:background="@drawable/pill_active" />
-
-                                <TextView
-                                    android:id="@+id/orderCapLighter"
-                                    android:layout_width="80dp"
-                                    android:layout_height="24dp"
-                                    android:gravity="center"
-                                    android:text="@string/order_cap_lighter"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/ink_muted"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:letterSpacing="0.03" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderCapVolume"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:id="@+id/unitOrderCapVolume"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/unit_liters"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_light"
-                                android:letterSpacing="0.04"
-                                android:paddingBottom="10dp" />
-                        </LinearLayout>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="@color/border_strong" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginTop="20dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="4dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/label_minimum_required"
-                                android:textSize="13sp"
-                                android:textColor="@color/ink_muted"
-                                android:letterSpacing="0.02" />
-
-                            <TextView
-                                android:id="@+id/orderComplianceInfo"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="(!)"
-                                android:textSize="14sp"
-                                android:textColor="@color/ink_muted"
-                                android:paddingStart="8dp"
-                                android:paddingEnd="2dp"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:contentDescription="@string/cd_compliance_info" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="bottom">
-
-                            <EditText
-                                android:id="@+id/orderMinimumRequired"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textSize="28sp"
-                                android:textColor="@color/ink"
-                                android:fontFamily="@font/playfair_display"
-                                android:background="@null"
-                                android:paddingTop="4dp"
-                                android:paddingBottom="6dp"
-                                android:inputType="numberDecimal"
-                                android:importantForAutofill="no"
-                                android:hint="0" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="%"
                                 android:textSize="13sp"
                                 android:textColor="@color/ink_light"
                                 android:letterSpacing="0.04"
@@ -3010,7 +2518,8 @@
                             android:id="@+id/resWater"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3041,7 +2550,8 @@
                             android:id="@+id/resFinalVol"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
 
@@ -3097,7 +2607,8 @@
                             android:id="@+id/resPureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3133,7 +2644,8 @@
                                 android:id="@+id/resContraction"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -3169,7 +2681,8 @@
                             android:id="@+id/combPooledVol"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
 
@@ -3225,7 +2738,8 @@
                             android:id="@+id/combPooledAbv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
 
@@ -3268,7 +2782,8 @@
                             android:id="@+id/combPureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3304,268 +2819,11 @@
                                 android:id="@+id/combContraction"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- From Order results -->
-
-                <LinearLayout
-                    android:id="@+id/resultsGroupFromOrder"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_compound_volume"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderCompoundVolume"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_stronger_used"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderStrongerUsed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_lighter_used"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderLighterUsed"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_lowest_proof"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderLowestProof"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_highest_proof"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderHighestProof"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_water_to_add"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderWaterAdd"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-
-                        <TextView
-                            android:id="@+id/pushOrderToBottlerVol"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/push_arrow"
-                            android:textSize="20sp"
-                            android:textColor="@color/ink_muted"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="4dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:contentDescription="@string/cd_push_to_bottler" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_pure_alcohol"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderPureAlc"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/border" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingTop="14dp"
-                        android:paddingBottom="14dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/result_total"
-                            android:textSize="15sp"
-                            android:textColor="@color/ink_muted" />
-
-                        <TextView
-                            android:id="@+id/orderFinalTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="24sp"
-                            android:textColor="@color/ink"
-                            android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -3598,7 +2856,8 @@
                             android:id="@+id/solveSampleA"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3628,7 +2887,8 @@
                             android:id="@+id/solveSampleB"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3658,7 +2918,8 @@
                             android:id="@+id/solvePureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3688,7 +2949,8 @@
                             android:id="@+id/solveFinalTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -3731,7 +2993,8 @@
                                 android:id="@+id/bottlerOrderVolume"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -3761,7 +3024,8 @@
                                 android:id="@+id/bottlerWithWastage"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
 
@@ -3804,7 +3068,8 @@
                                 android:id="@+id/bottlerStockCharge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
 
@@ -3847,7 +3112,8 @@
                                 android:id="@+id/bottlerWaterAdd"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -3883,7 +3149,8 @@
                                     android:id="@+id/bottlerContraction"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="24sp"
+                                    android:maxLines="1"
+                                    android:textSize="20sp"
                                     android:textColor="@color/ink"
                                     android:fontFamily="@font/playfair_display" />
                             </LinearLayout>
@@ -3921,7 +3188,8 @@
                                     android:id="@+id/bottlerAngelsShare"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="24sp"
+                                    android:maxLines="1"
+                                    android:textSize="20sp"
                                     android:textColor="@color/ink"
                                     android:fontFamily="@font/playfair_display" />
                             </LinearLayout>
@@ -3957,7 +3225,8 @@
                                 android:id="@+id/bottlerWholeCases"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -3987,7 +3256,8 @@
                                 android:id="@+id/bottlerWholeBottles"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -4017,7 +3287,8 @@
                                 android:id="@+id/bottlerResidual"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -4047,7 +3318,8 @@
                                 android:id="@+id/bottlerTotalBottled"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
+                                android:maxLines="1"
+                                android:textSize="20sp"
                                 android:textColor="@color/ink"
                                 android:fontFamily="@font/playfair_display" />
                         </LinearLayout>
@@ -4083,7 +3355,8 @@
                             android:id="@+id/flavBaseSpirit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
 
@@ -4126,7 +3399,8 @@
                             android:id="@+id/flavWaterAdd"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -4157,7 +3431,8 @@
                             android:id="@+id/flavAdd1Vol"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -4188,7 +3463,8 @@
                             android:id="@+id/flavAdd2Vol"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -4219,7 +3495,8 @@
                             android:id="@+id/flavAdd3Vol"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -4249,7 +3526,8 @@
                             android:id="@+id/flavPureAlc"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
                     </LinearLayout>
@@ -4279,7 +3557,8 @@
                             android:id="@+id/flavFinalTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24sp"
+                            android:maxLines="1"
+                            android:textSize="20sp"
                             android:textColor="@color/ink"
                             android:fontFamily="@font/playfair_display" />
 
