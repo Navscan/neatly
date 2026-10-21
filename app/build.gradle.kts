@@ -11,7 +11,7 @@ android {
         applicationId = "com.neatly.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 33
+        versionCode = 35
         versionName = "1.30"
     }
 
