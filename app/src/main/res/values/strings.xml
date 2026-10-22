@@ -70,21 +70,10 @@
     <string name="bottler_label_bottle_size">Bottle size</string>
     <string name="bottler_label_pack_size">Pack size</string>
     <string name="bottler_label_cases">Cases</string>
-    <string name="bottler_label_available_stock">Available stock (optional)</string>
     <string name="bottler_label_wastage">Wastage</string>
-    <string name="bottler_label_angels_share">Include barrel aging</string>
-    <string name="bottler_label_years_barrel">Years in barrel</string>
-    <string name="bottler_label_annual_loss">Annual loss</string>
 
     <string name="bottler_result_order_requires">Order requires</string>
     <string name="bottler_result_with_wastage">With wastage</string>
-    <string name="bottler_result_stock_to_charge">Base spirit needed</string>
-    <string name="bottler_result_water_to_add">Water to add</string>
-    <string name="bottler_result_contraction">Contraction</string>
-
-    <string name="bottler_msg_shortfall">Shortfall: %1$s</string>
-    <string name="bottler_msg_surplus">Surplus: %1$s</string>
-    <string name="bottler_msg_sufficient">Sufficient stock available.</string>
 
     <string name="flavour_additive_1">Additive 1</string>
     <string name="flavour_additive_2">Additive 2</string>
@@ -146,8 +135,6 @@
     <string name="enh_mode_base_mass">Base mass</string>
     <string name="bottler_label_finished_mass">Finished mass</string>
     <string name="bottler_mode_mass">Mass</string>
-
-    <string name="bottler_result_angels_share">Barrel start volume</string>
 
     <string name="btn_export_pdf">PDF Document</string>
     <string name="btn_export_tsv">Excel (.tsv)</string>

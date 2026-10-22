@@ -1,8 +1,5 @@
 package com.neatly.app
 
-/**
- * Spirits dilution and blending math engine.
- */
 object SpiritsMath {
 
     private const val C0 = 61.223438
@@ -190,62 +187,6 @@ object SpiritsMath {
             sampleVolumeA = sampleVolumeA,
             sampleVolumeB = sampleVolumeB,
             pureAlcoholLiters = pureAlcohol
-        )
-    }
-
-    data class BottlerResult(
-        val orderVolumeLiters: Double,
-        val withWastageLiters: Double,
-        val stockToChargeLiters: Double,
-        val waterToAddLiters: Double,
-        val pureAlcoholLiters: Double,
-        val contractionLiters: Double,
-        val angelsShareStartVolume: Double
-    )
-
-    fun calculateBottler(
-        bottleVolumeMl: Double,
-        packSize: Int,
-        caseCount: Int,
-        targetAbv: Double,
-        stockAbv: Double,
-        wastagePercent: Double,
-        angelsShareEnabled: Boolean,
-        yearsInBarrel: Double,
-        annualLossPercent: Double
-    ): BottlerResult {
-        require(bottleVolumeMl > 0.0) { "Bottle size must be greater than zero." }
-        require(packSize > 0) { "Pack size must be greater than zero." }
-        require(caseCount > 0) { "Case count must be greater than zero." }
-        require(targetAbv > 0.0) { "Target strength must be greater than zero." }
-        require(stockAbv > targetAbv) { "Stock strength must be higher than target strength." }
-        require(wastagePercent >= 0.0) { "Wastage cannot be negative." }
-
-        val orderVolumeLiters = (bottleVolumeMl / 1000.0) * packSize * caseCount
-        val wastageMultiplier = 1.0 + (wastagePercent / 100.0)
-        val withWastage = orderVolumeLiters * wastageMultiplier
-        val stockToCharge = withWastage * (targetAbv / stockAbv)
-        val waterPer100 = waterPer100L(stockAbv, targetAbv)
-        val waterToAdd = (stockToCharge / 100.0) * waterPer100
-        val pureAlcohol = stockToCharge * (stockAbv / 100.0)
-        val apparentVolume = stockToCharge + waterToAdd
-        val contraction = apparentVolume - withWastage
-
-        val angelsShareStartVolume = if (angelsShareEnabled && yearsInBarrel > 0.0 && annualLossPercent > 0.0) {
-            val retention = Math.pow(1.0 - (annualLossPercent / 100.0), yearsInBarrel)
-            if (retention > 0.0) stockToCharge / retention else stockToCharge
-        } else {
-            stockToCharge
-        }
-
-        return BottlerResult(
-            orderVolumeLiters = orderVolumeLiters,
-            withWastageLiters = withWastage,
-            stockToChargeLiters = stockToCharge,
-            waterToAddLiters = waterToAdd,
-            pureAlcoholLiters = pureAlcohol,
-            contractionLiters = contraction,
-            angelsShareStartVolume = angelsShareStartVolume
         )
     }
 
