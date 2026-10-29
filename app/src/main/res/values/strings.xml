@@ -148,8 +148,8 @@
     <string name="age_gate_warning">You must confirm you are of legal drinking age.</string>
 
     <!-- FlipStack Integration -->
-    <string name="flipstack_app_id" translatable="false">YOUR_APP_ID_HERE</string>
-    <string name="paystack_public_key" translatable="false">pk_test_YOUR_PAYSTACK_KEY</string>
+    <string name="flipstack_app_id" translatable="false">neatly--830e</string>
+    <string name="paystack_public_key" translatable="false">pk_test_17226a396e33c225ac22a3d7c57a4318713d4019</string>
     
     <!-- Pro / Paywall Strings -->
     <string name="pro_upgrade_title">Upgrade to Neatly Pro</string>
