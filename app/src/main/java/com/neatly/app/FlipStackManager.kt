@@ -2,9 +2,6 @@ package com.neatly.app
 
 import android.content.Context
 import android.util.Log
-import co.paystack.android.PaystackSdk
-import co.paystack.android.model.Card
-import co.paystack.android.ui.payments.Pop
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
