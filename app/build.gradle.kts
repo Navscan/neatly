@@ -11,8 +11,8 @@ android {
         applicationId = "com.neatly.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 38
-        versionName = "1.33"
+        versionCode = 39
+        versionName = "1.34"
     }
 
     signingConfigs {
@@ -55,5 +55,5 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("co.paystack.android:paystack:3.1.2")
+    implementation("co.paystack.android:paystack:3.1.4")
 }
