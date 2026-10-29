@@ -22,10 +22,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
-import co.paystack.android.PaystackSdk
-import co.paystack.android.model.Card
-import co.paystack.android.ui.payments.Pop
 import com.google.android.material.card.MaterialCardView
+import com.paystack.android.core.Paystack
+import com.paystack.android.ui.paymentsheet.PaymentSheet
+import com.paystack.android.ui.paymentsheet.PaymentSheetResult
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private enum class Product { BRANDY, WHISKY, RUM, VODKA }
 
     private var isPro = false
+    private lateinit var paymentSheet: PaymentSheet
 
     // Cut inputs
     private lateinit var sourceVolume: EditText
@@ -250,9 +251,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize Paystack
-        PaystackSdk.initialize(applicationContext)
-        PaystackSdk.setPublicKey(getString(R.string.paystack_public_key))
+        // Initialize Paystack UI
+        Paystack.builder()
+            .setPublicKey(getString(R.string.paystack_public_key))
+            .build()
+
+        // Initialize the PaymentSheet
+        paymentSheet = PaymentSheet(this, ::paymentComplete)
 
         bindViews()
         buildWordmark()
@@ -296,6 +301,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun paymentComplete(paymentSheetResult: PaymentSheetResult) {
+        when (paymentSheetResult) {
+            is PaymentSheetResult.Completed -> {
+                Toast.makeText(this, R.string.pro_success, Toast.LENGTH_LONG).show()
+                // Re-check entitlement to unlock the app
+                FlipStackManager.checkEntitlement(this) { pro ->
+                    isPro = pro
+                    updateProUI()
+                }
+            }
+            is PaymentSheetResult.Cancelled -> {
+                Toast.makeText(this, R.string.pro_error, Toast.LENGTH_SHORT).show()
+            }
+            is PaymentSheetResult.Failed -> {
+                Toast.makeText(this, paymentSheetResult.error.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     private fun checkAgeGate() {
         val prefs = getSharedPreferences("neatly_prefs", Context.MODE_PRIVATE)
         val isVerified = prefs.getBoolean("isAgeVerified", false)
@@ -327,7 +351,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun wireProBadges() {
-        // Intercept clicks on Pro features if not Pro
         tabBottler.setOnClickListener {
             if (isPro) setTopTab(TopTab.BOTTLER) else showUpgradeDialog()
         }
@@ -341,7 +364,6 @@ class MainActivity : AppCompatActivity() {
             if (isPro) setMode(Mode.BLEND_COMBINE) else showUpgradeDialog()
         }
         
-        // Export buttons
         btnExportPdf.setOnClickListener {
             if (isPro) exportPdf() else showUpgradeDialog()
         }
@@ -367,15 +389,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUpgradeDialog() {
-        val dialog = AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
             .setTitle(R.string.pro_upgrade_title)
             .setMessage(R.string.pro_upgrade_message)
             .setPositiveButton(R.string.pro_upgrade_button) { _, _ ->
                 promptForEmail()
             }
             .setNegativeButton(android.R.string.cancel, null)
-            .create()
-        dialog.show()
+            .show()
     }
 
     private fun promptForEmail() {
@@ -406,10 +427,8 @@ class MainActivity : AppCompatActivity() {
             email = email,
             onSuccess = { accessCode ->
                 runOnUiThread {
-                    // Launch Paystack Native Modal
-                    PaystackSdk.setPublicKey(getString(R.string.paystack_public_key))
-                    // In Paystack SDK, Pop.checkout requires email, amount (can be 0 if using access code), and accessCode
-                    Pop.checkout(this, email, accessCode)
+                    // Launch Paystack UI PaymentSheet
+                    paymentSheet.present(accessCode)
                 }
             },
             onError = { error ->
@@ -421,7 +440,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
-        // ... (Keep all original bindings, added new ones below)
+        // ... (Keep all original bindings, unchanged)
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
@@ -948,8 +967,6 @@ class MainActivity : AppCompatActivity() {
     private fun wireTopTabs() {
         tabCut.setOnClickListener { setTopTab(TopTab.CUT) }
         // Pro gating handled in wireProBadges
-        // tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
-        // tabFlavour.setOnClickListener { setTopTab(TopTab.FLAVOUR) }
     }
 
     private fun setTopTab(tab: TopTab) {
@@ -970,9 +987,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun wireSubTabs() {
         // Pro gating handled in wireProBadges
-        // subBatch.setOnClickListener { setMode(Mode.BATCH) }
         subReduce.setOnClickListener { setMode(Mode.REDUCE) }
-        // subBlend.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subCombine.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subSolve.setOnClickListener { setMode(Mode.BLEND_SOLVE) }
     }
