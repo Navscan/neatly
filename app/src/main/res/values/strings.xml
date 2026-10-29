@@ -146,4 +146,16 @@
     <string name="age_gate_enter">ENTER NEATLY</string>
     <string name="age_gate_exit">Exit</string>
     <string name="age_gate_warning">You must confirm you are of legal drinking age.</string>
+
+    <!-- FlipStack Integration -->
+    <string name="flipstack_app_id" translatable="false">YOUR_APP_ID_HERE</string>
+    <string name="paystack_public_key" translatable="false">pk_test_YOUR_PAYSTACK_KEY</string>
+    
+    <!-- Pro / Paywall Strings -->
+    <string name="pro_upgrade_title">Upgrade to Neatly Pro</string>
+    <string name="pro_upgrade_message">Unlock the full distillery workflow: Formulate, Blend, Bottler, Enhancing, and Exports.</string>
+    <string name="pro_upgrade_button">Upgrade Now</string>
+    <string name="pro_email_prompt">Enter your email for the receipt</string>
+    <string name="pro_success">Welcome to Neatly Pro!</string>
+    <string name="pro_error">Payment failed or cancelled.</string>
 </resources>

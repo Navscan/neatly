@@ -22,6 +22,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
+import co.paystack.android.PaystackSdk
+import co.paystack.android.model.Card
+import co.paystack.android.ui.payments.Pop
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -33,6 +36,8 @@ class MainActivity : AppCompatActivity() {
     private enum class TopTab { CUT, BOTTLER, FLAVOUR }
     private enum class Mode { BATCH, REDUCE, BLEND_COMBINE, BLEND_SOLVE }
     private enum class Product { BRANDY, WHISKY, RUM, VODKA }
+
+    private var isPro = false
 
     // Cut inputs
     private lateinit var sourceVolume: EditText
@@ -245,6 +250,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Initialize Paystack
+        PaystackSdk.initialize(applicationContext)
+        PaystackSdk.setPublicKey(getString(R.string.paystack_public_key))
+
         bindViews()
         buildWordmark()
         populateFooter()
@@ -262,6 +271,7 @@ class MainActivity : AppCompatActivity() {
         wirePushButtons()
         wireUpdateBanner()
         wireExportButtons()
+        wireProBadges()
         checkAgeGate()
 
         updateToggleVisuals()
@@ -279,6 +289,11 @@ class MainActivity : AppCompatActivity() {
         if (updateBanner.visibility != View.VISIBLE) {
             checkForUpdate()
         }
+        // Check entitlement on resume (in case they just purchased)
+        FlipStackManager.checkEntitlement(this) { pro ->
+            isPro = pro
+            updateProUI()
+        }
     }
 
     private fun checkAgeGate() {
@@ -287,12 +302,20 @@ class MainActivity : AppCompatActivity() {
 
         if (isVerified) {
             ageGateOverlay.visibility = View.GONE
+            FlipStackManager.checkEntitlement(this) { pro ->
+                isPro = pro
+                updateProUI()
+            }
         } else {
             ageGateOverlay.visibility = View.VISIBLE
             ageGateEnterButton.setOnClickListener {
                 if (ageGateCheckbox.isChecked) {
                     prefs.edit().putBoolean("isAgeVerified", true).apply()
                     ageGateOverlay.visibility = View.GONE
+                    FlipStackManager.checkEntitlement(this) { pro ->
+                        isPro = pro
+                        updateProUI()
+                    }
                 } else {
                     Toast.makeText(this, R.string.age_gate_warning, Toast.LENGTH_SHORT).show()
                 }
@@ -303,7 +326,102 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun wireProBadges() {
+        // Intercept clicks on Pro features if not Pro
+        tabBottler.setOnClickListener {
+            if (isPro) setTopTab(TopTab.BOTTLER) else showUpgradeDialog()
+        }
+        tabFlavour.setOnClickListener {
+            if (isPro) setTopTab(TopTab.FLAVOUR) else showUpgradeDialog()
+        }
+        subBatch.setOnClickListener {
+            if (isPro) setMode(Mode.BATCH) else showUpgradeDialog()
+        }
+        subBlend.setOnClickListener {
+            if (isPro) setMode(Mode.BLEND_COMBINE) else showUpgradeDialog()
+        }
+        
+        // Export buttons
+        btnExportPdf.setOnClickListener {
+            if (isPro) exportPdf() else showUpgradeDialog()
+        }
+        btnExportTsv.setOnClickListener {
+            if (isPro) exportTsv() else showUpgradeDialog()
+        }
+    }
+
+    private fun updateProUI() {
+        runOnUiThread {
+            if (isPro) {
+                tabBottler.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                tabFlavour.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                subBatch.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+                subBlend.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            } else {
+                tabBottler.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_crown, 0)
+                tabFlavour.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_crown, 0)
+                subBatch.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_crown, 0)
+                subBlend.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_crown, 0)
+            }
+        }
+    }
+
+    private fun showUpgradeDialog() {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.pro_upgrade_title)
+            .setMessage(R.string.pro_upgrade_message)
+            .setPositiveButton(R.string.pro_upgrade_button) { _, _ ->
+                promptForEmail()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.show()
+    }
+
+    private fun promptForEmail() {
+        val input = EditText(this)
+        input.hint = "Email Address"
+        val padding = (16 * resources.displayMetrics.density).toInt()
+        input.setPadding(padding, padding, padding, padding)
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.pro_upgrade_title)
+            .setMessage(R.string.pro_email_prompt)
+            .setView(input)
+            .setPositiveButton("Continue") { _, _ ->
+                val email = input.text.toString().trim()
+                if (email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    startCheckout(email)
+                } else {
+                    Toast.makeText(this, "Invalid email", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun startCheckout(email: String) {
+        FlipStackManager.initiateCheckout(
+            context = this,
+            email = email,
+            onSuccess = { accessCode ->
+                runOnUiThread {
+                    // Launch Paystack Native Modal
+                    PaystackSdk.setPublicKey(getString(R.string.paystack_public_key))
+                    // In Paystack SDK, Pop.checkout requires email, amount (can be 0 if using access code), and accessCode
+                    Pop.checkout(this, email, accessCode)
+                }
+            },
+            onError = { error ->
+                runOnUiThread {
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                }
+            }
+        )
+    }
+
     private fun bindViews() {
+        // ... (Keep all original bindings, added new ones below)
         sourceVolume = findViewById(R.id.sourceVolume)
         sourceAbv = findViewById(R.id.sourceAbv)
         targetAbv = findViewById(R.id.targetAbv)
@@ -496,6 +614,22 @@ class MainActivity : AppCompatActivity() {
         ageGateCheckbox = findViewById(R.id.ageGateCheckbox)
         ageGateEnterButton = findViewById(R.id.ageGateEnterButton)
         ageGateExitButton = findViewById(R.id.ageGateExitButton)
+    }
+
+    private fun exportPdf() {
+        val data = mutableMapOf<String, Map<String, String>>()
+        data["Cut"] = cutExportData ?: defaultCutData
+        data["Bottler"] = bottlerExportData ?: defaultBottlerData
+        data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
+        ExportManager.exportPdf(this, data)
+    }
+
+    private fun exportTsv() {
+        val data = mutableMapOf<String, Map<String, String>>()
+        data["Cut"] = cutExportData ?: defaultCutData
+        data["Bottler"] = bottlerExportData ?: defaultBottlerData
+        data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
+        ExportManager.exportTsv(this, data)
     }
 
     private fun buildWordmark() {
@@ -715,7 +849,7 @@ class MainActivity : AppCompatActivity() {
             compAVolume -> readStrength(compAStrength) ?: 40.0
             compBVolume -> readStrength(compBStrength) ?: 40.0
             solveBatchSize -> readStrength(targetAbv) ?: 40.0
-            bottlerFinishedVolume -> 40.0 // Pure volume, so density doesn't strictly matter, but we use a default
+            bottlerFinishedVolume -> 40.0
             flavourFinishedVolume -> if (enhBaseMode) {
                 readStrength(flavourBaseAbv) ?: 40.0
             } else {
@@ -813,8 +947,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun wireTopTabs() {
         tabCut.setOnClickListener { setTopTab(TopTab.CUT) }
-        tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
-        tabFlavour.setOnClickListener { setTopTab(TopTab.FLAVOUR) }
+        // Pro gating handled in wireProBadges
+        // tabBottler.setOnClickListener { setTopTab(TopTab.BOTTLER) }
+        // tabFlavour.setOnClickListener { setTopTab(TopTab.FLAVOUR) }
     }
 
     private fun setTopTab(tab: TopTab) {
@@ -834,9 +969,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun wireSubTabs() {
-        subBatch.setOnClickListener { setMode(Mode.BATCH) }
+        // Pro gating handled in wireProBadges
+        // subBatch.setOnClickListener { setMode(Mode.BATCH) }
         subReduce.setOnClickListener { setMode(Mode.REDUCE) }
-        subBlend.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
+        // subBlend.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subCombine.setOnClickListener { setMode(Mode.BLEND_COMBINE) }
         subSolve.setOnClickListener { setMode(Mode.BLEND_SOLVE) }
     }
@@ -917,18 +1053,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun wireBottlerPresets() {
-        bottlerPresetGlobal.setOnClickListener {
-            applyBottlerPreset(750.0, "12", bottlerPresetGlobal)
-        }
-        bottlerPresetEu.setOnClickListener {
-            applyBottlerPreset(700.0, "6", bottlerPresetEu)
-        }
-        bottlerPresetUs.setOnClickListener {
-            applyBottlerPreset(750.0, "12", bottlerPresetUs)
-        }
-        bottlerPresetRsa.setOnClickListener {
-            applyBottlerPreset(750.0, "12", bottlerPresetRsa)
-        }
+        bottlerPresetGlobal.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetGlobal) }
+        bottlerPresetEu.setOnClickListener { applyBottlerPreset(700.0, "6", bottlerPresetEu) }
+        bottlerPresetUs.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetUs) }
+        bottlerPresetRsa.setOnClickListener { applyBottlerPreset(750.0, "12", bottlerPresetRsa) }
     }
 
     private fun applyBottlerPreset(bottleMl: Double, packSize: String, selected: TextView) {
@@ -1009,7 +1137,6 @@ class MainActivity : AppCompatActivity() {
         pushDiluteFinalToBottlerVol.setOnClickListener { pushToBottler(resFinalVol) }
         pushCombineVolToBottlerVol.setOnClickListener { pushToBottler(combPooledVol) }
         pushFlavHeadlineToBottlerVol.setOnClickListener { pushToBottler(flavFinalTotal) }
-        
         pushBottlerWastageToCutVol.setOnClickListener { pushBottlerToFormulate() }
     }
 
@@ -1705,20 +1832,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     private fun wireExportButtons() {
-        btnExportPdf.setOnClickListener {
-            val data = mutableMapOf<String, Map<String, String>>()
-            data["Cut"] = cutExportData ?: defaultCutData
-            data["Bottler"] = bottlerExportData ?: defaultBottlerData
-            data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
-            ExportManager.exportPdf(this, data)
-        }
-        btnExportTsv.setOnClickListener {
-            val data = mutableMapOf<String, Map<String, String>>()
-            data["Cut"] = cutExportData ?: defaultCutData
-            data["Bottler"] = bottlerExportData ?: defaultBottlerData
-            data["Enhancing"] = enhancingExportData ?: defaultEnhancingData
-            ExportManager.exportTsv(this, data)
-        }
+        // Handled in wireProBadges
     }
 
     private fun updateExportVisibility() {
