@@ -428,7 +428,7 @@ class MainActivity : AppCompatActivity() {
             onSuccess = { accessCode ->
                 runOnUiThread {
                     // Launch Paystack UI PaymentSheet
-                    paymentSheet.presentWithAccessCode(accessCode)
+                    paymentSheet.launch(accessCode)
                 }
             },
             onError = { error ->
