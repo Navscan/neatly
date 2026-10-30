@@ -1,74 +1,44 @@
 package com.neatly.app
 
 import android.content.Context
-import android.util.Log
+import android.provider.Settings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.UUID
 
 object FlipStackManager {
-    private const val PREFS = "flipstack_prefs"
-    private const val KEY_USER_ID = "user_id"
-    private const val KEY_TIER = "tier"
+
+    private const val APP_ID = "neatly--830e"
     private const val BASE_URL = "https://api.flipstack.store/api"
 
-    fun getUserId(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        var userId = prefs.getString(KEY_USER_ID, null)
+    private fun getUserId(context: Context): String {
+        val prefs = context.getSharedPreferences("flipstack_prefs", Context.MODE_PRIVATE)
+        var userId = prefs.getString("flipstack_user_id", null)
         if (userId == null) {
-            userId = UUID.randomUUID().toString()
-            prefs.edit().putString(KEY_USER_ID, userId).apply()
+            val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            userId = "neatly_user_$androidId"
+            prefs.edit().putString("flipstack_user_id", userId).apply()
         }
         return userId
     }
 
-    fun getCachedTier(context: Context): String {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_TIER, "free") ?: "free"
-    }
-
-    fun checkEntitlement(context: Context, callback: (Boolean) -> Unit) {
-        Thread {
+    fun initiateCheckout(
+        context: Context,
+        email: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val userId = getUserId(context)
+        
+        CoroutineScope(Dispatchers.IO).launch {
             try {
-                val appId = context.getString(R.string.flipstack_app_id)
-                val userId = getUserId(context)
-                val url = URL("$BASE_URL/entitlement?app_id=$appId&user_id=$userId")
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "GET"
-                conn.connectTimeout = 8000
-                conn.readTimeout = 8000
-
-                if (conn.responseCode == 200) {
-                    val reader = BufferedReader(InputStreamReader(conn.inputStream))
-                    val response = reader.readText()
-                    reader.close()
-                    
-                    val json = JSONObject(response)
-                    val tier = json.optString("tier", "free")
-                    
-                    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                    prefs.edit().putString(KEY_TIER, tier).apply()
-                    
-                    callback(tier == "pro")
-                } else {
-                    callback(getCachedTier(context) == "pro")
-                }
-            } catch (e: Exception) {
-                Log.e("FlipStack", "Entitlement check failed", e)
-                callback(getCachedTier(context) == "pro")
-            }
-        }.start()
-    }
-
-    fun initiateCheckout(context: Context, email: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        Thread {
-            try {
-                val appId = context.getString(R.string.flipstack_app_id)
-                val userId = getUserId(context)
                 val url = URL("$BASE_URL/checkout/initiate")
                 val conn = url.openConnection() as HttpURLConnection
                 conn.requestMethod = "POST"
@@ -76,35 +46,86 @@ object FlipStackManager {
                 conn.doOutput = true
 
                 val payload = JSONObject().apply {
-                    put("app_id", appId)
+                    put("app_id", APP_ID)
                     put("email", email)
                     put("user_id", userId)
                 }
 
-                val os = OutputStreamWriter(conn.outputStream)
-                os.write(payload.toString())
-                os.flush()
-                os.close()
+                val os = conn.outputStream
+                val writer = OutputStreamWriter(os, "UTF-8")
+                writer.write(payload.toString())
+                writer.flush()
+                writer.close()
 
-                if (conn.responseCode == 200) {
+                val responseCode = conn.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                     val reader = BufferedReader(InputStreamReader(conn.inputStream))
-                    val response = reader.readText()
+                    val response = StringBuilder()
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        response.append(line)
+                    }
                     reader.close()
+
+                    val jsonResponse = JSONObject(response.toString())
+                    val accessCode = jsonResponse.optString("access_code")
                     
-                    val json = JSONObject(response)
-                    if (json.optBoolean("success")) {
-                        val accessCode = json.optString("access_code")
-                        onSuccess(accessCode)
-                    } else {
-                        onError("Checkout initiation failed.")
+                    withContext(Dispatchers.Main) {
+                        if (accessCode.isNotEmpty()) {
+                            onSuccess(accessCode)
+                        } else {
+                            onError("Failed to parse access code from FlipStack.")
+                        }
                     }
                 } else {
-                    onError("Server error: ${conn.responseCode}")
+                    withContext(Dispatchers.Main) {
+                        onError("Checkout initialization failed. HTTP $responseCode")
+                    }
                 }
             } catch (e: Exception) {
-                Log.e("FlipStack", "Checkout failed", e)
-                onError(e.message ?: "Unknown error")
+                withContext(Dispatchers.Main) {
+                    onError("Network error: ${e.message}")
+                }
             }
-        }.start()
+        }
+    }
+
+    fun checkEntitlement(context: Context, callback: (Boolean) -> Unit) {
+        val userId = getUserId(context)
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Assuming standard entitlement check endpoint based on BYOK patterns
+                val url = URL("$BASE_URL/entitlements/check?app_id=$APP_ID&user_id=$userId")
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "GET"
+
+                val responseCode = conn.responseCode
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    val reader = BufferedReader(InputStreamReader(conn.inputStream))
+                    val response = StringBuilder()
+                    var line: String?
+                    while (reader.readLine().also { line = it } != null) {
+                        response.append(line)
+                    }
+                    reader.close()
+
+                    val jsonResponse = JSONObject(response.toString())
+                    val isPro = jsonResponse.optBoolean("is_pro", false)
+                    
+                    withContext(Dispatchers.Main) {
+                        callback(isPro)
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        callback(false)
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    callback(false)
+                }
+            }
+        }
     }
 }
